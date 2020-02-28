@@ -51,7 +51,9 @@ public class QuizAnswer {
             Collections.shuffle(quizQuestions);
         }
 
-        quizQuestions.forEach(quizQuestion -> new QuestionAnswer(this, quizQuestion, quizQuestion.getSequence()));
+        for (int i = 0; i < quizQuestions.size(); i++) {
+            new QuestionAnswer(this, quizQuestions.get(i), i);
+        }
     }
 
     public void remove() {
