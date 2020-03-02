@@ -4,7 +4,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import spock.lang.Specification
 
 @DataJpaTest
-class CreateQuestionStudent extends Specification {
+class getQuestionStatus extends Specification {
 
     def "get status of approved question"(){
         //should return a list with the status, as well as the teacher that approved it
