@@ -1,4 +1,4 @@
-//package pt.ulisboa.tecnico.socialsoftware.tutor.question.service
+package pt.ulisboa.tecnico.socialsoftware.tutor.question.service
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import spock.lang.Specification
@@ -8,10 +8,10 @@ class StudentCreateSubmitQuestionTest extends Specification {
 
     def questionService
 
-    /*def setup() {
+    def setup() {
         questionService = new QuestionService()
     }
-*/
+
     def "the course and topic exist and title and body of text is valid "() {
         // the question is created or submited
         expect: false
