@@ -15,9 +15,9 @@ public class Tournament {
     public Tournament(){}
 
     public Tournament(Date s, Date e, User u, List<Topic> t){
-        start = s;
-        end = e;
-        creator = u;
-        topics = t;
+        this.start = s;
+        this.end = e;
+        this.creator = u;
+        this.topics = t;
     }
 }
