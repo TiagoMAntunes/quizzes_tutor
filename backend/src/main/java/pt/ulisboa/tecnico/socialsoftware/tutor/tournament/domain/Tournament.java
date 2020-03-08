@@ -97,4 +97,8 @@ public class Tournament {
     public int getNumberOfQuestions() {
         return numberOfQuestions;
     }
+
+    public Course getCourse() { return course; }
+
+    public void setCourse(Course course) { this.course = course; }
 }
