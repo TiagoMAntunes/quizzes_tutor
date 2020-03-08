@@ -52,6 +52,7 @@ public enum ErrorMessage {
     AUTHENTICATION_ERROR("Authentication Error"),
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
+    CANT_ADD_EXPLANATION("Question is not in the rejected state"),
 
     ACCESS_DENIED("You do not have permission to view this resource");
 
