@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.service
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import spock.lang.Specification
 
 @DataJpaTest
