@@ -6,7 +6,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
@@ -70,21 +69,21 @@ public class TournamentService {
             t.addTournament(tournament);
         
         courseExecution.addTournament(tournament);
+        tournament.setCourseExecution(courseExecution);
 
         entityManager.persist(tournament);
         return new TournamentDto(tournament);
     }
 
-    public List<TournamentDto> getOpenTournaments(Course course){
+    public List<Tournament> getOpenTournaments(CourseExecution courseExecution){
         LocalDateTime now = LocalDateTime.now();
 
         return tournamentRepository.findAll().stream()
-                .filter(tournament -> tournament.getCourse().getId() == course.getId())
+                .filter(tournament -> tournament.getCourseExecution().getId() == courseExecution.getId())
                 .filter(tournament -> tournament.getStartTime().isBefore(now))
                 .filter(tournament -> tournament.getFinishTime().isAfter(now))
                 .sorted(comparing(Tournament::getStartTime).reversed())
-                .map(TournamentDto::new).collect(Collectors.toList());
-
+                .collect(Collectors.toList());
     }
 
 

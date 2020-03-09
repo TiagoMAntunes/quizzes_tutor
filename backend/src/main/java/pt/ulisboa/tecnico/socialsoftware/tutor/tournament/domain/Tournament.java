@@ -1,15 +1,9 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 
-<<<<<<< HEAD
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
-=======
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
->>>>>>> 2800fbdedde5dd542ec11964dee1f1adedcad9ab
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 
 import javax.persistence.*;
@@ -53,6 +47,8 @@ public class Tournament {
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
     private List<Topic> topics = new ArrayList<>();
+
+    public Tournament(){}
 
     public Tournament(TournamentDto tournamentDto, List<Topic> topic) {
         this.id = tournamentDto.getId();
