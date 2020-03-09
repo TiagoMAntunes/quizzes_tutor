@@ -10,6 +10,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import static java.util.Comparator.*;
 
 @Service
@@ -46,13 +46,13 @@ public class TournamentService {
         value = {SQLException.class },
         backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto createTournament(TournamentDto tournamentDto) {
+    public TournamentDto createTournament(TournamentDto tournamentDto, CourseExecution courseExecution) {
         if (tournamentDto.getKey() == null)
             tournamentDto.setKey(getMaxTournamentKey() + 1);
 
-        Set<Topic> topics_set = tournamentDto.getTopics().stream().map(topicDto -> topicRepository.findById(topicDto.getId()).orElseThrow()).collect(Collectors.toSet());
+        Set<Topic> topicsSet = tournamentDto.getTopics().stream().map(topicDto -> topicRepository.findById(topicDto.getId()).orElseThrow()).collect(Collectors.toSet());
 
-        List<Topic> topics = new ArrayList<>(topics_set);
+        List<Topic> topics = new ArrayList<>(topicsSet);
 
         if (topics.size() == 0)
             throw new TutorException(ErrorMessage.NO_TOPICS_SELECTED);
@@ -65,6 +65,11 @@ public class TournamentService {
             throw new TutorException(ErrorMessage.INVALID_TOURNAMENT_TIME);
         else if (tournament.getFinishTime().isBefore(LocalDateTime.now()))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_FINISHED);
+
+        for (Topic t : topics) 
+            t.addTournament(tournament);
+        
+        courseExecution.addTournament(tournament);
 
         entityManager.persist(tournament);
         return new TournamentDto(tournament);

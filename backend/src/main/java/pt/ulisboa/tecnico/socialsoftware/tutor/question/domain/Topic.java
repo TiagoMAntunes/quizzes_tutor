@@ -38,7 +38,7 @@ public class Topic {
     private Course course;
 
     @ManyToMany
-    private List<Tournament> tournament;
+    private List<Tournament> tournaments = new ArrayList<>();
 
     public Topic() {
     }
@@ -141,5 +141,13 @@ public class Topic {
 
         this.parentTopic = null;
         this.childrenTopics.clear();
+    }
+
+    public List<Tournament> getTournaments() { 
+        return tournaments; 
+    }
+
+    public void addTournament(Tournament tournament) { 
+        tournaments.add(tournament); 
     }
 }

@@ -5,11 +5,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicConjunctionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
@@ -19,7 +20,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -30,6 +30,7 @@ class CreateTournamentTest extends Specification {
     public static final int TOURNAMENT_ID = 1
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_NAME = "Software Architecture"
+    public static final String COURSE_ABREV = "ES1"
 
 
     @Autowired
@@ -47,11 +48,15 @@ class CreateTournamentTest extends Specification {
     @Autowired
     CourseRepository courseRepository
 
+    @Autowired
+    CourseExecutionRepository courseExecutionRepository
+
     def formatter
     def NOW_TIME
     def FINISH_TIME
     def TOPIC_LIST
     def course
+    def courseExecution
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -67,6 +72,9 @@ class CreateTournamentTest extends Specification {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
+        //Creates a course execution
+        courseExecution = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
+        courseExecutionRepository.save(courseExecution)
 
         //Creates a topic
         def topic = new Topic()
@@ -92,10 +100,9 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setCreatorId(userId)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentDto.setCourse(course)
 
         when:
-        tournamentService.createTournament(tournamentDto)
+        tournamentService.createTournament(tournamentDto, courseExecution)
 
         then:
         tournamentRepository.count() == 1L
@@ -107,6 +114,9 @@ class CreateTournamentTest extends Specification {
         result.getCreatorID() == userId
         result.getTopics().size() == 1
         result.getNumberOfQuestions() == NUMBER_QUESTIONS
+
+        courseExecutionRepository.findAll().get(0).getTournaments().size() == 1
+        topicRepository.findAll().get(0).getTournaments().size() == 1
     }
 
     def "the tournament is created with a start time after finish time"() {
@@ -122,7 +132,7 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
         when:
-        tournamentService.createTournament(tournamentDto)
+        tournamentService.createTournament(tournamentDto, courseExecution)
 
         then:
         def exception = thrown(TutorException)
@@ -138,13 +148,12 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setCreatorId(userId)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentDto.setCourse(course)
 
         tournamentDto.setStartTime(LocalDateTime.now().minusDays(3).format(formatter))
         tournamentDto.setFinishTime(LocalDateTime.now().minusDays(1).format(formatter))
 
         when:
-        tournamentService.createTournament(tournamentDto)
+        tournamentService.createTournament(tournamentDto, courseExecution)
 
         then:
         def exception = thrown(TutorException)
@@ -162,14 +171,13 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setCreatorId(userId)
 
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentDto.setCourse(course)
 
 
         List<Topic> lst = new ArrayList<>();
         tournamentDto.setTopics(lst)
 
         when:
-        tournamentService.createTournament(tournamentDto)
+        tournamentService.createTournament(tournamentDto, courseExecution)
 
         then:
         def exception = thrown(TutorException)
@@ -186,12 +194,11 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setFinishTime(FINISH_TIME)
         tournamentDto.setCreatorId(userId)
         tournamentDto.setTopics(TOPIC_LIST)
-        tournamentDto.setCourse(course)
 
         tournamentDto.setNumberOfQuestions(0)
 
         when:
-        tournamentService.createTournament(tournamentDto)
+        tournamentService.createTournament(tournamentDto, courseExecution)
 
         then:
         def exception = thrown(TutorException)
@@ -209,8 +216,6 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setCreatorId(userId)
 
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentDto.setCourse(course)
-
 
         def topic = new Topic()
         topic.setName(TOPIC_NAME)
@@ -228,7 +233,7 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setTopics(topicList)
 
         when:
-        tournamentService.createTournament(tournamentDto)
+        tournamentService.createTournament(tournamentDto, courseExecution)
 
         then:
         tournamentRepository.count() == 1L

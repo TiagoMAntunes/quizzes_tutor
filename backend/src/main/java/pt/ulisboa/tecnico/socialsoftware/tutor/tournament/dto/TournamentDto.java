@@ -1,8 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
 import org.springframework.data.annotation.Transient;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
@@ -20,8 +18,6 @@ public class TournamentDto implements Serializable {
     private Integer creatorId;
     private Integer numberOfQuestions;
     private List<TopicDto> topics;
-    private Course course;
-
 
     @Transient
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -41,8 +37,6 @@ public class TournamentDto implements Serializable {
             this.finishTime= tournament.getFinishTime().format(formatter);
 
         this.topics = tournament.getTopics().stream().map(TopicDto::new).collect(Collectors.toList());
-
-        this.course = tournament.getCourse();
     }
 
     public void setId(int id) { this.id = id; }
@@ -73,7 +67,4 @@ public class TournamentDto implements Serializable {
 
     public List<TopicDto> getTopics() { return topics; }
 
-    public Course getCourse() { return course; }
-
-    public void setCourse(Course c) { course = c; }
 }

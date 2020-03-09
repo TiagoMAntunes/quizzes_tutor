@@ -1,7 +1,12 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 
+<<<<<<< HEAD
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+=======
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+>>>>>>> 2800fbdedde5dd542ec11964dee1f1adedcad9ab
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 
@@ -44,9 +49,9 @@ public class Tournament {
     private Integer numberOfQuestions;
 
     @ManyToOne
-    private Course course;
+    private CourseExecution courseExecution;
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournament", fetch=FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
     private List<Topic> topics = new ArrayList<>();
 
     public Tournament(TournamentDto tournamentDto, List<Topic> topic) {
@@ -56,7 +61,6 @@ public class Tournament {
         this.finishTime = LocalDateTime.parse(tournamentDto.getFinishTime(), formatter);
         this.creatorId = tournamentDto.getCreatorId();
         this.numberOfQuestions = tournamentDto.getNumberOfQuestions();
-        this.course = tournamentDto.getCourse();
         this.topics = topic;
     }
 
@@ -98,7 +102,11 @@ public class Tournament {
         return numberOfQuestions;
     }
 
-    public Course getCourse() { return course; }
+    public CourseExecution getCourseExecution() { 
+        return courseExecution;
+    }
 
-    public void setCourse(Course course) { this.course = course; }
+    public void setCourseExecution(CourseExecution c) {
+        courseExecution = c;
+    }
 }
