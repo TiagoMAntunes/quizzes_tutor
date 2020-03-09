@@ -8,6 +8,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
@@ -104,10 +106,10 @@ class CancelTournamentTest extends Specification {
 
         def tournamentId = tournamentRepository.findAll().get(0).getId()
 
-        when:
+        when: "cancel tournament"
         tournamentService.cancelTournament(tournamentId, userId)
 
-        then:
+        then: "tournament is canceled"
         tournamentRepository.count() == 0L
         courseExecutionRepository.findAll().get(0).getTournaments().size() == 0
         topicRepository.findAll().get(0).getTournaments().size() == 0
@@ -128,9 +130,11 @@ class CancelTournamentTest extends Specification {
         def tournamentId = tournamentRepository.findAll().get(0).getId()
 
         when: "not the creater tries to cancel"
-        tournamentService.cancelTournament(tournamentId, userId)
+        tournamentService.cancelTournament(tournamentId, userId+100)
 
-        then:
+        then: "tournament not canceled"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_THE_CREATER
         tournamentRepository.count() == 1L
         courseExecutionRepository.findAll().get(0).getTournaments().size() == 1
         topicRepository.findAll().get(0).getTournaments().size() == 1
@@ -153,7 +157,9 @@ class CancelTournamentTest extends Specification {
         when: "tries to cancel"
         tournamentService.cancelTournament(tournamentId, userId)
 
-        then:
+        then: "tournament not canceled"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_HAS_STARTED
         tournamentRepository.count() == 1L
         courseExecutionRepository.findAll().get(0).getTournaments().size() == 1
         topicRepository.findAll().get(0).getTournaments().size() == 1

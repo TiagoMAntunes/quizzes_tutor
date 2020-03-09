@@ -2,9 +2,9 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 
@@ -12,7 +12,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(
@@ -106,5 +108,16 @@ public class Tournament {
         courseExecution = c;
     }
 
+    public void cancel() {
+        if (startTime.isBefore(LocalDateTime.now())) throw new TutorException(ErrorMessage.TOURNAMENT_HAS_STARTED);
 
+        Set<Topic> topics = new HashSet<>(getTopics());
+
+        topics.forEach(topic -> topic.getTournaments().remove(this));
+
+        topics.clear();
+
+        courseExecution.getTournaments().remove(this);
+        courseExecution = null;
+    }
 }

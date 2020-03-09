@@ -25,6 +25,7 @@ import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -70,7 +71,8 @@ public class TournamentService {
 
         for (Topic t : topics) 
             t.addTournament(tournament);
-        
+
+        tournament.setCourseExecution(courseExecution);
         courseExecution.addTournament(tournament);
 
         entityManager.persist(tournament);
@@ -82,7 +84,13 @@ public class TournamentService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void cancelTournament(Integer tournamentId, Integer userId) {
-        // TODO cancel tournament
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
+
+        if (tournament.getCreatorID() != userId) throw new TutorException(ErrorMessage.TOURNAMENT_NOT_THE_CREATER);
+
+        tournament.cancel();
+
+        entityManager.remove(tournament);
     }
 
 

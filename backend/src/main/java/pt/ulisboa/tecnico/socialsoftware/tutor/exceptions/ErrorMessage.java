@@ -52,11 +52,13 @@ public enum ErrorMessage {
     AUTHENTICATION_ERROR("Authentication Error"),
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
-
     INVALID_TOURNAMENT_TIME("Start time of a tournament must be before finish time"),
     TOURNAMENT_ALREADY_FINISHED("Finish time of a tournament must be after the time of creation"),
     NO_TOPICS_SELECTED("Tournament requires at least one topic to be valid"),
     TOURNAMENT_HAS_NO_QUESTIONS("Tournament requires at least 1 question"),
+    TOURNAMENT_HAS_STARTED("Can only cancel a tournament before it has started"),
+    TOURNAMENT_NOT_FOUND("Tournament not found with id %d"),
+    TOURNAMENT_NOT_THE_CREATER("Only the tournament creater can cancel"),
 
     ACCESS_DENIED("You do not have permission to view this resource");
 
