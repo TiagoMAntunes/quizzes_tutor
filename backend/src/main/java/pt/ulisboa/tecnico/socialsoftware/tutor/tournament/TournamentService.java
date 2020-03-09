@@ -80,7 +80,6 @@ public class TournamentService {
 
         return tournamentRepository.findAll().stream()
                 .filter(tournament -> tournament.getCourseExecution().getId() == courseExecution.getId())
-                .filter(tournament -> tournament.getStartTime().isBefore(now))
                 .filter(tournament -> tournament.getFinishTime().isAfter(now))
                 .sorted(comparing(Tournament::getStartTime).reversed())
                 .collect(Collectors.toList());

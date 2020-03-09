@@ -127,15 +127,6 @@ class GetOpenTournamentsTest extends Specification {
 
         openTournament1 = tournamentDto
 
-        //Creates a not yet open tournament
-        def tournamentDto2 = new TournamentDto()
-        tournamentDto2.setStartTime(THREE_DAYS_LATER)
-        tournamentDto2.setFinishTime(FIVE_DAYS_LATER)
-        tournamentDto2.setCreatorId(CREATOR_ID)
-        tournamentDto2.setTopics(TOPIC_LIST)
-        tournamentDto2.setNumberOfQuestions(NUMBER_QUESTIONS)
-
-        notOpenTournament = tournamentDto2
 
         //Creates an open tournament for a different course
         def course3 = courseExecutionRepository.findAll().get(1)
@@ -172,8 +163,11 @@ class GetOpenTournamentsTest extends Specification {
     }
 
     def "no open tournaments"(){
-        given:"a tournament that is not yet open"
-        tournamentService.createTournament(notOpenTournament, COURSE_EXEC)
+        given:"a tournament that is already closed"
+        tournamentService.createTournament(openTournament2, COURSE_EXEC)
+        def result = tournamentRepository.findAll().get(0)
+        result.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
+        tournamentRepository.save(result)
 
         when:
         def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC)
@@ -187,7 +181,7 @@ class GetOpenTournamentsTest extends Specification {
         tournamentService.createTournament(diffCourseTournament, DIFF_COURSE_EXEC)
 
         when:
-        def tournaments = tournamentService.getOpenTournaments(DIFF_COURSE_EXEC)
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC)
 
         then:
         tournaments.size() == 0
@@ -202,11 +196,6 @@ class GetOpenTournamentsTest extends Specification {
 
         then:
         tournaments.size() == 1
-        tournaments.get(0).getStartTime().format(formatter) == THREE_DAYS_EARLIER
-        tournaments.get(0).getFinishTime().format(formatter) == THREE_DAYS_LATER
-        tournaments.get(0).getCreatorID() == CREATOR_ID
-        tournaments.get(0).getNumberOfQuestions() == NUMBER_QUESTIONS
-        tournaments.get(0).getCourseExecution().getId() == COURSE_EXEC_ID
 
 
         def topics = tournaments.get(0).getTopics()
@@ -230,28 +219,13 @@ class GetOpenTournamentsTest extends Specification {
 
         tournaments.get(0).getStartTime().format(formatter) == TWO_DAYS_EARLIER
         tournaments.get(0).getFinishTime().format(formatter) == THREE_DAYS_LATER
-        tournaments.get(0).getCreatorID() == CREATOR_ID
-        tournaments.get(0).getNumberOfQuestions() == NUMBER_QUESTIONS
-        tournaments.get(0).getCourseExecution().getId() == COURSE_EXEC_ID
 
         tournaments.get(1).getStartTime().format(formatter) == THREE_DAYS_EARLIER
         tournaments.get(1).getFinishTime().format(formatter) == THREE_DAYS_LATER
-        tournaments.get(1).getCreatorID() == CREATOR_ID
-        tournaments.get(1).getNumberOfQuestions() == NUMBER_QUESTIONS
-        tournaments.get(1).getCourseExecution().getId() == COURSE_EXEC_ID
 
         tournaments.get(2).getStartTime().format(formatter) == FIVE_DAYS_EARLIER
         tournaments.get(2).getFinishTime().format(formatter) == THREE_DAYS_LATER
-        tournaments.get(2).getCreatorID() == CREATOR_ID
-        tournaments.get(2).getNumberOfQuestions() == NUMBER_QUESTIONS
-        tournaments.get(2).getCourseExecution().getId() == COURSE_EXEC_ID
 
-        for(int i=0; i<3; i++) {
-            def topics = tournaments.get(i).getTopics()
-            for (int j = 0; j < topics.size(); j++) {
-                topics.get(j) == (TOPIC_LIST.get(j))
-            }
-        }
 
     }
 
