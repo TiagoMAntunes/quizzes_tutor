@@ -34,7 +34,7 @@ public class Course {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "course", fetch=FetchType.LAZY, orphanRemoval=true)
     private Set<Topic> topics = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course", fetch = FetchType.LAZY, orphanRemoval=true)
     private List<Tournament> tournaments = new ArrayList<>();
 
     public Course() {}

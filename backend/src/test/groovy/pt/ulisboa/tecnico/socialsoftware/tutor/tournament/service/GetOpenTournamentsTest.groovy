@@ -214,17 +214,8 @@ class GetOpenTournamentsTest extends Specification {
         when:
         def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC)
 
-        then:"returns the 3 tournaments, sorted by start date (most recent to least)"
+        then:"returns the 3 tournaments"
         tournaments.size() == 3
-
-        tournaments.get(0).getStartTime().format(formatter) == TWO_DAYS_EARLIER
-        tournaments.get(0).getFinishTime().format(formatter) == THREE_DAYS_LATER
-
-        tournaments.get(1).getStartTime().format(formatter) == THREE_DAYS_EARLIER
-        tournaments.get(1).getFinishTime().format(formatter) == THREE_DAYS_LATER
-
-        tournaments.get(2).getStartTime().format(formatter) == FIVE_DAYS_EARLIER
-        tournaments.get(2).getFinishTime().format(formatter) == THREE_DAYS_LATER
 
 
     }
