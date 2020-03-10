@@ -53,7 +53,8 @@ public enum ErrorMessage {
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
 
-    ACCESS_DENIED("You do not have permission to view this resource");
+    ACCESS_DENIED("You do not have permission to view this resource"),
+    NO_QUESTION_SUBMITTED("The user hasn't submitted any questions yet"),
 
     public final String label;
 
