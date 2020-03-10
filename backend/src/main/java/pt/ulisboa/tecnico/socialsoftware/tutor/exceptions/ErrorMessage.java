@@ -51,6 +51,7 @@ public enum ErrorMessage {
     FENIX_ERROR("Fenix Error"),
     AUTHENTICATION_ERROR("Authentication Error"),
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
+    USER_MISSING_DATA("Missing information for the creating of a student question"),
 
 
     ACCESS_DENIED("You do not have permission to view this resource");
