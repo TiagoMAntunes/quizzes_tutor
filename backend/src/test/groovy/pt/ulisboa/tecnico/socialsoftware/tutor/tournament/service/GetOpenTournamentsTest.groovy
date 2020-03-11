@@ -166,7 +166,6 @@ class GetOpenTournamentsTest extends Specification {
         tournamentService.createTournament(openTournament2, COURSE_EXEC)
         def result = tournamentRepository.findAll().get(0)
         result.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
-        tournamentRepository.save(result)
 
         when:
         def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC)
