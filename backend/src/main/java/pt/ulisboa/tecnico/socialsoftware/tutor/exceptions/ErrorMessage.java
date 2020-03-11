@@ -53,6 +53,11 @@ public enum ErrorMessage {
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
 
+    INVALID_TOURNAMENT_TIME("Start time of a tournament must be before finish time"),
+    TOURNAMENT_ALREADY_FINISHED("Finish time of a tournament must be after the time of creation"),
+    NO_TOPICS_SELECTED("Tournament requires at least one topic to be valid"),
+    TOURNAMENT_HAS_NO_QUESTIONS("Tournament requires at least 1 question"),
+
     ACCESS_DENIED("You do not have permission to view this resource");
 
     public final String label;
