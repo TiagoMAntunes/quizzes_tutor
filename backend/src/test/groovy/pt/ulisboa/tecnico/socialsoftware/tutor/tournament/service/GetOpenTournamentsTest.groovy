@@ -168,7 +168,7 @@ class GetOpenTournamentsTest extends Specification {
         result.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
 
         when:
-        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC)
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
 
         then:
         tournaments.size() == 0
@@ -179,7 +179,7 @@ class GetOpenTournamentsTest extends Specification {
         tournamentService.createTournament(diffCourseTournament, DIFF_COURSE_EXEC)
 
         when:
-        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC)
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
 
         then:
         tournaments.size() == 0
@@ -190,16 +190,10 @@ class GetOpenTournamentsTest extends Specification {
         tournamentService.createTournament(openTournament1, COURSE_EXEC)
 
         when:
-        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC)
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
 
         then:
         tournaments.size() == 1
-
-
-        def topics = tournaments.get(0).getTopics()
-        for(int i=0; i<topics.size(); i++){
-            topics.get(i) == (TOPIC_LIST.get(i))
-        }
 
     }
 
@@ -210,7 +204,7 @@ class GetOpenTournamentsTest extends Specification {
         tournamentService.createTournament(openTournament3, COURSE_EXEC)
 
         when:
-        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC)
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
 
         then:"returns the 3 tournaments"
         tournaments.size() == 3

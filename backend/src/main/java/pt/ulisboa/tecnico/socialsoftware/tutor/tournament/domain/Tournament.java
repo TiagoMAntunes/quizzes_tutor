@@ -1,7 +1,5 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
-
-
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;

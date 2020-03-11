@@ -14,6 +14,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
@@ -61,6 +62,7 @@ class TournamentSignUpTest extends Specification {
     def COURSE_EXEC
     def COURSE_EXEC_ID
     def USER
+    def USER_ID
     def openTournament1
 
     def setup() {
@@ -77,6 +79,7 @@ class TournamentSignUpTest extends Specification {
         user.setKey(1)
         userRepository.save(user)
         USER = userRepository.findAll().get(0)
+        USER_ID = USER.getId()
 
         //Creates a course
         def course1 = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -126,7 +129,7 @@ class TournamentSignUpTest extends Specification {
         def tournament = tournamentRepository.findAll().get(0)
 
         when:
-        tournamentService.joinTournament(tournament, COURSE_EXEC, USER)
+        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, USER_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -141,26 +144,57 @@ class TournamentSignUpTest extends Specification {
         def tournament = tournamentRepository.findAll().get(0)
 
         when:
-        tournamentService.joinTournament(tournament, COURSE_EXEC, USER)
+        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, USER_ID)
 
         then:
         tournament.hasSignedUp(USER)
         USER.hasTournament(tournament)
-
     }
 
     def "tournament is open and student has already signed up for it"(){
         given:"an open tournament that the student has already joined"
         tournamentService.createTournament(openTournament1, COURSE_EXEC)
         def tournament = tournamentRepository.findAll().get(0)
-        tournamentService.joinTournament(tournament, COURSE_EXEC, USER)
+        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, USER_ID)
 
         when:
-        tournamentService.joinTournament(tournament, COURSE_EXEC, USER)
+        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, USER_ID)
 
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_ALREADY_JOINED
+    }
+
+    def "no user with the given id"(){
+        given:"an unused user id"
+        tournamentService.createTournament(openTournament1, COURSE_EXEC)
+        def tournament = tournamentRepository.findAll().get(0)
+        def userId = 1
+        def user = new User()
+        user.setId(userId)
+
+        when:
+        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, userId)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
+        !tournament.hasSignedUp(user)
+    }
+
+    def "no tournament with the given id"(){
+        given:"an unused tournament id"
+        def tournamentId = 1
+        def tournament = new Tournament();
+        tournament.setId(tournamentId)
+
+        when:
+        tournamentService.joinTournament(tournamentId, COURSE_EXEC_ID, USER_ID)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
+        !USER.hasTournament(tournament)
     }
 
     @TestConfiguration

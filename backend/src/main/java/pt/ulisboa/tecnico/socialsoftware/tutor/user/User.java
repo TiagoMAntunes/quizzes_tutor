@@ -449,7 +449,7 @@ public class User implements UserDetails, Importable {
         tournaments.add(tournament);
     }
 
-    public boolean hasTournament(Tournament tournament){
+    public boolean hasTournament(Tournament tournament) {
         return tournaments.contains(tournament);
     }
 }

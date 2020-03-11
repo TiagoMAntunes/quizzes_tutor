@@ -75,26 +75,53 @@ public class TournamentService {
         return new TournamentDto(tournament);
     }
 
-    public List<Tournament> getOpenTournaments(CourseExecution courseExecution){
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<TournamentDto> getOpenTournaments(Integer courseExecutionId){
         return tournamentRepository.findAll().stream()
-                .filter(tournament -> tournamentIsOpen(tournament, courseExecution))
+                .filter(tournament -> tournamentIsOpen(tournament.getId(), courseExecutionId))
+                .map(TournamentDto::new)
                 .collect(Collectors.toList());
     }
 
-    public boolean tournamentIsOpen(Tournament tournament, CourseExecution courseExecution){
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public boolean tournamentIsOpen(Integer tournamentId, Integer courseExecutionId){
         LocalDateTime now = LocalDateTime.now();
-        return (tournament.getCourseExecution().getId().equals(courseExecution.getId())) &&
+        Tournament tournament = getTournament(tournamentId);
+        return (tournament.getCourseExecution().getId().equals(courseExecutionId)) &&
                 tournament.getFinishTime().isAfter(now);
     }
 
-    public void joinTournament(Tournament tournament,CourseExecution courseExecution ,User user){
-        if(!tournamentIsOpen(tournament, courseExecution))
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void joinTournament(Integer tournamentId, Integer courseExecutionId, Integer userId){
+        Tournament tournament = getTournament(tournamentId);
+        User user = getUser(userId);
+
+        if(!tournamentIsOpen(tournamentId, courseExecutionId))
             throw new TutorException(ErrorMessage.TOURNAMENT_NOT_OPEN);
-        else if(tournament.hasSignedUp(user))
+
+        if(tournament.hasSignedUp(user))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_JOINED);
 
         tournament.signUp(user);
         user.addTournament(tournament);
+    }
+
+    private User getUser(Integer userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
+    }
+
+    private Tournament getTournament(Integer tournamentId) {
+        return tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
     }
 
 
