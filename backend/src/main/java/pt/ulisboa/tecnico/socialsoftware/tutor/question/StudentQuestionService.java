@@ -13,7 +13,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import javax.persistence.EntityManager;
@@ -24,13 +26,16 @@ import java.time.LocalDateTime;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.COURSE_NOT_FOUND;
 
 @Service
-public class StudentQuestionService extends QuestionService{
+public class StudentQuestionService {
 
     @Autowired
     private CourseRepository courseRepository;
 
     @Autowired
-    private QuestionRepository questionRepository;
+    private UserRepository userRepository;
+
+    @Autowired
+    private StudentQuestionRepository studentQuestionRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -39,20 +44,12 @@ public class StudentQuestionService extends QuestionService{
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public StudentQuestionDto createStudentQuestion(Course course, QuestionDto questionDto, UserDto student){
-        //courseRepository.findById(course.getId()).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, course.getId()));
-        //topic empty blannk doesnt exit
-        // topic doesnt in course
-        //title already exists
-        if (questionDto.getKey() == null) {
-            int maxQuestionNumber = questionRepository.getMaxQuestionNumber() != null ?
-                    questionRepository.getMaxQuestionNumber() : 0;
-            questionDto.setKey(maxQuestionNumber + 1);
-        }
-
+    public StudentQuestionDto createStudentQuestion(int courseId, QuestionDto questionDto, int studentId){
+        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
         StudentQuestion studentQuestion = new StudentQuestion(course, questionDto, student);
         studentQuestion.setCreationDate(LocalDateTime.now());
-        //this.entityManager.persist(studentQuestion);
+        this.entityManager.persist(studentQuestion);
 
         return new StudentQuestionDto(studentQuestion);
     }

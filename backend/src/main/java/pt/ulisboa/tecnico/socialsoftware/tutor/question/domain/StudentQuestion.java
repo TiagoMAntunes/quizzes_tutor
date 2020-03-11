@@ -15,12 +15,9 @@ import javax.persistence.*;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
-
 @Table(
-        name = "studentQuestions",
-        indexes = {
-                @Index(name = "studentQuestion_indx_0", columnList = "keyStu")
-        })
+        name = "studentQuestions"
+)
 
 public class StudentQuestion extends Question {
 
@@ -28,33 +25,28 @@ public class StudentQuestion extends Question {
         APPROVED, REJECTED, PENDING
     }
 
-    @Column(unique=true, nullable = false)
-    private Integer keyStu;
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
+
 
     @Enumerated(EnumType.STRING)
     private QuestionStatus questionStatus = QuestionStatus.PENDING;
 
     public StudentQuestion(){
-
+        super();
     }
-    public StudentQuestion(Course course, QuestionDto questionDto, UserDto userDto){
+    public StudentQuestion(Course course, QuestionDto questionDto, User user){
         super(course, questionDto);
 
-        checkConsistentUser(userDto);
+        checkConsistentUser(user);
 
-        this.keyStu = questionDto.getKey();
-        this.user = new User();
-        this.user.setId(userDto.getId());
-        this.user.setName(userDto.getName());
-        this.user.setUsername(userDto.getUsername());
-        this.user.setRole(userDto.getRole());
+        this.user = user;
 
-        this.questionStatus = QuestionStatus.valueOf(questionDto.getStatus());;
+        this.setQuestionStatus(QuestionStatus.PENDING);
 
-        course.addStudentQuestion(this);
+        user.addStudentQuestion(this);
+
 
     }
 
@@ -74,17 +66,9 @@ public class StudentQuestion extends Question {
         this.user = userDto;
     }
 
-    public Integer getKeyStu() {
-        return keyStu;
-    }
+    // TODO toString
 
-    public void setKeyStu(Integer key) {
-        this.keyStu = key;
-    }
-
-    // do toString
-
-    private void checkConsistentUser(UserDto user){
+    private void checkConsistentUser(User user){
         if (user.getName() == null || user.getName().trim().length() == 0 ||
                 user.getUsername() == null || user.getUsername().trim().length() == 0) {
             throw new TutorException(USER_MISSING_DATA);

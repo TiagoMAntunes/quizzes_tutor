@@ -8,19 +8,26 @@ import java.io.Serializable;
 public class StudentQuestionDto extends QuestionDto implements Serializable {
     private String questionStatus;
     private UserDto user;
-    private Integer keyStu;
+    private Integer id;
 
     public StudentQuestionDto(){
-
+        super();
     }
 
     public StudentQuestionDto(StudentQuestion studentQuestion){
-        super((Question)studentQuestion);
+        super(studentQuestion);
         this.questionStatus = studentQuestion.getStatus().name();
 
         this.user = new UserDto(studentQuestion.getUser());
-        this.keyStu = studentQuestion.getKeyStu();
 
+    }
+
+    public Integer getIdStu() {
+        return id;
+    }
+
+    public void setIdStu(Integer id) {
+        this.id = id;
     }
 
     public String getQuestionStatus() {
@@ -37,14 +44,6 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
 
     public void setUserDto(UserDto userDto) {
         this.user = userDto;
-    }
-
-    public Integer getKeyStu() {
-        return keyStu;
-    }
-
-    public void setKeyStu(Integer key) {
-        this.keyStu = key;
     }
 
 }
