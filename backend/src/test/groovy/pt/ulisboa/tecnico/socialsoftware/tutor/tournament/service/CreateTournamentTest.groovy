@@ -11,7 +11,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicConjunctionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
@@ -21,7 +20,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -73,7 +71,6 @@ class CreateTournamentTest extends Specification {
         //Creates a course
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
-
 
         //Creates a course execution
         courseExecution = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
@@ -219,7 +216,6 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setCreatorId(userId)
 
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-
 
         def topic = new Topic()
         topic.setName(TOPIC_NAME)
