@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(
         name = "questions",
         indexes = {
