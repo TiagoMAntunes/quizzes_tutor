@@ -14,6 +14,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicReposito
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
 import javax.persistence.EntityManager;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import static java.util.Comparator.*;
 
 @Service
 public class TournamentService {
@@ -76,12 +76,25 @@ public class TournamentService {
     }
 
     public List<Tournament> getOpenTournaments(CourseExecution courseExecution){
-        LocalDateTime now = LocalDateTime.now();
-
         return tournamentRepository.findAll().stream()
-                .filter(tournament -> tournament.getCourseExecution().getId() == courseExecution.getId())
-                .filter(tournament -> tournament.getFinishTime().isAfter(now))
+                .filter(tournament -> tournamentIsOpen(tournament, courseExecution))
                 .collect(Collectors.toList());
+    }
+
+    public boolean tournamentIsOpen(Tournament tournament, CourseExecution courseExecution){
+        LocalDateTime now = LocalDateTime.now();
+        return (tournament.getCourseExecution().getId().equals(courseExecution.getId())) &&
+                tournament.getFinishTime().isAfter(now);
+    }
+
+    public void joinTournament(Tournament tournament,CourseExecution courseExecution ,User user){
+        if(!tournamentIsOpen(tournament, courseExecution))
+            throw new TutorException(ErrorMessage.TOURNAMENT_NOT_OPEN);
+        else if(tournament.hasSignedUp(user))
+            throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_JOINED);
+
+        tournament.signUp(user);
+        user.addTournament(tournament);
     }
 
 

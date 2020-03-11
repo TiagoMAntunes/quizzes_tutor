@@ -62,7 +62,6 @@ class GetOpenTournamentsTest extends Specification {
     def COURSE_EXEC_ID
     def DIFF_COURSE_EXEC
     def DIFF_COURSE_EXEC_ID
-    def notOpenTournament
     def openTournament1
     def openTournament2
     def openTournament3
