@@ -451,12 +451,14 @@ public class User implements UserDetails, Importable {
         tournaments.add(tournament);
     }
 
+    public Set<Tournament> getSignedUpTournaments() { return tournaments; }
+
     public boolean hasTournament(Tournament tournament) {
         return tournaments.contains(tournament);
     }
 
-    public Set<Tournament> getCreatedTournaments() { return createdTournaments; }
-
     public void addCreatedTournament(Tournament tournament) { createdTournaments.add(tournament); }
+
+    public Set<Tournament> getCreatedTournaments() { return createdTournaments; }
 
 }

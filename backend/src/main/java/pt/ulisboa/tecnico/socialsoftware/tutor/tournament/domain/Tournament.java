@@ -117,10 +117,11 @@ public class Tournament {
         if (startTime.isBefore(LocalDateTime.now())) throw new TutorException(ErrorMessage.TOURNAMENT_HAS_STARTED);
 
         Set<Topic> topics = new HashSet<>(getTopics());
-
         topics.forEach(topic -> topic.getTournaments().remove(this));
-
         topics.clear();
+
+        signedUp.forEach(user -> user.getSignedUpTournaments().remove(this));
+        signedUp.clear();
 
         creator.getCreatedTournaments().remove(this);
         creator = null;
@@ -136,4 +137,6 @@ public class Tournament {
     public void signUp(User user){
         signedUp.add(user);
     }
+
+    public Set<User> getSignedUp() { return signedUp; }
 }

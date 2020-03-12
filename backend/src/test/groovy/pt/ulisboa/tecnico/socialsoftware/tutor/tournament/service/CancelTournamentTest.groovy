@@ -71,7 +71,6 @@ class CancelTournamentTest extends Specification {
         def course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
-
         //Creates a course execution
         courseExecution = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
@@ -106,7 +105,7 @@ class CancelTournamentTest extends Specification {
         def tournamentId = tournamentRepository.findAll().get(0).getId()
 
         when: "cancel tournament"
-        tournamentService.cancelTournament(tournamentId, user.getId())
+        tournamentService.cancelTournament(tournamentId, userId)
 
         then: "tournament is canceled"
         tournamentRepository.count() == 0L
@@ -168,9 +167,30 @@ class CancelTournamentTest extends Specification {
     }
 
     def "cancel a tournament with 1 student signed up"() {
-        // the tournament should be canceled and removed from the students tournaments
-        // depends on feature tdp:f3
-        expect: false
+        given: "a cancelable tournament with 1 student signed up"
+        def userId = userRepository.findAll().get(0).getId()
+        def user = userRepository.findAll().get(0)
+
+        def tournamentDto = new TournamentDto()
+        tournamentDto.setStartTime(IN_TWO_DAYS_TIME)
+        tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
+        tournamentDto.setTopics(TOPIC_LIST)
+        tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
+        tournamentService.createTournament(tournamentDto, courseExecution, user)
+
+        def tournamentId = tournamentRepository.findAll().get(0).getId()
+
+        tournamentService.joinTournament(tournamentId, courseExecution.getId(), userId)
+
+        when: "cancel tournament"
+        tournamentService.cancelTournament(tournamentId, userId)
+
+        then: "tournament is canceled"
+        tournamentRepository.count() == 0L
+        userRepository.findAll().get(0).getCreatedTournaments().size() == 0
+        userRepository.findAll().get(0).getSignedUpTournaments().size() == 0
+        courseExecutionRepository.findAll().get(0).getTournaments().size() == 0
+        topicRepository.findAll().get(0).getTournaments().size() == 0
     }
 
     @TestConfiguration
