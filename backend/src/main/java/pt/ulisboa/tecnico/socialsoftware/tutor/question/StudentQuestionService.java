@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
@@ -23,8 +25,7 @@ import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.ACCESS_DENIED;
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.COURSE_NOT_FOUND;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Service
 public class StudentQuestionService {
@@ -36,7 +37,7 @@ public class StudentQuestionService {
     private UserRepository userRepository;
 
     @Autowired
-    private StudentQuestionRepository studentQuestionRepository;
+    private QuestionRepository questionRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -48,6 +49,11 @@ public class StudentQuestionService {
     public StudentQuestionDto createStudentQuestion(int courseId, QuestionDto questionDto, int studentId){
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
+        if (questionDto.getKey() == null) {
+            int maxQuestionNumber = questionRepository.getMaxQuestionNumber() != null ?
+                    questionRepository.getMaxQuestionNumber() : 0;
+            questionDto.setKey(maxQuestionNumber + 1);
+        }
         StudentQuestion studentQuestion = new StudentQuestion(course, questionDto, student);
         studentQuestion.setCreationDate(LocalDateTime.now());
         this.entityManager.persist(studentQuestion);
