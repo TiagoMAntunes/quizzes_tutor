@@ -20,6 +20,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,6 +84,23 @@ public class TournamentService {
 
         entityManager.persist(tournament);
         return new TournamentDto(tournament);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void cancelTournament(Integer tournamentId, Integer userId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
+
+        if (!tournament.getCreator().getId().equals(userId))
+            throw new TutorException(ErrorMessage.TOURNAMENT_USER_IS_NOT_THE_CREATOR);
+
+        if (tournament.getStartTime().isBefore(LocalDateTime.now()))
+            throw new TutorException(ErrorMessage.TOURNAMENT_HAS_STARTED);
+
+        tournament.cancel();
+        entityManager.remove(tournament);
     }
 
     @Retryable(

@@ -59,7 +59,7 @@ public class User implements UserDetails, Importable {
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
     @ManyToMany
-    private Set<Tournament> tournaments = new HashSet<>();
+    private Set<Tournament> signedUpTournaments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Tournament> createdTournaments = new HashSet<>();
@@ -448,15 +448,17 @@ public class User implements UserDetails, Importable {
     }
 
     public void addTournament(Tournament tournament) {
-        tournaments.add(tournament);
+        signedUpTournaments.add(tournament);
     }
+
+    public Set<Tournament> getSignedUpTournaments() { return signedUpTournaments; }
 
     public boolean hasTournament(Tournament tournament) {
-        return tournaments.contains(tournament);
+        return signedUpTournaments.contains(tournament);
     }
 
-    public Set<Tournament> getCreatedTournaments() { return createdTournaments; }
-
     public void addCreatedTournament(Tournament tournament) { createdTournaments.add(tournament); }
+
+    public Set<Tournament> getCreatedTournaments() { return createdTournaments; }
 
 }

@@ -8,7 +8,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(
@@ -46,7 +50,7 @@ public class Tournament {
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
     private List<Topic> topics = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "signedUpTournaments", fetch=FetchType.EAGER)
     private Set<User> signedUp = new HashSet<>();
 
     public Tournament(){}
@@ -107,6 +111,21 @@ public class Tournament {
         courseExecution = c;
     }
 
+    public void cancel() {
+        Set<Topic> topicsSet = new HashSet<>(getTopics());
+        topicsSet.forEach(topic -> topic.getTournaments().remove(this));
+        topicsSet.clear();
+
+        signedUp.forEach(user -> user.getSignedUpTournaments().remove(this));
+        signedUp.clear();
+
+        creator.getCreatedTournaments().remove(this);
+        creator = null;
+
+        courseExecution.getTournaments().remove(this);
+        courseExecution = null;
+    }
+
     public boolean hasSignedUp(User user){
         return signedUp.contains(user);
     }
@@ -114,4 +133,6 @@ public class Tournament {
     public void signUp(User user){
         signedUp.add(user);
     }
+
+    public Set<User> getSignedUp() { return signedUp; }
 }
