@@ -63,10 +63,10 @@ public class TournamentService {
 
         Tournament tournament = new Tournament(tournamentDto, topics, creator);
 
-        if (tournament.getStartTime().isAfter(tournament.getFinishTime()))
+        if (tournament.getStartTime().isAfter(tournament.getFinishTime()) || tournament.getStartTime().isEqual(tournament.getFinishTime()))
             throw new TutorException(ErrorMessage.INVALID_TOURNAMENT_TIME);
-        else if (tournament.getFinishTime().isBefore(LocalDateTime.now()))
-            throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_FINISHED);
+        else if (tournament.getStartTime().isBefore(LocalDateTime.now()))
+            throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_STARTED);
 
         topics.forEach(topic -> topic.addTournament(tournament));
 

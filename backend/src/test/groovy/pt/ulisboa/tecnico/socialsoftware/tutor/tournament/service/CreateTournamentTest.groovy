@@ -59,7 +59,7 @@ class CreateTournamentTest extends Specification {
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        NOW_TIME = LocalDateTime.now().format(formatter)
+        NOW_TIME = LocalDateTime.now().plusDays(1).format(formatter)
         FINISH_TIME = LocalDateTime.now().plusDays(5).format(formatter)
 
         //Creates a user
@@ -143,23 +143,23 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 0L
     }
 
-    def "the tournament is created with a finish time before the time of creation"() {
+    def "the tournament is created with a start time before the time of creation"() {
         given: "a tournament with a finish time before the time of creation"
         def user = userRepository.findAll().get(0).getId()
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
+        tournamentDto.setFinishTime(FINISH_TIME)
 
         tournamentDto.setStartTime(LocalDateTime.now().minusDays(3).format(formatter))
-        tournamentDto.setFinishTime(LocalDateTime.now().minusDays(1).format(formatter))
 
         when:
         tournamentService.createTournament(tournamentDto, courseExecution, user)
 
         then:
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_ALREADY_FINISHED
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_ALREADY_STARTED
         tournamentRepository.count() == 0L
     }
 
