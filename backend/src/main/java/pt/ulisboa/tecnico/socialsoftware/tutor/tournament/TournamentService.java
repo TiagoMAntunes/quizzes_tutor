@@ -45,7 +45,7 @@ public class TournamentService {
         value = {SQLException.class },
         backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto createTournament(TournamentDto tournamentDto, CourseExecution courseExecution) {
+    public TournamentDto createTournament(TournamentDto tournamentDto, CourseExecution courseExecution, User creator) {
         if (tournamentDto.getKey() == null)
             tournamentDto.setKey(getMaxTournamentKey() + 1);
 
@@ -53,23 +53,29 @@ public class TournamentService {
 
         List<Topic> topics = new ArrayList<>(topicsSet);
 
-        if (topics.size() == 0)
+        if (topics.isEmpty())
             throw new TutorException(ErrorMessage.NO_TOPICS_SELECTED);
 
         if (tournamentDto.getNumberOfQuestions() <= 0)
             throw new TutorException(ErrorMessage.TOURNAMENT_HAS_NO_QUESTIONS);
 
-        Tournament tournament = new Tournament(tournamentDto, topics);
+
+        Tournament tournament = new Tournament(tournamentDto, topics, creator);
+
         if (tournament.getStartTime().isAfter(tournament.getFinishTime()))
             throw new TutorException(ErrorMessage.INVALID_TOURNAMENT_TIME);
         else if (tournament.getFinishTime().isBefore(LocalDateTime.now()))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_FINISHED);
 
-        for (Topic t : topics) 
-            t.addTournament(tournament);
-        
+        topics.forEach(topic -> topic.addTournament(tournament));
+
+        //Add tournament to course execution
         courseExecution.addTournament(tournament);
         tournament.setCourseExecution(courseExecution);
+
+        //Set the creator
+        creator.addCreatedTournament(tournament);
+        tournament.setCreator(creator);
 
         entityManager.persist(tournament);
         return new TournamentDto(tournament);

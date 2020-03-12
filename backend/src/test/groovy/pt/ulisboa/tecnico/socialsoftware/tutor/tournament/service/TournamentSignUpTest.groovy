@@ -58,7 +58,7 @@ class TournamentSignUpTest extends Specification {
     def FIVE_DAYS_LATER
     def THREE_DAYS_LATER
     def TOPIC_LIST
-    def CREATOR_ID
+    def user
     def COURSE_EXEC
     def COURSE_EXEC_ID
     def USER
@@ -75,11 +75,13 @@ class TournamentSignUpTest extends Specification {
         TWO_DAYS_EARLIER = LocalDateTime.now().minusDays(2).format(formatter)
 
         //Creates a user
-        def user = new User()
-        user.setKey(1)
-        userRepository.save(user)
+        def tmp_user = new User()
+        tmp_user.setKey(1)
+        userRepository.save(tmp_user)
         USER = userRepository.findAll().get(0)
         USER_ID = USER.getId()
+
+
 
         //Creates a course
         def course1 = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -103,9 +105,6 @@ class TournamentSignUpTest extends Specification {
         TOPIC_LIST = topicList
 
         //Creates an open tournament
-        def userId = userRepository.findAll().get(0).getId()
-        CREATOR_ID = userId
-
         def course2 = courseExecutionRepository.findAll().get(0)
         COURSE_EXEC = course2
         COURSE_EXEC_ID = course2.getId()
@@ -113,7 +112,6 @@ class TournamentSignUpTest extends Specification {
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(THREE_DAYS_EARLIER)
         tournamentDto.setFinishTime(THREE_DAYS_LATER)
-        tournamentDto.setCreatorId(CREATOR_ID)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -122,7 +120,7 @@ class TournamentSignUpTest extends Specification {
 
     def "tournament is not open"(){
         given:"a tournament that is not open"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC)
+        tournamentService.createTournament(openTournament1, COURSE_EXEC, USER)
         def result = tournamentRepository.findAll().get(0)
         result.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
         tournamentRepository.save(result)
@@ -140,7 +138,7 @@ class TournamentSignUpTest extends Specification {
 
     def "tournament is open and student hasnt signed up for it yet"(){
         given:"an open tournament that the student hasnt joined"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC)
+        tournamentService.createTournament(openTournament1, COURSE_EXEC, USER)
         def tournament = tournamentRepository.findAll().get(0)
 
         when:
@@ -153,7 +151,7 @@ class TournamentSignUpTest extends Specification {
 
     def "tournament is open and student has already signed up for it"(){
         given:"an open tournament that the student has already joined"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC)
+        tournamentService.createTournament(openTournament1, COURSE_EXEC, USER)
         def tournament = tournamentRepository.findAll().get(0)
         tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, USER_ID)
 
@@ -167,7 +165,7 @@ class TournamentSignUpTest extends Specification {
 
     def "no user with the given id"(){
         given:"an unused user id"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC)
+        tournamentService.createTournament(openTournament1, COURSE_EXEC, USER)
         def tournament = tournamentRepository.findAll().get(0)
         def userId = 1
         def user = new User()
