@@ -57,13 +57,17 @@ class TournamentSignUpTest extends Specification {
     def TWO_DAYS_EARLIER
     def FIVE_DAYS_LATER
     def THREE_DAYS_LATER
+    def ONE_DAY_LATER
     def TOPIC_LIST
     def user
     def COURSE_EXEC
     def COURSE_EXEC_ID
     def USER
     def USER_ID
-    def openTournament1
+    def openTournamentDto
+    def openTournament
+    def openTournamentId
+
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -73,15 +77,15 @@ class TournamentSignUpTest extends Specification {
         FIVE_DAYS_EARLIER = LocalDateTime.now().minusDays(5).format(formatter)
         THREE_DAYS_EARLIER = LocalDateTime.now().minusDays(3).format(formatter)
         TWO_DAYS_EARLIER = LocalDateTime.now().minusDays(2).format(formatter)
+        ONE_DAY_LATER = LocalDateTime.now().plusDays(1).format(formatter)
 
         //Creates a user
         def tmp_user = new User()
         tmp_user.setKey(1)
+        tmp_user.setRole(User.Role.STUDENT)
         userRepository.save(tmp_user)
         USER = userRepository.findAll().get(0)
         USER_ID = USER.getId()
-
-
 
         //Creates a course
         def course1 = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -110,53 +114,46 @@ class TournamentSignUpTest extends Specification {
         COURSE_EXEC_ID = course2.getId()
 
         def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(THREE_DAYS_EARLIER)
+        tournamentDto.setStartTime(ONE_DAY_LATER)
         tournamentDto.setFinishTime(THREE_DAYS_LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
-        openTournament1 = tournamentDto
+        openTournamentDto = tournamentDto
+        tournamentService.createTournament(openTournamentDto, COURSE_EXEC, USER_ID)
+        openTournament = tournamentRepository.findAll().get(0)
+        openTournamentId = openTournament.getId()
     }
 
     def "tournament is not open"(){
         given:"a tournament that is not open"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC, USER)
-        def result = tournamentRepository.findAll().get(0)
-        result.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
-        tournamentRepository.save(result)
-        def tournament = tournamentRepository.findAll().get(0)
+        openTournament.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
 
         when:
-        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, USER_ID)
 
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_OPEN
-        !tournament.hasSignedUp(USER)
-        !USER.hasTournament(tournament)
+        !openTournament.hasSignedUp(USER)
+        !USER.hasTournament(openTournament)
     }
 
     def "tournament is open and student hasnt signed up for it yet"(){
-        given:"an open tournament that the student hasnt joined"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC, USER)
-        def tournament = tournamentRepository.findAll().get(0)
-
         when:
-        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(openTournament.getId(), COURSE_EXEC_ID, USER_ID)
 
         then:
-        tournament.hasSignedUp(USER)
-        USER.hasTournament(tournament)
+        openTournament.hasSignedUp(USER)
+        USER.hasTournament(openTournament)
     }
 
     def "tournament is open and student has already signed up for it"(){
         given:"an open tournament that the student has already joined"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC, USER)
-        def tournament = tournamentRepository.findAll().get(0)
-        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, USER_ID)
 
         when:
-        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, USER_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -165,19 +162,17 @@ class TournamentSignUpTest extends Specification {
 
     def "no user with the given id"(){
         given:"an unused user id"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC, USER)
-        def tournament = tournamentRepository.findAll().get(0)
         def userId = 1
         def user = new User()
         user.setId(userId)
 
         when:
-        tournamentService.joinTournament(tournament.getId(), COURSE_EXEC_ID, userId)
+        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, userId)
 
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
-        !tournament.hasSignedUp(user)
+        !openTournament.hasSignedUp(user)
     }
 
     def "no tournament with the given id"(){

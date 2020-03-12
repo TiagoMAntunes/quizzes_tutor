@@ -46,7 +46,7 @@ public class TournamentService {
         value = {SQLException.class },
         backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto createTournament(TournamentDto tournamentDto, CourseExecution courseExecution, User creator) {
+    public TournamentDto createTournament(TournamentDto tournamentDto, CourseExecution courseExecution, int creatorId) {
         if (tournamentDto.getKey() == null)
             tournamentDto.setKey(getMaxTournamentKey() + 1);
 
@@ -60,13 +60,17 @@ public class TournamentService {
         if (tournamentDto.getNumberOfQuestions() <= 0)
             throw new TutorException(ErrorMessage.TOURNAMENT_HAS_NO_QUESTIONS);
 
+        User creator = userRepository.findById(creatorId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, creatorId));
+
+        if (creator.getRole() != User.Role.STUDENT)
+            throw new TutorException(ErrorMessage.TOURNAMENT_CREATION_INCORRECT_ROLE);
 
         Tournament tournament = new Tournament(tournamentDto, topics, creator);
 
-        if (tournament.getStartTime().isAfter(tournament.getFinishTime()))
+        if (tournament.getStartTime().isAfter(tournament.getFinishTime()) || tournament.getStartTime().isEqual(tournament.getFinishTime()))
             throw new TutorException(ErrorMessage.INVALID_TOURNAMENT_TIME);
-        else if (tournament.getFinishTime().isBefore(LocalDateTime.now()))
-            throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_FINISHED);
+        else if (tournament.getStartTime().isBefore(LocalDateTime.now()))
+            throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_STARTED);
 
         topics.forEach(topic -> topic.addTournament(tournament));
 
