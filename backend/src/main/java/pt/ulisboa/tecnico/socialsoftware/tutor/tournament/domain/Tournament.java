@@ -1,8 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
@@ -52,7 +50,7 @@ public class Tournament {
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
     private List<Topic> topics = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "signedUpTournaments", fetch=FetchType.EAGER)
     private Set<User> signedUp = new HashSet<>();
 
     public Tournament(){}
@@ -114,11 +112,9 @@ public class Tournament {
     }
 
     public void cancel() {
-        if (startTime.isBefore(LocalDateTime.now())) throw new TutorException(ErrorMessage.TOURNAMENT_HAS_STARTED);
-
-        Set<Topic> topics = new HashSet<>(getTopics());
-        topics.forEach(topic -> topic.getTournaments().remove(this));
-        topics.clear();
+        Set<Topic> topicsSet = new HashSet<>(getTopics());
+        topicsSet.forEach(topic -> topic.getTournaments().remove(this));
+        topicsSet.clear();
 
         signedUp.forEach(user -> user.getSignedUpTournaments().remove(this));
         signedUp.clear();

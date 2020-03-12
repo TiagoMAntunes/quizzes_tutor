@@ -59,7 +59,7 @@ public enum ErrorMessage {
 
     TOURNAMENT_HAS_STARTED("Can only cancel a tournament before it has started"),
     TOURNAMENT_NOT_FOUND("Tournament not found with id %d"),
-    TOURNAMENT_NOT_THE_CREATER("Only the tournament creater can cancel"),
+    TOURNAMENT_USER_IS_NOT_THE_CREATOR("Only the tournament creator can cancel"),
 
     TOURNAMENT_ALREADY_JOINED("User has already joined this tournament"),
     TOURNAMENT_NOT_OPEN("Tournament is not open"),

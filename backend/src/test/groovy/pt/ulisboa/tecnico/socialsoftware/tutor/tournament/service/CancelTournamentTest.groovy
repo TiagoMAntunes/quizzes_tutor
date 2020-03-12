@@ -114,6 +114,21 @@ class CancelTournamentTest extends Specification {
         topicRepository.findAll().get(0).getTournaments().size() == 0
     }
 
+    def "cancel a non existing tournament"() {
+        given: "a cancelable tournament"
+        def userId = userRepository.findAll().get(0).getId()
+        def user = userRepository.findAll().get(0)
+
+        def tournamentId = 123
+
+        when: "try to cancel"
+        tournamentService.cancelTournament(tournamentId, userId)
+
+        then: "error thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
+    }
+
     def "cancel a tournament not created by the student"() {
         given: "a cancelable tournament"
         def userId = userRepository.findAll().get(0).getId()
@@ -133,7 +148,7 @@ class CancelTournamentTest extends Specification {
 
         then: "tournament not canceled"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_THE_CREATER
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_USER_IS_NOT_THE_CREATOR
         tournamentRepository.count() == 1L
         userRepository.findAll().get(0).getCreatedTournaments().size() == 1
         courseExecutionRepository.findAll().get(0).getTournaments().size() == 1

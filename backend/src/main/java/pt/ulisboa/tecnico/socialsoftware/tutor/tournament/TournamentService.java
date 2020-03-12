@@ -89,8 +89,11 @@ public class TournamentService {
     public void cancelTournament(Integer tournamentId, Integer userId) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
 
-        if (tournament.getCreator().getId() != userId)
-            throw new TutorException(ErrorMessage.TOURNAMENT_NOT_THE_CREATER);
+        if (!tournament.getCreator().getId().equals(userId))
+            throw new TutorException(ErrorMessage.TOURNAMENT_USER_IS_NOT_THE_CREATOR);
+
+        if (tournament.getStartTime().isBefore(LocalDateTime.now()))
+            throw new TutorException(ErrorMessage.TOURNAMENT_HAS_STARTED);
 
         tournament.cancel();
         entityManager.remove(tournament);
