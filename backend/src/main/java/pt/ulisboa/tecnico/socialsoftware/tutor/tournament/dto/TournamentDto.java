@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
 import org.springframework.data.annotation.Transient;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
@@ -67,4 +66,5 @@ public class TournamentDto implements Serializable {
     public void setTopics(List<TopicDto> p) { topics = p; }
 
     public List<TopicDto> getTopics() { return topics; }
+
 }

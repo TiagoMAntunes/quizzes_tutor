@@ -1,18 +1,14 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
-
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
-
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(
@@ -49,6 +45,11 @@ public class Tournament {
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
     private List<Topic> topics = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
+    private Set<User> signedUp = new HashSet<>();
+
+    public Tournament(){}
 
     public Tournament(TournamentDto tournamentDto, List<Topic> topic) {
         this.id = tournamentDto.getId();
@@ -106,5 +107,11 @@ public class Tournament {
         courseExecution = c;
     }
 
+    public boolean hasSignedUp(User user){
+        return signedUp.contains(user);
+    }
 
+    public void signUp(User user){
+        signedUp.add(user);
+    }
 }

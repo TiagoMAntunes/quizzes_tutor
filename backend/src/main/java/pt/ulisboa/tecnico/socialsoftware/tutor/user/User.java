@@ -7,7 +7,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.Importable;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -56,6 +58,9 @@ public class User implements UserDetails, Importable {
 
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
+
+    @ManyToMany
+    private Set<Tournament> tournaments = new HashSet<>();
 
     public User() {
     }
@@ -438,5 +443,13 @@ public class User implements UserDetails, Importable {
         }
 
         return result;
+    }
+
+    public void addTournament(Tournament tournament) {
+        tournaments.add(tournament);
+    }
+
+    public boolean hasTournament(Tournament tournament) {
+        return tournaments.contains(tournament);
     }
 }

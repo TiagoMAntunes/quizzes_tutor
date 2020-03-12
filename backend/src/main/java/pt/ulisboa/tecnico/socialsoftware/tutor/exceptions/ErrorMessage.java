@@ -58,6 +58,10 @@ public enum ErrorMessage {
     NO_TOPICS_SELECTED("Tournament requires at least one topic to be valid"),
     TOURNAMENT_HAS_NO_QUESTIONS("Tournament requires at least 1 question"),
 
+    TOURNAMENT_ALREADY_JOINED("User has already joined this tournament"),
+    TOURNAMENT_NOT_OPEN("Tournament is not open"),
+    TOURNAMENT_NOT_FOUND("No tournament found with id %d"),
+
     ACCESS_DENIED("You do not have permission to view this resource");
 
     public final String label;
