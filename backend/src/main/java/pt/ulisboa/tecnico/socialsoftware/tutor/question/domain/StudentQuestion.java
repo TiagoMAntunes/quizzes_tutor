@@ -3,19 +3,13 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.question.domain;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
-
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import javax.persistence.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -41,7 +35,7 @@ public class StudentQuestion extends Question {
     public StudentQuestion(){
         super();
     }
-    public StudentQuestion(Course course, QuestionDto questionDto, User user){
+    public StudentQuestion(Course course, QuestionDto questionDto, User user) {
         super(course, questionDto);
 
         checkConsistentUser(user, course);
@@ -73,7 +67,7 @@ public class StudentQuestion extends Question {
 
     // TODO toString
 
-    private void checkConsistentUser(User user, Course course){
+    private void checkConsistentUser(User user, Course course) {
         if (user.getName() == null || user.getName().trim().length() == 0 ||
                 user.getUsername() == null || user.getUsername().trim().length() == 0) {
             throw new TutorException(USER_MISSING_DATA);

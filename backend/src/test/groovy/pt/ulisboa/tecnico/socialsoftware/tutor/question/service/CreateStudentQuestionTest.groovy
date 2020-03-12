@@ -11,11 +11,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.ImageDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
@@ -67,7 +65,6 @@ class CreateStudentQuestionTest extends Specification {
     def student
     def student2
     def teacher
-    def topic
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -125,86 +122,6 @@ class CreateStudentQuestionTest extends Specification {
         resOption.getCorrect()
 
     }
-
-    def "not a student"() {
-        given: "a questionDto"
-        def questionDto = new QuestionDto()
-        questionDto.setKey(1)
-        questionDto.setTitle(QUESTION_TITLE)
-        questionDto.setContent(QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-        and: 'a optionId'
-        def optionDto = new OptionDto()
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        questionDto.setOptions(options)
-
-        when:
-        studentQuestionService.createStudentQuestion(course.getId(), questionDto, teacher.getId())
-
-        then:
-            thrown(TutorException)
-    }
-    def "a student isnt in a course"() {
-        given: "a questionDto"
-        def questionDto = new QuestionDto()
-        questionDto.setKey(1)
-        questionDto.setTitle(QUESTION_TITLE)
-        questionDto.setContent(QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-        and: 'a optionId'
-        def optionDto = new OptionDto()
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        questionDto.setOptions(options)
-
-        when:
-        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student2.getId())
-
-        then:
-        thrown(TutorException)
-    }
-
-
-    @Unroll("invalid arguments:  #Title | #Content | #Option || errorMessage")
-    def "invalid input values"(){
-        given: "a questionDto"
-        def questionDto = new QuestionDto()
-        questionDto.setKey(1)
-        questionDto.setTitle(Title)
-        questionDto.setContent(Content)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-        and: 'a optionId'
-        def optionDto = new OptionDto()
-        optionDto.setContent(Option)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        questionDto.setOptions(options)
-
-        when:
-        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
-
-        then: "a StudentQuestion Exception"
-        def error = thrown(TutorException)
-        error.errorMessage == errorMessage
-
-        where:
-        Title             | Content            | Option             || errorMessage
-        BLANK             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        EMPTY             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | BLANK              | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | QUESTION_CONTENT   | BLANK              || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | QUESTION_CONTENT   | EMPTY              || QUESTION_MISSING_DATA
-        //QUESTION_TITLE    | QUESTION_CONTENT   | COURSE_NAME   || OPTION_CONTENT    ||
-        //QUESTION_TITLE    | QUESTION_CONTENT   | COURSE_NAME   || OPTION_CONTENT    ||
-    }
-
 
     def "create a question with image and two options"() {
         given: "a questionDto"
@@ -272,6 +189,83 @@ class CreateStudentQuestionTest extends Specification {
         def resultOne = studentQuestionRepository.findAll().get(0)
         def resultTwo = studentQuestionRepository.findAll().get(1)
         resultOne.getKey() + resultTwo.getKey() == 3
+    }
+
+    def "not a student"() {
+        given: "a questionDto"
+        def questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(QUESTION_TITLE)
+        questionDto.setContent(QUESTION_CONTENT)
+        questionDto.setStatus(Question.Status.AVAILABLE.name())
+        and: 'a optionId'
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
+
+        when:
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, teacher.getId())
+
+        then:
+        thrown(TutorException)
+    }
+
+    def "a student isnt in a course"() {
+        given: "a questionDto"
+        def questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(QUESTION_TITLE)
+        questionDto.setContent(QUESTION_CONTENT)
+        questionDto.setStatus(Question.Status.AVAILABLE.name())
+        and: 'a optionId'
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
+
+        when:
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student2.getId())
+
+        then:
+        thrown(TutorException)
+    }
+
+    @Unroll("invalid arguments:  #Title | #Content | #Option || errorMessage")
+    def "invalid input values"(){
+        given: "a questionDto"
+        def questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(Title)
+        questionDto.setContent(Content)
+        questionDto.setStatus(Question.Status.AVAILABLE.name())
+        and: 'a optionId'
+        def optionDto = new OptionDto()
+        optionDto.setContent(Option)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
+
+        when:
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
+
+        then: "a StudentQuestion Exception"
+        def error = thrown(TutorException)
+        error.errorMessage == errorMessage
+
+        where:
+        Title             | Content            | Option             || errorMessage
+        BLANK             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        EMPTY             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | BLANK              | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | QUESTION_CONTENT   | BLANK              || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | QUESTION_CONTENT   | EMPTY              || QUESTION_MISSING_DATA
     }
 
     @TestConfiguration
