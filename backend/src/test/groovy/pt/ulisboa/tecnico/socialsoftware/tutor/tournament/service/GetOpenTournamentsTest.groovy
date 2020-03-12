@@ -110,7 +110,7 @@ class GetOpenTournamentsTest extends Specification {
         TOPIC_LIST = topicList
 
         //Creates an open tournament
-        user = userRepository.findAll().get(0)
+        user = userRepository.findAll().get(0).getId()
 
         def course2 = courseExecutionRepository.findAll().get(0)
         COURSE_EXEC = course2

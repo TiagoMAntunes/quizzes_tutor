@@ -45,7 +45,7 @@ public class TournamentService {
         value = {SQLException.class },
         backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto createTournament(TournamentDto tournamentDto, CourseExecution courseExecution, User creator) {
+    public TournamentDto createTournament(TournamentDto tournamentDto, CourseExecution courseExecution, int creatorId) {
         if (tournamentDto.getKey() == null)
             tournamentDto.setKey(getMaxTournamentKey() + 1);
 
@@ -59,6 +59,7 @@ public class TournamentService {
         if (tournamentDto.getNumberOfQuestions() <= 0)
             throw new TutorException(ErrorMessage.TOURNAMENT_HAS_NO_QUESTIONS);
 
+        User creator = userRepository.findById(creatorId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, creatorId));
 
         Tournament tournament = new Tournament(tournamentDto, topics, creator);
 

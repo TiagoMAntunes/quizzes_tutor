@@ -117,7 +117,7 @@ class TournamentSignUpTest extends Specification {
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
         openTournamentDto = tournamentDto
-        tournamentService.createTournament(openTournamentDto, COURSE_EXEC, USER)
+        tournamentService.createTournament(openTournamentDto, COURSE_EXEC, USER_ID)
         openTournament = tournamentRepository.findAll().get(0)
         openTournamentId = openTournament.getId()
     }
