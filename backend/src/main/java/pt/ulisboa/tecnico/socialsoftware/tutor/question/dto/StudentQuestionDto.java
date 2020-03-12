@@ -8,7 +8,6 @@ import java.io.Serializable;
 public class StudentQuestionDto extends QuestionDto implements Serializable {
     private String questionStatus;
     private UserDto user;
-    private Integer id;
 
     public StudentQuestionDto(){
         super();
@@ -20,14 +19,6 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
 
         this.user = new UserDto(studentQuestion.getUser());
 
-    }
-
-    public Integer getIdStu() {
-        return id;
-    }
-
-    public void setIdStu(Integer id) {
-        this.id = id;
     }
 
     public String getQuestionStatus() {

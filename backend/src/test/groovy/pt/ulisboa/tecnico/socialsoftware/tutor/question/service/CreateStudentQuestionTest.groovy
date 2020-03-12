@@ -8,19 +8,19 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.ImageDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
 import spock.lang.Specification
+import spock.lang.Unroll
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*
+
+import javax.validation.constraints.NotBlank
 
 @DataJpaTest
 class CreateStudentQuestionTest extends Specification {
@@ -31,7 +31,12 @@ class CreateStudentQuestionTest extends Specification {
     public static final String QUESTION_CONTENT = 'question content'
     public static final String OPTION_CONTENT = "optionId content"
     public static final String URL = 'URL'
-
+    public static final String EMPTY = "    "
+    public static final String BLANK = ""
+    public static final String USER_NAME = "pedro"
+    public static final String USER_USERNAME = "lamegow"
+    public static final String TEACHER_NAME = "maria"
+    public static final String TEACHER_USERNAME = "appolle"
     @Autowired
     CourseRepository courseRepository
 
@@ -50,7 +55,8 @@ class CreateStudentQuestionTest extends Specification {
     def course
     def courseExecution
 
-    def user
+    def student
+    def teacher
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -59,8 +65,11 @@ class CreateStudentQuestionTest extends Specification {
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
 
-        user = new User("ola", "adeus", 1, User.Role.STUDENT)
-        userRepository.save(user)
+        student = new User(USER_NAME, USER_USERNAME, 1, User.Role.STUDENT)
+        userRepository.save(student)
+
+        teacher = new User(TEACHER_NAME, TEACHER_USERNAME, 2, User.Role.TEACHER)
+        userRepository.save(teacher)
 
     }
 
@@ -80,7 +89,7 @@ class CreateStudentQuestionTest extends Specification {
         questionDto.setOptions(options)
 
         when:
-        studentQuestionService.createStudentQuestion(course.getId(), questionDto, user.getId())
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
 
         then: "the correct question is inside the repository"
         studentQuestionRepository.count() == 1L
@@ -99,6 +108,65 @@ class CreateStudentQuestionTest extends Specification {
         resOption.getCorrect()
 
     }
+
+    def "not a student"() {
+        given: "a questionDto"
+        def questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(QUESTION_TITLE)
+        questionDto.setContent(QUESTION_CONTENT)
+        questionDto.setStatus(Question.Status.AVAILABLE.name())
+        and: 'a optionId'
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
+
+        when:
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, teacher.getId())
+
+        then:
+            thrown(TutorException)
+    }
+
+
+    @Unroll("invalid arguments:  #Title | #Content | #Option || errorMessage")
+    def "invalid input values"(){
+        given: "a questionDto"
+        def questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(Title)
+        questionDto.setContent(Content)
+        questionDto.setStatus(Question.Status.AVAILABLE.name())
+        and: 'a optionId'
+        def optionDto = new OptionDto()
+        optionDto.setContent(Option)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
+
+        when:
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
+
+        then: "a StudentQuestion Exception"
+        def error = thrown(TutorException)
+        error.errorMessage == errorMessage
+
+        where:
+        Title             | Content            | Option             || errorMessage
+        BLANK             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        EMPTY             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | BLANK              | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | QUESTION_CONTENT   | BLANK              || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | QUESTION_CONTENT   | EMPTY              || QUESTION_MISSING_DATA
+        //QUESTION_TITLE    | QUESTION_CONTENT   | COURSE_NAME   || OPTION_CONTENT    ||
+        //QUESTION_TITLE    | QUESTION_CONTENT   | COURSE_NAME   || OPTION_CONTENT    ||
+    }
+
     @TestConfiguration
     static class StudentQuestionServiceImplTestContextConfiguration {
 

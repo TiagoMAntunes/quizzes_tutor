@@ -53,7 +53,6 @@ public enum ErrorMessage {
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
     USER_MISSING_DATA("Missing information for the creating of a student question"),
 
-
     ACCESS_DENIED("You do not have permission to view this resource");
 
     public final String label;

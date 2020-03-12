@@ -23,6 +23,7 @@ import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.ACCESS_DENIED;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.COURSE_NOT_FOUND;
 
 @Service
@@ -45,7 +46,7 @@ public class StudentQuestionService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDto createStudentQuestion(int courseId, QuestionDto questionDto, int studentId){
-        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
+        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
         StudentQuestion studentQuestion = new StudentQuestion(course, questionDto, student);
         studentQuestion.setCreationDate(LocalDateTime.now());
