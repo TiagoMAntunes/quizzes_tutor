@@ -50,30 +50,37 @@ class CancelTournamentTest extends Specification {
     CourseExecutionRepository courseExecutionRepository
 
     def formatter
-    def TWO_DAYS_AGO_TIME
+    def TWO_DAYS_AGO_DATETIME
     def IN_TWO_DAYS_TIME
     def IN_FOUR_DAYS_TIME
     def TOPIC_LIST
     def courseExecution
+    def courseExecutionId
+    def userId
+    def tournamentId
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        TWO_DAYS_AGO_TIME = LocalDateTime.now().minusDays(2).format(formatter)
+        TWO_DAYS_AGO_DATETIME = LocalDateTime.now().minusDays(2)
         IN_TWO_DAYS_TIME = LocalDateTime.now().plusDays(2).format(formatter)
         IN_FOUR_DAYS_TIME = LocalDateTime.now().plusDays(4).format(formatter)
 
         //Creates a user
         def user = new User()
         user.setKey(1)
+        user.setRole(User.Role.STUDENT)
         userRepository.save(user)
+        userId = userRepository.findAll().get(0).getId()
 
         //Creates a course
         def course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
         //Creates a course execution
-        courseExecution = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
-        courseExecutionRepository.save(courseExecution)
+        def newCourseExecution = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
+        courseExecutionRepository.save(newCourseExecution)
+        courseExecution = courseExecutionRepository.findAll().get(0)
+        courseExecutionId = courseExecutionRepository.findAll().get(0).getId()
 
         //Creates a topic
         def topic = new Topic()
@@ -87,23 +94,20 @@ class CancelTournamentTest extends Specification {
         topicList.add(new TopicDto(topic))
 
         TOPIC_LIST = topicList
-    }
 
-    // A cancelable tournament is one that the student created but hasn't started yet
-    def "cancel a cancelable tournament"() {
-        given: "a cancelable tournament"
-        def userId = userRepository.findAll().get(0).getId()
-        def user = userRepository.findAll().get(0)
-
+        //Creates a cancelable tournament
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(IN_TWO_DAYS_TIME)
         tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
+        tournamentService.createTournament(tournamentDto, courseExecution, userId)
 
-        def tournamentId = tournamentRepository.findAll().get(0).getId()
+        tournamentId = tournamentRepository.findAll().get(0).getId()
+    }
 
+    // A cancelable tournament is one that the student created but hasn't started yet
+    def "cancel a cancelable tournament"() {
         when: "cancel tournament"
         tournamentService.cancelTournament(tournamentId, userId)
 
@@ -115,14 +119,11 @@ class CancelTournamentTest extends Specification {
     }
 
     def "cancel a non existing tournament"() {
-        given: "a cancelable tournament"
-        def userId = userRepository.findAll().get(0).getId()
-        def user = userRepository.findAll().get(0)
-
-        def tournamentId = 123
+        given: "non existing tournament"
+        def nonExistingTournamentId = tournamentId + 10
 
         when: "try to cancel"
-        tournamentService.cancelTournament(tournamentId, userId)
+        tournamentService.cancelTournament(nonExistingTournamentId, userId)
 
         then: "error thrown"
         def exception = thrown(TutorException)
@@ -130,21 +131,11 @@ class CancelTournamentTest extends Specification {
     }
 
     def "cancel a tournament not created by the student"() {
-        given: "a cancelable tournament"
-        def userId = userRepository.findAll().get(0).getId()
-        def user = userRepository.findAll().get(0)
+        given: "user that is not the creator"
+        def notTheCreatorId = userId + 24
 
-        def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(IN_TWO_DAYS_TIME)
-        tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
-        tournamentDto.setTopics(TOPIC_LIST)
-        tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
-
-        def tournamentId = tournamentRepository.findAll().get(0).getId()
-
-        when: "not the creater tries to cancel"
-        tournamentService.cancelTournament(tournamentId, userId+100)
+        when: "not the creator tries to cancel"
+        tournamentService.cancelTournament(tournamentId, notTheCreatorId)
 
         then: "tournament not canceled"
         def exception = thrown(TutorException)
@@ -157,17 +148,8 @@ class CancelTournamentTest extends Specification {
 
     def "cancel a tournament after it as started"() {
         given: "a tournament that has started"
-        def userId = userRepository.findAll().get(0).getId()
-        def user = userRepository.findAll().get(0)
-
-        def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(TWO_DAYS_AGO_TIME)
-        tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
-        tournamentDto.setTopics(TOPIC_LIST)
-        tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
-
-        def tournamentId = tournamentRepository.findAll().get(0).getId()
+        def tournament = tournamentRepository.findAll().get(0)
+        tournament.setStartTime(TWO_DAYS_AGO_DATETIME)
 
         when: "tries to cancel"
         tournamentService.cancelTournament(tournamentId, userId)
@@ -183,19 +165,7 @@ class CancelTournamentTest extends Specification {
 
     def "cancel a tournament with 1 student signed up"() {
         given: "a cancelable tournament with 1 student signed up"
-        def userId = userRepository.findAll().get(0).getId()
-        def user = userRepository.findAll().get(0)
-
-        def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(IN_TWO_DAYS_TIME)
-        tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
-        tournamentDto.setTopics(TOPIC_LIST)
-        tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
-
-        def tournamentId = tournamentRepository.findAll().get(0).getId()
-
-        tournamentService.joinTournament(tournamentId, courseExecution.getId(), userId)
+        tournamentService.joinTournament(tournamentId, courseExecutionId, userId)
 
         when: "cancel tournament"
         tournamentService.cancelTournament(tournamentId, userId)
