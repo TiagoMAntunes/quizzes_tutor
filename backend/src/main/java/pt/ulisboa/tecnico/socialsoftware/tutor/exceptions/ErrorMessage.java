@@ -54,7 +54,10 @@ public enum ErrorMessage {
     USER_MISSING_DATA("Missing information for the creating of a student question"),
 
     CANT_ADD_EXPLANATION("Question is not in the rejected state"),
-    ACCESS_DENIED("You do not have permission to view this resource");
+
+    ACCESS_DENIED("You do not have permission to view this resource"),
+    NO_QUESTION_SUBMITTED("The user hasn't submitted any questions yet");
+
 
     public final String label;
 

@@ -8,9 +8,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
@@ -24,6 +22,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -64,6 +64,10 @@ public class StudentQuestionService {
         return new StudentQuestionDto(studentQuestion);
     }
 
+    @Retryable(
+    value = { SQLException.class },
+    backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void studentQuestionApproveReject(Integer questionId, StudentQuestion.QuestionStatus status, String explanation, User teacher, CourseExecution execution) {
         checkUserRole(teacher);
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
@@ -89,6 +93,19 @@ public class StudentQuestionService {
     private void checkUserRole(User teacher) {
         if (teacher.getRole() != User.Role.TEACHER) {
             throw new TutorException(ACCESS_DENIED);
+        }
+    }
+
+    public List<StudentQuestion> getStudentQuestions(User student){
+
+        List<StudentQuestion> list = studentQuestionRepository.findAll().stream()
+                .filter(studentQuestion -> studentQuestion.getUser() == student)
+                .collect(Collectors.toList());
+
+        if(list.size() == 0){
+            throw new TutorException(NO_QUESTION_SUBMITTED);
+        }else{
+            return list;
         }
     }
 }
