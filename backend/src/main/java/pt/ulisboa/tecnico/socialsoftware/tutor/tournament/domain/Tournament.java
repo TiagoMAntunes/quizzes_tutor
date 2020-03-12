@@ -1,16 +1,16 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
-
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
-
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,8 +40,8 @@ public class Tournament {
     @Column(name = "finish_time")
     private LocalDateTime finishTime = null;
 
-    @Column(name = "creator_id")
-    private Integer creatorId;
+    @ManyToOne
+    private User creator;
 
     @Column(name = "number_of_questions")
     private Integer numberOfQuestions;
@@ -52,12 +52,17 @@ public class Tournament {
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
     private List<Topic> topics = new ArrayList<>();
 
-    public Tournament(TournamentDto tournamentDto, List<Topic> topic) {
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
+    private Set<User> signedUp = new HashSet<>();
+
+    public Tournament(){}
+
+    public Tournament(TournamentDto tournamentDto, List<Topic> topic, User creator) {
         this.id = tournamentDto.getId();
         this.key = tournamentDto.getKey();
         this.startTime = LocalDateTime.parse(tournamentDto.getStartTime(), formatter);
         this.finishTime = LocalDateTime.parse(tournamentDto.getFinishTime(), formatter);
-        this.creatorId = tournamentDto.getCreatorId();
+        this.creator = creator;
         this.numberOfQuestions = tournamentDto.getNumberOfQuestions();
         this.topics = topic;
     }
@@ -84,11 +89,11 @@ public class Tournament {
 
     public void setFinishTime(LocalDateTime time) { finishTime = time; }
 
-    public int getCreatorID() {
-        return creatorId;
+    public User getCreator() {
+        return creator;
     }
 
-    public void setCreatorId(int id) { creatorId = id; }
+    public void setCreator(User user) { creator = user; }
 
     public List<Topic> getTopics() {
         return topics;
@@ -117,7 +122,18 @@ public class Tournament {
 
         topics.clear();
 
+        creator.getCreatedTournaments().remove(this);
+        creator = null;
+
         courseExecution.getTournaments().remove(this);
         courseExecution = null;
+    }
+
+    public boolean hasSignedUp(User user){
+        return signedUp.contains(user);
+    }
+
+    public void signUp(User user){
+        signedUp.add(user);
     }
 }

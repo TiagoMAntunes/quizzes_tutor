@@ -54,7 +54,6 @@ class CancelTournamentTest extends Specification {
     def IN_TWO_DAYS_TIME
     def IN_FOUR_DAYS_TIME
     def TOPIC_LIST
-    def course
     def courseExecution
 
     def setup() {
@@ -69,7 +68,7 @@ class CancelTournamentTest extends Specification {
         userRepository.save(user)
 
         //Creates a course
-        course = new Course(COURSE_NAME, Course.Type.TECNICO)
+        def course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
 
@@ -95,22 +94,23 @@ class CancelTournamentTest extends Specification {
     def "cancel a cancelable tournament"() {
         given: "a cancelable tournament"
         def userId = userRepository.findAll().get(0).getId()
+        def user = userRepository.findAll().get(0)
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(IN_TWO_DAYS_TIME)
         tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
-        tournamentDto.setCreatorId(userId)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentService.createTournament(tournamentDto, courseExecution)
+        tournamentService.createTournament(tournamentDto, courseExecution, user)
 
         def tournamentId = tournamentRepository.findAll().get(0).getId()
 
         when: "cancel tournament"
-        tournamentService.cancelTournament(tournamentId, userId)
+        tournamentService.cancelTournament(tournamentId, user.getId())
 
         then: "tournament is canceled"
         tournamentRepository.count() == 0L
+        userRepository.findAll().get(0).getCreatedTournaments().size() == 0
         courseExecutionRepository.findAll().get(0).getTournaments().size() == 0
         topicRepository.findAll().get(0).getTournaments().size() == 0
     }
@@ -118,14 +118,14 @@ class CancelTournamentTest extends Specification {
     def "cancel a tournament not created by the student"() {
         given: "a cancelable tournament"
         def userId = userRepository.findAll().get(0).getId()
+        def user = userRepository.findAll().get(0)
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(IN_TWO_DAYS_TIME)
         tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
-        tournamentDto.setCreatorId(userId)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentService.createTournament(tournamentDto, courseExecution)
+        tournamentService.createTournament(tournamentDto, courseExecution, user)
 
         def tournamentId = tournamentRepository.findAll().get(0).getId()
 
@@ -136,6 +136,7 @@ class CancelTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_THE_CREATER
         tournamentRepository.count() == 1L
+        userRepository.findAll().get(0).getCreatedTournaments().size() == 1
         courseExecutionRepository.findAll().get(0).getTournaments().size() == 1
         topicRepository.findAll().get(0).getTournaments().size() == 1
     }
@@ -143,14 +144,14 @@ class CancelTournamentTest extends Specification {
     def "cancel a tournament after it as started"() {
         given: "a tournament that has started"
         def userId = userRepository.findAll().get(0).getId()
+        def user = userRepository.findAll().get(0)
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(TWO_DAYS_AGO_TIME)
         tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
-        tournamentDto.setCreatorId(userId)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentService.createTournament(tournamentDto, courseExecution)
+        tournamentService.createTournament(tournamentDto, courseExecution, user)
 
         def tournamentId = tournamentRepository.findAll().get(0).getId()
 
@@ -161,6 +162,7 @@ class CancelTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_HAS_STARTED
         tournamentRepository.count() == 1L
+        userRepository.findAll().get(0).getCreatedTournaments().size() == 1
         courseExecutionRepository.findAll().get(0).getTournaments().size() == 1
         topicRepository.findAll().get(0).getTournaments().size() == 1
     }
