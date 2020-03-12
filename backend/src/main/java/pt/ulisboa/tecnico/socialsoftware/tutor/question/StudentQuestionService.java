@@ -15,6 +15,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
@@ -34,6 +35,9 @@ public class StudentQuestionService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private StudentQuestionRepository studentQuestionRepository;
 
     @Autowired
     private QuestionRepository questionRepository;
@@ -60,16 +64,10 @@ public class StudentQuestionService {
         return new StudentQuestionDto(studentQuestion);
     }
 
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void studentQuestionApproveReject(Integer questionId, StudentQuestion.QuestionStatus status, String explanation, User teacher) {
-        if (teacher.getRole() != User.Role.TEACHER) {
-            throw new TutorException(ACCESS_DENIED);
-        }
-
+    public void studentQuestionApproveReject(Integer questionId, StudentQuestion.QuestionStatus status, String explanation, User teacher, CourseExecution execution) {
+        checkUserRole(teacher);
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+        checkTeacherCourse(teacher, execution);
 
         switch (status) {
             case REJECTED:
@@ -79,6 +77,18 @@ public class StudentQuestionService {
             case APPROVED:
                 question.setQuestionStatus(status);
                 break;
+        }
+    }
+
+    private void checkTeacherCourse(User teacher, CourseExecution execution) {
+        if(!teacher.getCourseExecutions().contains(execution)){
+            throw new TutorException(ACCESS_DENIED);
+        }
+    }
+
+    private void checkUserRole(User teacher) {
+        if (teacher.getRole() != User.Role.TEACHER) {
+            throw new TutorException(ACCESS_DENIED);
         }
     }
 }
