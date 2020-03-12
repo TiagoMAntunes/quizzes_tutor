@@ -56,6 +56,7 @@ class GetOpenTournamentsTest extends Specification {
     def TWO_DAYS_EARLIER
     def FIVE_DAYS_LATER
     def THREE_DAYS_LATER
+    def ONE_DAY_LATER
     def TOPIC_LIST
     def COURSE_EXEC
     def COURSE_EXEC_ID
@@ -75,10 +76,12 @@ class GetOpenTournamentsTest extends Specification {
         FIVE_DAYS_EARLIER = LocalDateTime.now().minusDays(5).format(formatter)
         THREE_DAYS_EARLIER = LocalDateTime.now().minusDays(3).format(formatter)
         TWO_DAYS_EARLIER = LocalDateTime.now().minusDays(2).format(formatter)
+        ONE_DAY_LATER = LocalDateTime.now().plusDays(1).format(formatter)
 
         //Creates a user
         def tmp_user = new User()
         tmp_user.setKey(1)
+        tmp_user.setRole(User.Role.STUDENT)
         userRepository.save(tmp_user)
 
         //Creates a course
@@ -110,14 +113,14 @@ class GetOpenTournamentsTest extends Specification {
         TOPIC_LIST = topicList
 
         //Creates an open tournament
-        user = userRepository.findAll().get(0)
+        user = userRepository.findAll().get(0).getId()
 
         def course2 = courseExecutionRepository.findAll().get(0)
         COURSE_EXEC = course2
         COURSE_EXEC_ID = course2.getId()
 
         def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(THREE_DAYS_EARLIER)
+        tournamentDto.setStartTime(ONE_DAY_LATER)
         tournamentDto.setFinishTime(THREE_DAYS_LATER)
                 tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
@@ -131,7 +134,7 @@ class GetOpenTournamentsTest extends Specification {
         DIFF_COURSE_EXEC_ID = course3.getId()
 
         def tournamentDto3 = new TournamentDto()
-        tournamentDto3.setStartTime(THREE_DAYS_LATER)
+        tournamentDto3.setStartTime(ONE_DAY_LATER)
         tournamentDto3.setFinishTime(FIVE_DAYS_LATER)
                 tournamentDto3.setTopics(TOPIC_LIST)
         tournamentDto3.setNumberOfQuestions(NUMBER_QUESTIONS)
@@ -140,7 +143,7 @@ class GetOpenTournamentsTest extends Specification {
 
         //Creates 2 more open tournaments for this course
         def tournamentDto4 = new TournamentDto()
-        tournamentDto4.setStartTime(FIVE_DAYS_EARLIER)
+        tournamentDto4.setStartTime(ONE_DAY_LATER)
         tournamentDto4.setFinishTime(THREE_DAYS_LATER)
                 tournamentDto4.setTopics(TOPIC_LIST)
         tournamentDto4.setNumberOfQuestions(NUMBER_QUESTIONS)
@@ -148,7 +151,7 @@ class GetOpenTournamentsTest extends Specification {
         openTournament2 = tournamentDto4
 
         def tournamentDto5 = new TournamentDto()
-        tournamentDto5.setStartTime(TWO_DAYS_EARLIER)
+        tournamentDto5.setStartTime(ONE_DAY_LATER)
         tournamentDto5.setFinishTime(THREE_DAYS_LATER)
                 tournamentDto5.setTopics(TOPIC_LIST)
         tournamentDto5.setNumberOfQuestions(NUMBER_QUESTIONS)

@@ -54,9 +54,10 @@ public enum ErrorMessage {
 
 
     INVALID_TOURNAMENT_TIME("Start time of a tournament must be before finish time"),
-    TOURNAMENT_ALREADY_FINISHED("Finish time of a tournament must be after the time of creation"),
+    TOURNAMENT_ALREADY_STARTED("Start time of a tournament must be after the time of creation"),
     NO_TOPICS_SELECTED("Tournament requires at least one topic to be valid"),
     TOURNAMENT_HAS_NO_QUESTIONS("Tournament requires at least 1 question"),
+    TOURNAMENT_CREATION_INCORRECT_ROLE("Only students can create a tournament"),
 
     TOURNAMENT_ALREADY_JOINED("User has already joined this tournament"),
     TOURNAMENT_NOT_OPEN("Tournament is not open"),
