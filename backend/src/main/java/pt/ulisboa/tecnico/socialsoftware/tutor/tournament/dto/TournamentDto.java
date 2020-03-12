@@ -15,7 +15,6 @@ public class TournamentDto implements Serializable {
     private Integer key;
     private String startTime = null;
     private String finishTime = null;
-    private Integer creatorId;
     private Integer numberOfQuestions;
     private List<TopicDto> topics;
 
@@ -27,7 +26,6 @@ public class TournamentDto implements Serializable {
     public TournamentDto(Tournament tournament) {
         this.id = tournament.getId();
         this.key = tournament.getKey();
-        this.creatorId = tournament.getCreatorID();
         this.numberOfQuestions = tournament.getNumberOfQuestions();
 
 
@@ -54,10 +52,6 @@ public class TournamentDto implements Serializable {
     public void setFinishTime(String time) { finishTime = time; }
 
     public String getFinishTime() { return finishTime; }
-
-    public void setCreatorId(int id) { creatorId = id; }
-
-    public int getCreatorId() { return creatorId; }
 
     public void setNumberOfQuestions(int p) { numberOfQuestions = p; }
 
