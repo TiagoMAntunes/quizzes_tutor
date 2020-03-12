@@ -8,11 +8,16 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
+<<<<<<< HEAD
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
+=======
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
+>>>>>>> b17b840a044ff7b7ff45c300f495454905e2766d
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
@@ -53,6 +58,7 @@ public class StudentQuestionService {
         return new StudentQuestionDto(studentQuestion);
     }
 
+<<<<<<< HEAD
     public void checkQuestionKey(QuestionDto questionDto) {
         if (questionDto.getKey() == null) {
             int maxQuestionNumber = questionRepository.getMaxQuestionNumber() != null ?
@@ -61,3 +67,27 @@ public class StudentQuestionService {
         }
     }
 }
+=======
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void studentQuestionApproveReject(Integer questionId, StudentQuestion.QuestionStatus status, String explanation, User teacher) {
+        if (teacher.getRole() != User.Role.TEACHER) {
+            throw new TutorException(ACCESS_DENIED);
+        }
+
+        StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+
+        switch (status) {
+            case REJECTED:
+                question.setQuestionStatus(status);
+                question.setRejectionExplanation(explanation);
+                break;
+            case APPROVED:
+                question.setQuestionStatus(status);
+                break;
+        }
+    }
+}
+>>>>>>> b17b840a044ff7b7ff45c300f495454905e2766d

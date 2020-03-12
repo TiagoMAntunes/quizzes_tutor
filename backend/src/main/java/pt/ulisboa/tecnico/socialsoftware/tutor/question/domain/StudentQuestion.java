@@ -5,6 +5,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+<<<<<<< HEAD
+=======
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
+>>>>>>> b17b840a044ff7b7ff45c300f495454905e2766d
 
 import javax.persistence.*;
 
@@ -27,6 +32,7 @@ public class StudentQuestion extends Question {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+    private String explanation;
 
 
     @Enumerated(EnumType.STRING)
@@ -41,12 +47,10 @@ public class StudentQuestion extends Question {
         checkConsistentUser(user, course);
 
         this.user = user;
-
+        this.explanation = null;
         this.setQuestionStatus(QuestionStatus.PENDING);
 
         user.addStudentQuestion(this);
-
-
     }
 
     public QuestionStatus getQuestionStatus() {
@@ -55,6 +59,16 @@ public class StudentQuestion extends Question {
 
     public void setQuestionStatus(QuestionStatus status) {
         this.questionStatus = status;
+    }
+
+    public String getRejectionExplanation() { return this.explanation; }
+
+    public void setRejectionExplanation(String explanation) {
+        if(this.questionStatus == QuestionStatus.REJECTED) {
+            this.explanation = explanation;
+        }else{
+            throw new TutorException(CANT_ADD_EXPLANATION);
+        }
     }
 
     public User getUser() {
