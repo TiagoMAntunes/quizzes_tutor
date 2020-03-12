@@ -59,11 +59,12 @@ class TournamentSignUpTest extends Specification {
     def THREE_DAYS_LATER
     def ONE_DAY_LATER
     def TOPIC_LIST
-    def user
     def COURSE_EXEC
     def COURSE_EXEC_ID
     def USER
     def USER_ID
+    def TEACHER
+    def TEACHER_ID
     def openTournamentDto
     def openTournament
     def openTournamentId
@@ -80,12 +81,19 @@ class TournamentSignUpTest extends Specification {
         ONE_DAY_LATER = LocalDateTime.now().plusDays(1).format(formatter)
 
         //Creates a user
-        def tmp_user = new User()
-        tmp_user.setKey(1)
-        tmp_user.setRole(User.Role.STUDENT)
-        userRepository.save(tmp_user)
+        def tmp_user1 = new User()
+        tmp_user1.setKey(1)
+        tmp_user1.setRole(User.Role.STUDENT)
+        userRepository.save(tmp_user1)
         USER = userRepository.findAll().get(0)
         USER_ID = USER.getId()
+
+        def tmp_user2 = new User()
+        tmp_user2.setKey(2)
+        tmp_user2.setRole(User.Role.TEACHER)
+        userRepository.save(tmp_user2)
+        TEACHER = userRepository.findAll().get(1)
+        TEACHER_ID = TEACHER.getId()
 
         //Creates a course
         def course1 = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -158,6 +166,15 @@ class TournamentSignUpTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_ALREADY_JOINED
+    }
+
+    def "tournament is open but user isnt a student"(){
+        when:
+        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, TEACHER_ID)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_JOIN_WRONG_ROLE
     }
 
     def "no user with the given id"(){
