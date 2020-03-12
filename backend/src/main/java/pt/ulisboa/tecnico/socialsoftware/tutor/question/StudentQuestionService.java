@@ -21,6 +21,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -74,4 +76,18 @@ public class StudentQuestionService {
                 break;
         }
     }
+
+    public List<StudentQuestion> getStudentQuestions(User student){
+
+        List<StudentQuestion> list = studentQuestionRepository.findAll().stream()
+                .filter(studentQuestion -> studentQuestion.getUser() == student)
+                .collect(Collectors.toList());
+
+        if(list.size() == 0){
+            throw new TutorException(NO_QUESTION_SUBMITTED);
+        }else{
+            return list;
+        }
+    }
+
 }

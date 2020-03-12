@@ -56,7 +56,7 @@ public enum ErrorMessage {
     CANT_ADD_EXPLANATION("Question is not in the rejected state"),
 
     ACCESS_DENIED("You do not have permission to view this resource"),
-    NO_QUESTION_SUBMITTED("The user hasn't submitted any questions yet"),
+    NO_QUESTION_SUBMITTED("The user hasn't submitted any questions yet");
 
     public final String label;
 
