@@ -9,7 +9,6 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
     private String questionStatus;
     private String explanation;
     private UserDto user;
-    private Integer id;
 
     public StudentQuestionDto(){
         super();
@@ -21,14 +20,6 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
         this.explanation = studentQuestion.getRejectionExplanation();
         this.user = new UserDto(studentQuestion.getUser());
 
-    }
-
-    public Integer getIdStu() {
-        return id;
-    }
-
-    public void setIdStu(Integer id) {
-        this.id = id;
     }
 
     public String getQuestionStatus() {
