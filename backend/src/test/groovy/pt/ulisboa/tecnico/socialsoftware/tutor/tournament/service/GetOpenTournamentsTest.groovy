@@ -81,6 +81,7 @@ class GetOpenTournamentsTest extends Specification {
         //Creates a user
         def tmp_user = new User()
         tmp_user.setKey(1)
+        tmp_user.setRole(User.Role.STUDENT)
         userRepository.save(tmp_user)
 
         //Creates a course

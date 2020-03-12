@@ -65,6 +65,7 @@ class CreateTournamentTest extends Specification {
         //Creates a user
         def user = new User()
         user.setKey(1)
+        user.setRole(User.Role.STUDENT)
         userRepository.save(user)
 
         //Creates a course
@@ -255,6 +256,29 @@ class CreateTournamentTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
+        tournamentRepository.count() == 0L
+    }
+
+    def "the user is not a student" () {
+        given: "a tournamentDto"
+        def user = new User()
+        user.setKey(2)
+        user.setRole(User.Role.TEACHER)
+        userRepository.save(user)
+        user = userRepository.findByKey(2)
+
+        def tournamentDto = new TournamentDto()
+        tournamentDto.setStartTime(NOW_TIME)
+        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setTopics(TOPIC_LIST)
+        tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
+
+        when:
+        tournamentService.createTournament(tournamentDto, courseExecution, user.getId())
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_CREATION_INCORRECT_ROLE
         tournamentRepository.count() == 0L
     }
 

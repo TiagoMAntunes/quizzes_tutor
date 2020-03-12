@@ -61,6 +61,9 @@ public class TournamentService {
 
         User creator = userRepository.findById(creatorId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, creatorId));
 
+        if (creator.getRole() != User.Role.STUDENT)
+            throw new TutorException(ErrorMessage.TOURNAMENT_CREATION_INCORRECT_ROLE);
+
         Tournament tournament = new Tournament(tournamentDto, topics, creator);
 
         if (tournament.getStartTime().isAfter(tournament.getFinishTime()) || tournament.getStartTime().isEqual(tournament.getFinishTime()))
