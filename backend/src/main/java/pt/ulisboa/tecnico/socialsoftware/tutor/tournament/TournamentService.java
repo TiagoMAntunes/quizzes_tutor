@@ -67,8 +67,7 @@ public class TournamentService {
         else if (tournament.getFinishTime().isBefore(LocalDateTime.now()))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_FINISHED);
 
-        for (Topic t : topics) 
-            t.addTournament(tournament);
+        topics.forEach(topic -> topic.addTournament(tournament));
 
         //Add tournament to course execution
         courseExecution.addTournament(tournament);
