@@ -11,11 +11,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.ImageDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
@@ -41,7 +39,6 @@ class CreateStudentQuestionTest extends Specification {
     public static final String USER_USERNAME2 = "riju"
     public static final String TEACHER_NAME = "maria"
     public static final String TEACHER_USERNAME = "appolle"
-    public static final String TOPIC_NAME = "topic_name"
 
     @Autowired
     CourseRepository courseRepository
@@ -67,7 +64,6 @@ class CreateStudentQuestionTest extends Specification {
     def student
     def student2
     def teacher
-    def topic
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -171,7 +167,7 @@ class CreateStudentQuestionTest extends Specification {
 
 
     @Unroll("invalid arguments:  #Title | #Content | #Option || errorMessage")
-    def "invalid input values"(){
+    def "invalid input values"() {
         given: "a questionDto"
         def questionDto = new QuestionDto()
         questionDto.setKey(1)
@@ -201,8 +197,6 @@ class CreateStudentQuestionTest extends Specification {
         QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || QUESTION_MISSING_DATA
         QUESTION_TITLE    | QUESTION_CONTENT   | BLANK              || QUESTION_MISSING_DATA
         QUESTION_TITLE    | QUESTION_CONTENT   | EMPTY              || QUESTION_MISSING_DATA
-        //QUESTION_TITLE    | QUESTION_CONTENT   | COURSE_NAME   || OPTION_CONTENT    ||
-        //QUESTION_TITLE    | QUESTION_CONTENT   | COURSE_NAME   || OPTION_CONTENT    ||
     }
 
 

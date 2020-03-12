@@ -52,11 +52,7 @@ public class StudentQuestionService {
     public StudentQuestionDto createStudentQuestion(int courseId, QuestionDto questionDto, int studentId){
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
-        if (questionDto.getKey() == null) {
-            int maxQuestionNumber = questionRepository.getMaxQuestionNumber() != null ?
-                    questionRepository.getMaxQuestionNumber() : 0;
-            questionDto.setKey(maxQuestionNumber + 1);
-        }
+        checkQuestionKey(questionDto);
         StudentQuestion studentQuestion = new StudentQuestion(course, questionDto, student);
         studentQuestion.setCreationDate(LocalDateTime.now());
         this.entityManager.persist(studentQuestion);
@@ -84,6 +80,13 @@ public class StudentQuestionService {
         }
     }
 
+    private void checkQuestionKey(QuestionDto questionDto) {
+        if (questionDto.getKey() == null) {
+            int maxQuestionNumber = questionRepository.getMaxQuestionNumber() != null ?
+                    questionRepository.getMaxQuestionNumber() : 0;
+            questionDto.setKey(maxQuestionNumber + 1);
+        }
+    }
     private void checkTeacherCourse(User teacher, CourseExecution execution) {
         if(!teacher.getCourseExecutions().contains(execution)){
             throw new TutorException(ACCESS_DENIED);
@@ -96,7 +99,7 @@ public class StudentQuestionService {
         }
     }
 
-    public List<StudentQuestion> getStudentQuestions(User student){
+    public List<StudentQuestion> getStudentQuestions(User student) {
 
         List<StudentQuestion> list = studentQuestionRepository.findAll().stream()
                 .filter(studentQuestion -> studentQuestion.getUser() == student)
