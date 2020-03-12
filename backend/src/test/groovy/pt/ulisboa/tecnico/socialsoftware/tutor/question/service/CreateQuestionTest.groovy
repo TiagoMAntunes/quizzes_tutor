@@ -82,7 +82,6 @@ class CreateQuestionTest extends Specification {
         def resOption = result.getOptions().get(0)
         resOption.getContent() == OPTION_CONTENT
         resOption.getCorrect()
-
     }
 
     def "create a question with image and two options"() {

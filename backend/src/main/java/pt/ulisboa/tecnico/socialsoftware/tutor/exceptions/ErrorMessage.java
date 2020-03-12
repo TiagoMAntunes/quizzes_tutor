@@ -58,6 +58,7 @@ public enum ErrorMessage {
     ACCESS_DENIED("You do not have permission to view this resource"),
     NO_QUESTION_SUBMITTED("The user hasn't submitted any questions yet");
 
+
     public final String label;
 
     ErrorMessage(String label) {
