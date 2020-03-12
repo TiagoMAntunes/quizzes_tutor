@@ -62,6 +62,7 @@ public enum ErrorMessage {
     TOURNAMENT_ALREADY_JOINED("User has already joined this tournament"),
     TOURNAMENT_NOT_OPEN("Tournament is not open"),
     TOURNAMENT_NOT_FOUND("No tournament found with id %d"),
+    TOURNAMENT_JOIN_WRONG_ROLE("Only students can join tournaments"),
 
     ACCESS_DENIED("You do not have permission to view this resource");
 
