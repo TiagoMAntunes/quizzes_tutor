@@ -59,12 +59,16 @@ public class StudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void studentQuestionApproveReject(Integer questionId, StudentQuestion.QuestionStatus status, String explanation, User teacher) {
+    public void studentQuestionApproveReject(Integer questionId, StudentQuestion.QuestionStatus status, String explanation, User teacher, CourseExecution execution) {
         if (teacher.getRole() != User.Role.TEACHER) {
             throw new TutorException(ACCESS_DENIED);
         }
 
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+
+        if(!teacher.getCourseExecutions().contains(execution)){
+            throw new TutorException(ACCESS_DENIED);
+        }
 
         switch (status) {
             case REJECTED:
