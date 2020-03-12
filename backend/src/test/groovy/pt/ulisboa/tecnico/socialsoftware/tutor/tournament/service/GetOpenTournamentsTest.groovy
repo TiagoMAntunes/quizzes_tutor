@@ -88,15 +88,15 @@ class GetOpenTournamentsTest extends Specification {
         def course1 = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course1)
 
-        def diffCourse = new Course(DIFF_COURSE_NAME, Course.Type.TECNICO)
-        courseRepository.save(diffCourse)
+        def course2 = new Course(DIFF_COURSE_NAME, Course.Type.TECNICO)
+        courseRepository.save(course2)
 
         //Creates a course execution
         def courseExecution = new CourseExecution(course1, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
 
-        def diffCourseExecution = new CourseExecution(diffCourse, COURSE_NAME, DIFF_COURSE_ABREV, Course.Type.TECNICO)
-        courseExecutionRepository.save(courseExecution)
+        def diffCourseExecution = new CourseExecution(course2, DIFF_COURSE_NAME, DIFF_COURSE_ABREV, Course.Type.TECNICO)
+        courseExecutionRepository.save(diffCourseExecution)
 
 
         //Creates a topic
@@ -115,48 +115,48 @@ class GetOpenTournamentsTest extends Specification {
         //Creates an open tournament
         user = userRepository.findAll().get(0).getId()
 
-        def course2 = courseExecutionRepository.findAll().get(0)
-        COURSE_EXEC = course2
-        COURSE_EXEC_ID = course2.getId()
+        def course = courseExecutionRepository.findAll().get(0)
+        COURSE_EXEC = course
+        COURSE_EXEC_ID = course.getId()
 
-        def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(ONE_DAY_LATER)
-        tournamentDto.setFinishTime(THREE_DAYS_LATER)
-                tournamentDto.setTopics(TOPIC_LIST)
-        tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
+        def tournamentDto1 = new TournamentDto()
+        tournamentDto1.setStartTime(ONE_DAY_LATER)
+        tournamentDto1.setFinishTime(THREE_DAYS_LATER)
+        tournamentDto1.setTopics(TOPIC_LIST)
+        tournamentDto1.setNumberOfQuestions(NUMBER_QUESTIONS)
 
-        openTournament1 = tournamentDto
+        openTournament1 = tournamentDto1
 
 
         //Creates an open tournament for a different course
-        def course3 = courseExecutionRepository.findAll().get(1)
-        DIFF_COURSE_EXEC = course3
-        DIFF_COURSE_EXEC_ID = course3.getId()
+        def diffCourse = courseExecutionRepository.findAll().get(1)
+        DIFF_COURSE_EXEC = diffCourse
+        DIFF_COURSE_EXEC_ID = diffCourse.getId()
+
+        def diffTournamentDto = new TournamentDto()
+        diffTournamentDto.setStartTime(ONE_DAY_LATER)
+        diffTournamentDto.setFinishTime(FIVE_DAYS_LATER)
+        diffTournamentDto.setTopics(TOPIC_LIST)
+        diffTournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
+
+        diffCourseTournament = diffTournamentDto
+
+        //Creates 2 more open tournaments for this course
+        def tournamentDto2 = new TournamentDto()
+        tournamentDto2.setStartTime(ONE_DAY_LATER)
+        tournamentDto2.setFinishTime(THREE_DAYS_LATER)
+        tournamentDto2.setTopics(TOPIC_LIST)
+        tournamentDto2.setNumberOfQuestions(NUMBER_QUESTIONS)
+
+        openTournament2 = tournamentDto2
 
         def tournamentDto3 = new TournamentDto()
         tournamentDto3.setStartTime(ONE_DAY_LATER)
-        tournamentDto3.setFinishTime(FIVE_DAYS_LATER)
-                tournamentDto3.setTopics(TOPIC_LIST)
+        tournamentDto3.setFinishTime(THREE_DAYS_LATER)
+        tournamentDto3.setTopics(TOPIC_LIST)
         tournamentDto3.setNumberOfQuestions(NUMBER_QUESTIONS)
 
-        diffCourseTournament = tournamentDto3
-
-        //Creates 2 more open tournaments for this course
-        def tournamentDto4 = new TournamentDto()
-        tournamentDto4.setStartTime(ONE_DAY_LATER)
-        tournamentDto4.setFinishTime(THREE_DAYS_LATER)
-                tournamentDto4.setTopics(TOPIC_LIST)
-        tournamentDto4.setNumberOfQuestions(NUMBER_QUESTIONS)
-
-        openTournament2 = tournamentDto4
-
-        def tournamentDto5 = new TournamentDto()
-        tournamentDto5.setStartTime(ONE_DAY_LATER)
-        tournamentDto5.setFinishTime(THREE_DAYS_LATER)
-                tournamentDto5.setTopics(TOPIC_LIST)
-        tournamentDto5.setNumberOfQuestions(NUMBER_QUESTIONS)
-
-        openTournament3 = tournamentDto5
+        openTournament3 = tournamentDto3
     }
 
     def "no open tournaments"(){

@@ -133,6 +133,9 @@ public class TournamentService {
         Tournament tournament = getTournament(tournamentId);
         User user = getUser(userId);
 
+        if (user.getRole() != User.Role.STUDENT)
+            throw new TutorException(ErrorMessage.TOURNAMENT_JOIN_WRONG_ROLE);
+
         if(!tournamentIsOpen(tournamentId, courseExecutionId))
             throw new TutorException(ErrorMessage.TOURNAMENT_NOT_OPEN);
 
