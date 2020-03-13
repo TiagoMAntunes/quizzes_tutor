@@ -8,7 +8,6 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
@@ -21,6 +20,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.COURSE_NOT_FOUND;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUESTIONS_IMPORT_ERROR;
 
 public class QuestionsXmlImport {
@@ -112,7 +112,7 @@ public class QuestionsXmlImport {
 		}
 		questionDto.setOptions(optionDtos);
 
-		Course course = courseRepository.findByNameType(courseName, courseType).get();
+		Course course = courseRepository.findByNameType(courseName, courseType).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseName));
 		questionService.createQuestion(course.getId(), questionDto);
 	}
 

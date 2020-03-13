@@ -12,6 +12,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TopicService;
@@ -24,6 +26,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,6 +35,8 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class ImpExpService {
+    public static final String PATH_DELIMITER = "/";
+
     @Autowired
     private UserRepository userRepository;
 
@@ -85,15 +90,13 @@ public class ImpExpService {
       value = { SQLException.class },
       backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public String exportAll() throws IOException {
+    public String exportAll() {
         String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
         File directory = new File(exportDir);
-        FileOutputStream fos = null;
 
         String filename = "tutor-" + timeStamp + ".zip";
-        try {
-            fos = new FileOutputStream(directory.getPath() + "/" + filename);
-            ZipOutputStream zos = new ZipOutputStream(fos);
+        try (FileOutputStream fos = new FileOutputStream(directory.getPath() + PATH_DELIMITER + filename);
+        ZipOutputStream zos = new ZipOutputStream(fos);){
 
             zos.putNextEntry(new ZipEntry("users.xml"));
             InputStream in = generateUsersInputStream();
@@ -119,18 +122,9 @@ public class ImpExpService {
             in = generateAnswersInputStream();
             copyToZipStream(zos, in);
             zos.closeEntry();
-            zos.close();
+        } catch (IOException ex) {
+           throw new TutorException(ErrorMessage.CANNOT_OPEN_FILE);
         }
-        catch (IOException ex)
-        {
-            // log/report exception, then delete the invalid file
-            IOUtils.closeQuietly(fos);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(fos);
-        }
-
 
         return filename;
     }
@@ -144,29 +138,29 @@ public class ImpExpService {
         in.close();
     }
 
-    private InputStream generateUsersInputStream() throws IOException {
+    private InputStream generateUsersInputStream() {
         UsersXmlExport usersExporter = new UsersXmlExport();
-        return IOUtils.toInputStream(usersExporter.export(userRepository.findAll()), "UTF-8");
+        return IOUtils.toInputStream(usersExporter.export(userRepository.findAll()), StandardCharsets.UTF_8);
     }
 
-    private InputStream generateQuestionsInputStream() throws IOException {
+    private InputStream generateQuestionsInputStream() {
         QuestionsXmlExport generator = new QuestionsXmlExport();
-        return IOUtils.toInputStream(generator.export(questionRepository.findAll()), "UTF-8");
+        return IOUtils.toInputStream(generator.export(questionRepository.findAll()), StandardCharsets.UTF_8);
     }
 
-    private InputStream generateTopicsInputStream() throws IOException {
+    private InputStream generateTopicsInputStream() {
         TopicsXmlExport generator = new TopicsXmlExport();
-        return IOUtils.toInputStream(generator.export(topicRepository.findAll()), "UTF-8");
+        return IOUtils.toInputStream(generator.export(topicRepository.findAll()), StandardCharsets.UTF_8);
     }
 
-    private InputStream generateQuizzesInputStream() throws IOException {
+    private InputStream generateQuizzesInputStream() {
         QuizzesXmlExport generator = new QuizzesXmlExport();
-        return IOUtils.toInputStream(generator.export(quizRepository.findAll()), "UTF-8");
+        return IOUtils.toInputStream(generator.export(quizRepository.findAll()), StandardCharsets.UTF_8);
     }
 
-    private InputStream generateAnswersInputStream() throws IOException {
+    private InputStream generateAnswersInputStream() {
         AnswersXmlExport generator = new AnswersXmlExport();
-        return IOUtils.toInputStream(generator.export(quizAnswerRepository.findAll()), "UTF-8");
+        return IOUtils.toInputStream(generator.export(quizAnswerRepository.findAll()), StandardCharsets.UTF_8);
     }
 
 
@@ -174,32 +168,32 @@ public class ImpExpService {
       value = { SQLException.class },
       backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void importAll() throws IOException {
+    public void importAll() {
         if (userRepository.findAll().isEmpty()) {
             try {
                 File directory = new File(loadDir);
 
-                File usersFile = new File(directory.getPath() + "/" + "users.xml");
+                File usersFile = new File(directory.getPath() + PATH_DELIMITER + "users.xml");
                 UsersXmlImport usersXmlImport = new UsersXmlImport();
                 usersXmlImport.importUsers(new FileInputStream(usersFile), userService);
 
-                File questionsFile = new File(directory.getPath() + "/" + "questions.xml");
+                File questionsFile = new File(directory.getPath() + PATH_DELIMITER + "questions.xml");
                 QuestionsXmlImport questionsXmlImport = new QuestionsXmlImport();
                 questionsXmlImport.importQuestions(new FileInputStream(questionsFile), questionService, courseRepository);
 
-                File topicsFile = new File(directory.getPath() + "/" + "topics.xml");
+                File topicsFile = new File(directory.getPath() + PATH_DELIMITER + "topics.xml");
                 TopicsXmlImport topicsXmlImport = new TopicsXmlImport();
                 topicsXmlImport.importTopics(new FileInputStream(topicsFile), topicService, questionService, courseRepository);
 
-                File quizzesFile = new File(directory.getPath() + "/" + "quizzes.xml");
+                File quizzesFile = new File(directory.getPath() + PATH_DELIMITER + "quizzes.xml");
                 QuizzesXmlImport quizzesXmlImport = new QuizzesXmlImport();
                 quizzesXmlImport.importQuizzes(new FileInputStream(quizzesFile), quizService, questionRepository, quizQuestionRepository, courseExecutionRepository);
 
-                File answersFile = new File(directory.getPath() + "/" + "answers.xml");
+                File answersFile = new File(directory.getPath() + PATH_DELIMITER + "answers.xml");
 
                 answersXmlImport.importAnswers(new FileInputStream(answersFile), answerService, questionRepository, quizRepository, quizAnswerRepository, userRepository);
             } catch (FileNotFoundException e) {
-
+                throw new TutorException(ErrorMessage.CANNOT_OPEN_FILE);
             }
         }
     }

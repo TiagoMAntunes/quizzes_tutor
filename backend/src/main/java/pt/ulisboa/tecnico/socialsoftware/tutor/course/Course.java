@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.course;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
-import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.Importable;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
@@ -14,6 +13,8 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CO
 @Entity
 @Table(name = "courses")
 public class Course {
+    public static String DEMO_COURSE = "Demo Course";
+
     public enum Type {TECNICO, EXTERNAL}
 
     @Id
@@ -48,9 +49,13 @@ public class Course {
     public Optional<CourseExecution> getCourseExecution(String acronym, String academicTerm, Course.Type type) {
         return getCourseExecutions().stream()
                 .filter(courseExecution -> courseExecution.getType().equals(type)
-                                            && courseExecution.getAcronym().equals(acronym)
-                                            && courseExecution.getAcademicTerm().equals(academicTerm))
+                        && courseExecution.getAcronym().equals(acronym)
+                        && courseExecution.getAcademicTerm().equals(academicTerm))
                 .findAny();
+    }
+
+    public boolean existsCourseExecution(String acronym, String academicTerm, Course.Type type) {
+        return getCourseExecution(acronym, academicTerm, type).isPresent();
     }
 
     public Integer getId() {

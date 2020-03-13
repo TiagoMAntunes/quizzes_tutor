@@ -19,8 +19,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.ImageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.OptionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import spock.lang.Specification
 
 @DataJpaTest
@@ -54,6 +56,9 @@ class FindQuestionsTest extends Specification {
     QuizQuestionRepository quizQuestionRepository
 
     @Autowired
+    QuizRepository quizRepository
+
+    @Autowired
     QuizAnswerRepository quizAnswerRepository
 
     @Autowired
@@ -76,8 +81,8 @@ class FindQuestionsTest extends Specification {
         question.setKey(1)
         question.setContent(QUESTION_CONTENT)
         question.setStatus(Question.Status.AVAILABLE)
-        question.setNumberOfAnswers(0)
-        question.setNumberOfCorrect(0)
+        question.setNumberOfAnswers(2)
+        question.setNumberOfCorrect(1)
         question.setCourse(course)
         and: 'an image'
         def image = new Image()
@@ -99,9 +104,19 @@ class FindQuestionsTest extends Specification {
         optionRepository.save(optionKO)
         question.addOption(optionKO)
         questionRepository.save(question)
+
+        def quiz = new Quiz()
+        quiz.setType(Quiz.QuizType.PROPOSED)
+        quiz.setKey(1)
+
         def quizQuestion = new QuizQuestion()
-        quizQuestionRepository.save(quizQuestion)
+        quizQuestion.setQuestion(question)
         question.addQuizQuestion(quizQuestion)
+        quiz.addQuizQuestion(quizQuestion)
+        quizQuestion.setQuiz(quiz)
+        quizRepository.save(quiz);
+        quizQuestionRepository.save(quizQuestion)
+
         def quizAnswer = new QuizAnswer()
         quizAnswer.setCompleted(true)
         quizAnswer.addQuestionAnswer()

@@ -19,7 +19,7 @@
           />
 
           <v-spacer />
-          <v-btn color="primary" dark @click="newQuiz">New Quiz</v-btn>
+          <v-btn color="primary" dark @click="$emit('newQuiz')">New Quiz</v-btn>
         </v-card-title>
       </template>
 
@@ -38,7 +38,23 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="editQuiz(item.id)"
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="showQuizAnswers(item.id)"
+              >mdi-table</v-icon
+            >
+          </template>
+          <span>View Results</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="$emit('editQuiz', item.id)"
               >edit</v-icon
             >
           </template>
@@ -67,16 +83,19 @@
         </v-tooltip>
       </template>
     </v-data-table>
-    <show-quiz-dialog
-      v-if="quiz"
-      :dialog="quizDialog"
-      :quiz="quiz"
-      v-on:close-quiz-dialog="closeQuizDialog"
+    <show-quiz-dialog v-if="quiz" v-model="quizDialog" :quiz="quiz" />
+
+    <show-quiz-answers-dialog
+      v-if="quizAnswers"
+      v-model="quizAnswersDialog"
+      :quiz-answers="quizAnswers"
+      :correct-sequence="correctSequence"
+      :secondsToSubmission="secondsToSubmission"
     />
 
     <v-dialog
       v-model="qrcodeDialog"
-      @keydown.esc="closeQrCodeDialog"
+      @keydown.esc="qrcodeDialog = false"
       max-width="75%"
     >
       <v-card v-if="qrValue">
@@ -97,10 +116,14 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import { Quiz } from '@/models/management/Quiz';
 import RemoteServices from '@/services/RemoteServices';
 import ShowQuizDialog from '@/views/teacher/quizzes/ShowQuizDialog.vue';
+import ShowQuizAnswersDialog from '@/views/teacher/quizzes/ShowQuizAnswersDialog.vue';
 import VueQrcode from 'vue-qrcode';
+import { QuizAnswer } from '@/models/management/QuizAnswer';
+import { QuizAnswers } from '@/models/management/QuizAnswers';
 
 @Component({
   components: {
+    'show-quiz-answers-dialog': ShowQuizAnswersDialog,
     'show-quiz-dialog': ShowQuizDialog,
     'vue-qrcode': VueQrcode
   }
@@ -108,9 +131,15 @@ import VueQrcode from 'vue-qrcode';
 export default class QuizList extends Vue {
   @Prop({ type: Array, required: true }) readonly quizzes!: Quiz[];
   quiz: Quiz | null = null;
+  quizAnswers: QuizAnswer[] = [];
+  correctSequence: number[] = [];
+  secondsToSubmission: number = 0;
   search: string = '';
+
   quizDialog: boolean = false;
+  quizAnswersDialog: boolean = false;
   qrcodeDialog: boolean = false;
+
   qrValue: number | null = null;
   headers: object = [
     { text: 'Title', value: 'title', align: 'left', width: '30%' },
@@ -143,6 +172,12 @@ export default class QuizList extends Vue {
       width: '10%'
     },
     {
+      text: 'Timer to submission',
+      value: 'timerToSubmission',
+      align: 'center',
+      width: '10%'
+    },
+    {
       text: 'Answers',
       value: 'numberOfAnswers',
       align: 'center',
@@ -166,27 +201,24 @@ export default class QuizList extends Vue {
     }
   }
 
-  closeQuizDialog() {
-    this.quizDialog = false;
-    this.quiz = null;
+  async showQuizAnswers(quizId: number) {
+    try {
+      let quizAnswers: QuizAnswers = await RemoteServices.getQuizAnswers(
+        quizId
+      );
+
+      this.quizAnswers = quizAnswers.quizAnswers;
+      this.correctSequence = quizAnswers.correctSequence;
+      this.secondsToSubmission = quizAnswers.secondsToSubmission;
+      this.quizAnswersDialog = true;
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 
   showQrCode(quizId: number) {
     this.qrValue = quizId;
     this.qrcodeDialog = true;
-  }
-
-  closeQrCodeDialog() {
-    this.qrcodeDialog = false;
-    this.qrValue = null;
-  }
-
-  newQuiz() {
-    this.$emit('newQuiz');
-  }
-
-  editQuiz(quizId: number) {
-    this.$emit('editQuiz', quizId);
   }
 
   async deleteQuiz(quizId: number) {
