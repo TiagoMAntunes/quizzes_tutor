@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
@@ -39,6 +40,9 @@ public class TournamentService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CourseExecutionRepository courseExecutionRepository;
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -46,11 +50,14 @@ public class TournamentService {
         value = {SQLException.class },
         backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto createTournament(TournamentDto tournamentDto, CourseExecution courseExecution, int creatorId) {
+    public TournamentDto createTournament(TournamentDto tournamentDto, int courseExecutionId, int creatorId) {
         if (tournamentDto.getKey() == null)
             tournamentDto.setKey(getMaxTournamentKey() + 1);
 
-        Set<Topic> topicsSet = tournamentDto.getTopics().stream().map(topicDto -> topicRepository.findById(topicDto.getId()).orElseThrow()).collect(Collectors.toSet());
+        if (tournamentDto.getTopics() == null)
+            throw new TutorException(ErrorMessage.NO_TOPICS_SELECTED);
+
+        Set<Topic> topicsSet = tournamentDto.getTopics().stream().map(topicDto -> topicRepository.findById(topicDto.getId()).orElseThrow(() -> new TutorException(ErrorMessage.TOPIC_NOT_FOUND, topicDto.getId()))).collect(Collectors.toSet());
 
         List<Topic> topics = new ArrayList<>(topicsSet);
 
@@ -64,6 +71,8 @@ public class TournamentService {
 
         if (creator.getRole() != User.Role.STUDENT)
             throw new TutorException(ErrorMessage.TOURNAMENT_CREATION_INCORRECT_ROLE);
+
+        CourseExecution courseExecution = courseExecutionRepository.findById(courseExecutionId).orElseThrow(() -> new TutorException(ErrorMessage.COURSE_EXECUTION_NOT_FOUND, courseExecutionId));
 
         Tournament tournament = new Tournament(tournamentDto, topics, creator);
 

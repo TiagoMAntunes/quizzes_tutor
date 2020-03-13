@@ -54,7 +54,6 @@ class CancelTournamentTest extends Specification {
     def IN_TWO_DAYS_TIME
     def IN_FOUR_DAYS_TIME
     def TOPIC_LIST
-    def courseExecution
     def courseExecutionId
     def userId
     def tournamentId
@@ -79,7 +78,6 @@ class CancelTournamentTest extends Specification {
         //Creates a course execution
         def newCourseExecution = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
         courseExecutionRepository.save(newCourseExecution)
-        courseExecution = courseExecutionRepository.findAll().get(0)
         courseExecutionId = courseExecutionRepository.findAll().get(0).getId()
 
         //Creates a topic
@@ -101,7 +99,7 @@ class CancelTournamentTest extends Specification {
         tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentService.createTournament(tournamentDto, courseExecution, userId)
+        tournamentService.createTournament(tournamentDto, courseExecutionId, userId)
 
         tournamentId = tournamentRepository.findAll().get(0).getId()
     }

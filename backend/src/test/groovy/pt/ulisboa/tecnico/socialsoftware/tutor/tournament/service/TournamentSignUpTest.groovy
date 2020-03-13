@@ -59,7 +59,6 @@ class TournamentSignUpTest extends Specification {
     def THREE_DAYS_LATER
     def ONE_DAY_LATER
     def TOPIC_LIST
-    def COURSE_EXEC
     def COURSE_EXEC_ID
     def USER
     def USER_ID
@@ -118,7 +117,6 @@ class TournamentSignUpTest extends Specification {
 
         //Creates an open tournament
         def course2 = courseExecutionRepository.findAll().get(0)
-        COURSE_EXEC = course2
         COURSE_EXEC_ID = course2.getId()
 
         def tournamentDto = new TournamentDto()
@@ -128,7 +126,7 @@ class TournamentSignUpTest extends Specification {
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
         openTournamentDto = tournamentDto
-        tournamentService.createTournament(openTournamentDto, COURSE_EXEC, USER_ID)
+        tournamentService.createTournament(openTournamentDto, COURSE_EXEC_ID, USER_ID)
         openTournament = tournamentRepository.findAll().get(0)
         openTournamentId = openTournament.getId()
     }
