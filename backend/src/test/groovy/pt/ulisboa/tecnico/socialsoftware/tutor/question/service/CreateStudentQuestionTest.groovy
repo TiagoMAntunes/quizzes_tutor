@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
@@ -20,6 +21,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import javax.persistence.EntityManager
+
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*
 
 @DataJpaTest
@@ -141,9 +145,13 @@ class CreateStudentQuestionTest extends Specification {
         studentQuestionService.createStudentQuestion(course.getId(), questionDto, teacher.getId())
 
         then:
-            thrown(TutorException)
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
+        studentQuestionRepository.count() == 0L
+
     }
-    def "a student isnt in a course"() {
+
+    def "a student isn't in a course"() {
         given: "a questionDto"
         def questionDto = new QuestionDto()
         questionDto.setKey(1)
@@ -162,7 +170,9 @@ class CreateStudentQuestionTest extends Specification {
         studentQuestionService.createStudentQuestion(course.getId(), questionDto, student2.getId())
 
         then:
-        thrown(TutorException)
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
+        studentQuestionRepository.count() == 0L
     }
 
 
@@ -188,6 +198,7 @@ class CreateStudentQuestionTest extends Specification {
         then: "a StudentQuestion Exception"
         def error = thrown(TutorException)
         error.errorMessage == errorMessage
+        studentQuestionRepository.count() == 0L
 
         where:
         Title             | Content            | Option             || errorMessage

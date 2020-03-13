@@ -82,11 +82,12 @@ class getQuestionsStatusTest extends Specification {
 
     def "no questions submitted by the student"(){
         when:
-        studentQuestionService.getStudentQuestions(student)
+        studentQuestionService.getStudentQuestions(student.getId())
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.NO_QUESTION_SUBMITTED
+        studentQuestionRepository.count() == 0L
     }
 
     def "get status of question that is waiting for approval"(){
@@ -94,7 +95,7 @@ class getQuestionsStatusTest extends Specification {
         studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
 
         when:
-        def result = studentQuestionService.getStudentQuestions(student)
+        def result = studentQuestionService.getStudentQuestions(student.getId())
 
         then:
         result.size() == 1
@@ -107,10 +108,10 @@ class getQuestionsStatusTest extends Specification {
         given: "a student that has submitted a question that was approved"
         studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
         def question = studentQuestionRepository.findAll().get(0)
-        studentQuestionService.studentQuestionApproveReject(question.getId(), StudentQuestion.QuestionStatus.APPROVED, null, teacher, courseExecution)
+        studentQuestionService.studentQuestionApproveReject(question.getId(), StudentQuestion.QuestionStatus.APPROVED, null, teacher.getId(), courseExecution.getId())
 
         when:
-        def result = studentQuestionService.getStudentQuestions(student)
+        def result = studentQuestionService.getStudentQuestions(student.getId())
 
         then:
         result.size() == 1
@@ -123,10 +124,10 @@ class getQuestionsStatusTest extends Specification {
         given: "a student that has submitted a question that was rejected"
         studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
         def question = studentQuestionRepository.findAll().get(0)
-        studentQuestionService.studentQuestionApproveReject(question.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher, courseExecution)
+        studentQuestionService.studentQuestionApproveReject(question.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher.getId(), courseExecution.getId())
 
         when:
-        def result = studentQuestionService.getStudentQuestions(student)
+        def result = studentQuestionService.getStudentQuestions(student.getId())
 
         then:
         result.size() == 1
@@ -140,10 +141,10 @@ class getQuestionsStatusTest extends Specification {
         given: "a student that has submitted a question that was rejected"
         studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
         def question = studentQuestionRepository.findAll().get(0)
-        studentQuestionService.studentQuestionApproveReject(question.getId(), StudentQuestion.QuestionStatus.REJECTED, EXPLANATION, teacher, courseExecution)
+        studentQuestionService.studentQuestionApproveReject(question.getId(), StudentQuestion.QuestionStatus.REJECTED, EXPLANATION, teacher.getId(), courseExecution.getId())
 
         when:
-        def result = studentQuestionService.getStudentQuestions(student)
+        def result = studentQuestionService.getStudentQuestions(student.getId())
 
         then:
         result.size() == 1
@@ -157,7 +158,7 @@ class getQuestionsStatusTest extends Specification {
         given: "a student that has submitted two questions, one approved and another rejected with an explanation"
         studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
         def question = studentQuestionRepository.findAll().get(0)
-        studentQuestionService.studentQuestionApproveReject(question.getId(), StudentQuestion.QuestionStatus.APPROVED, null, teacher, courseExecution)
+        studentQuestionService.studentQuestionApproveReject(question.getId(), StudentQuestion.QuestionStatus.APPROVED, null, teacher.getId(), courseExecution.getId())
         def questionDto2 = new QuestionDto()
         questionDto2.setKey(2)
         questionDto2.setTitle(QUESTION_TITLE)
@@ -166,10 +167,10 @@ class getQuestionsStatusTest extends Specification {
         questionDto2.setOptions(options)
         studentQuestionService.createStudentQuestion(course.getId(), questionDto2, student.getId())
         def question2 = studentQuestionRepository.findAll().get(1)
-        studentQuestionService.studentQuestionApproveReject(question2.getId(), StudentQuestion.QuestionStatus.REJECTED, EXPLANATION, teacher, courseExecution)
+        studentQuestionService.studentQuestionApproveReject(question2.getId(), StudentQuestion.QuestionStatus.REJECTED, EXPLANATION, teacher.getId(), courseExecution.getId())
 
         when:
-        def result = studentQuestionService.getStudentQuestions(student)
+        def result = studentQuestionService.getStudentQuestions(student.getId())
 
         then:
         result.size() == 2

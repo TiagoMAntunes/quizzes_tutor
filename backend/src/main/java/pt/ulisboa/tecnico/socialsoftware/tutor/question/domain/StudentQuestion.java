@@ -14,10 +14,7 @@ import java.util.stream.Collectors;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
-@Table(
-        name = "studentQuestions"
-)
-
+@Table(name = "studentQuestions")
 public class StudentQuestion extends Question {
 
     public enum QuestionStatus {
@@ -40,8 +37,6 @@ public class StudentQuestion extends Question {
     public StudentQuestion(Course course, QuestionDto questionDto, User user) {
         super(course, questionDto);
 
-        checkConsistentUser(user, course);
-
         this.user = user;
         this.explanation = null;
         this.setQuestionStatus(QuestionStatus.PENDING);
@@ -55,32 +50,12 @@ public class StudentQuestion extends Question {
 
     public String getRejectionExplanation() { return this.explanation; }
 
-    public void setRejectionExplanation(String explanation) {
-        if(this.questionStatus == QuestionStatus.REJECTED) {
-            this.explanation = explanation;
-        } else {
-            throw new TutorException(CANT_ADD_EXPLANATION);
-        }
-    }
+    public void setRejectionExplanation(String explanation) { this.explanation = explanation; }
 
     public User getUser() { return this.user; }
 
     public void setUser(User userDto) { this.user = userDto; }
 
-    private void checkConsistentUser(User user, Course course) {
-        if (user.getName() == null || user.getName().trim().length() == 0 ||
-                user.getUsername() == null || user.getUsername().trim().length() == 0) {
-            throw new TutorException(USER_MISSING_DATA);
-        }
-        if (user.getRole() != User.Role.STUDENT) {
-            throw new TutorException(ACCESS_DENIED);
-        }
-        List<CourseExecution> list = user.getCourseExecutions().stream().filter(
-                courseExecution -> courseExecution.getCourse() == course).collect(Collectors.toList());
-        if(list.isEmpty()) {
-            throw  new TutorException(ACCESS_DENIED);
-        }
-    }
 }
 
 

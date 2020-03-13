@@ -85,7 +85,7 @@ class ApproveRejectQuestionTest extends Specification {
         result = studentQuestionRepository.findAll().get(0)
 
         when:
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, null, teacher, courseExecution)
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, null, teacher.getId(), courseExecution.getId())
 
         then: "the question status will be: approved"
         studentQuestionRepository.count() == 1L
@@ -100,7 +100,7 @@ class ApproveRejectQuestionTest extends Specification {
         result = studentQuestionRepository.findAll().get(0)
 
         when:
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher, courseExecution)
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher.getId(), courseExecution.getId())
 
         then: "the question status will be: rejected"
         studentQuestionRepository.count() == 1L
@@ -112,7 +112,7 @@ class ApproveRejectQuestionTest extends Specification {
     def "an explanation is added for a rejected question"() {
         given: "a rejected question"
         result = studentQuestionRepository.findAll().get(0)
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher, courseExecution)
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher.getId(), courseExecution.getId())
 
         when:
         result.setRejectionExplanation(EXPLANATION)
@@ -125,17 +125,15 @@ class ApproveRejectQuestionTest extends Specification {
     }
 
     def "an explanation is added for an approved question"() {
-        given: "an approved question"
+        given: "a question"
         result = studentQuestionRepository.findAll().get(0)
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, null, teacher, courseExecution)
 
         when:
-        result.setRejectionExplanation(EXPLANATION)
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, EXPLANATION, teacher.getId(), courseExecution.getId())
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.CANT_ADD_EXPLANATION
-        studentQuestionRepository.count() == 1L
     }
 
     def "an explanation is added for a question that has not been aproved or rejected"() {
@@ -143,7 +141,7 @@ class ApproveRejectQuestionTest extends Specification {
         result = studentQuestionRepository.findAll().get(0)
 
         when:
-        result.setRejectionExplanation(EXPLANATION)
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.PENDING, EXPLANATION, teacher.getId(), courseExecution.getId())
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
@@ -155,7 +153,7 @@ class ApproveRejectQuestionTest extends Specification {
         result = studentQuestionRepository.findAll().get(0)
 
         when:
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, null, student, courseExecution)
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, null, student.getId(), courseExecution.getId())
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
