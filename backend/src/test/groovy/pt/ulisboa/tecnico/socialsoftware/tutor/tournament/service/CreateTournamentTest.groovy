@@ -284,6 +284,27 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 0L
     }
 
+    def "topics are null" () {
+        given: "a tournamentDto"
+        def user = userRepository.findAll().get(0).getId()
+
+        def tournamentDto = new TournamentDto()
+        tournamentDto.setStartTime(NOW_TIME)
+        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setTopics(null)
+        tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
+
+        when:
+        tournamentService.createTournament(tournamentDto, courseExecution, user)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.NO_TOPICS_SELECTED
+        tournamentRepository.count() == 0L
+
+    }
+
+
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {
 
