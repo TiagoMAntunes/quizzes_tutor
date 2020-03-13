@@ -58,9 +58,7 @@ class GetOpenTournamentsTest extends Specification {
     def THREE_DAYS_LATER
     def ONE_DAY_LATER
     def TOPIC_LIST
-    def COURSE_EXEC
     def COURSE_EXEC_ID
-    def DIFF_COURSE_EXEC
     def DIFF_COURSE_EXEC_ID
     def openTournament1
     def openTournament2
@@ -116,7 +114,6 @@ class GetOpenTournamentsTest extends Specification {
         user = userRepository.findAll().get(0).getId()
 
         def course = courseExecutionRepository.findAll().get(0)
-        COURSE_EXEC = course
         COURSE_EXEC_ID = course.getId()
 
         def tournamentDto1 = new TournamentDto()
@@ -130,7 +127,6 @@ class GetOpenTournamentsTest extends Specification {
 
         //Creates an open tournament for a different course
         def diffCourse = courseExecutionRepository.findAll().get(1)
-        DIFF_COURSE_EXEC = diffCourse
         DIFF_COURSE_EXEC_ID = diffCourse.getId()
 
         def diffTournamentDto = new TournamentDto()
@@ -161,7 +157,7 @@ class GetOpenTournamentsTest extends Specification {
 
     def "no open tournaments"(){
         given:"a tournament that is already closed"
-        tournamentService.createTournament(openTournament2, COURSE_EXEC, user)
+        tournamentService.createTournament(openTournament2, COURSE_EXEC_ID, user)
         def result = tournamentRepository.findAll().get(0)
         result.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
 
@@ -174,7 +170,7 @@ class GetOpenTournamentsTest extends Specification {
 
     def "no open tournaments for this course"(){
         given:"a tournament that is open, but belongs to a different course"
-        tournamentService.createTournament(diffCourseTournament, DIFF_COURSE_EXEC, user)
+        tournamentService.createTournament(diffCourseTournament, DIFF_COURSE_EXEC_ID, user)
 
         when:
         def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
@@ -185,7 +181,7 @@ class GetOpenTournamentsTest extends Specification {
 
     def "one open tournament"(){
         given:"an open tournament for this course"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC, user)
+        tournamentService.createTournament(openTournament1, COURSE_EXEC_ID, user)
 
         when:
         def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
@@ -197,9 +193,9 @@ class GetOpenTournamentsTest extends Specification {
 
     def "3 open tournaments"(){
         given:"3 open tournaments for this course"
-        tournamentService.createTournament(openTournament1, COURSE_EXEC, user)
-        tournamentService.createTournament(openTournament2, COURSE_EXEC, user)
-        tournamentService.createTournament(openTournament3, COURSE_EXEC, user)
+        tournamentService.createTournament(openTournament1, COURSE_EXEC_ID, user)
+        tournamentService.createTournament(openTournament2, COURSE_EXEC_ID, user)
+        tournamentService.createTournament(openTournament3, COURSE_EXEC_ID, user)
 
         when:
         def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)

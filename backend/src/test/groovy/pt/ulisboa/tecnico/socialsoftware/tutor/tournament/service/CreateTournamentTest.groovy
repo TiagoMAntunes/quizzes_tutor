@@ -56,6 +56,7 @@ class CreateTournamentTest extends Specification {
     def TOPIC_LIST
     def course
     def courseExecution
+    def courseExecutionEntity
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -73,8 +74,9 @@ class CreateTournamentTest extends Specification {
         courseRepository.save(course)
 
         //Creates a course execution
-        courseExecution = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
-        courseExecutionRepository.save(courseExecution)
+        courseExecutionEntity = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
+        courseExecutionRepository.save(courseExecutionEntity)
+        courseExecution = courseExecutionRepository.findAll().get(0).getId()
 
         //Creates a topic
         def topic = new Topic()
@@ -117,8 +119,8 @@ class CreateTournamentTest extends Specification {
         result.getCreator() == user
         user.getCreatedTournaments().contains(result)
 
-        result.getCourseExecution() == courseExecution
-        courseExecution.getTournaments().contains(result)
+        result.getCourseExecution().getId() == courseExecution
+        courseExecutionEntity.getTournaments().contains(result)
 
         courseExecutionRepository.findAll().get(0).getTournaments().size() == 1
         topicRepository.findAll().get(0).getTournaments().size() == 1
