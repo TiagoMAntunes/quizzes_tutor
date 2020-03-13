@@ -131,7 +131,8 @@ public class TournamentService {
         LocalDateTime now = LocalDateTime.now();
         Tournament tournament = getTournament(tournamentId);
         return (tournament.getCourseExecution().getId().equals(courseExecutionId)) &&
-                tournament.getFinishTime().isAfter(now);
+                tournament.getFinishTime().isAfter(now) &&
+                tournament.getStartTime().isAfter(now);
     }
 
     @Retryable(
