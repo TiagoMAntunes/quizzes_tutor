@@ -85,7 +85,7 @@ public class StatementService {
 
         List<Question> availableQuestions = questionRepository.findAvailableQuestions(courseExecution.getCourse().getId());
 
-        availableQuestions = filterByAssessment(availableQuestions, quizDetails, user);
+        availableQuestions = filterByAssessment(availableQuestions, quizDetails);
 
         if (availableQuestions.size() < quizDetails.getNumberOfQuestions()) {
             throw new TutorException(NOT_ENOUGH_QUESTIONS);
@@ -128,7 +128,7 @@ public class StatementService {
             return qa;
         });
 
-        if (quizAnswer.getCompleted()) {
+        if (quizAnswer.isCompleted()) {
             throw new TutorException(QUIZ_ALREADY_COMPLETED);
 
         } else if (quiz.getAvailableDate() == null || LocalDateTime.now().isAfter(quiz.getAvailableDate())) {
@@ -174,7 +174,7 @@ public class StatementService {
                 .filter(quizAnswer -> quizAnswer.getQuiz().getConclusionDate() == null || LocalDateTime.now().isBefore(quizAnswer.getQuiz().getConclusionDate()))
                 .filter(quizAnswer -> quizAnswer.getQuiz().getCourseExecution().getId() == executionId)
                 .filter(quizAnswer -> quizAnswer.getQuiz().getAvailableDate() == null || !(quizAnswer.getQuiz().getType().equals(Quiz.QuizType.IN_CLASS) && quizAnswer.getQuiz().getAvailableDate().isAfter(now)))
-                .filter(quizAnswer -> !quizAnswer.getCompleted())
+                .filter(quizAnswer -> !quizAnswer.isCompleted())
                 .map(StatementQuizDto::new)
                 .sorted(Comparator.comparing(StatementQuizDto::getAvailableDate, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
@@ -232,16 +232,10 @@ public class StatementService {
         });
     }
 
-    public List<Question> filterByAssessment(List<Question> availableQuestions, StatementCreationDto quizDetails, User user) {
-        // remove all by default
-        // TODO: support a ALL assessment
-        //if (!quizDetails.getAssessment().equals("all")) {
-            Assessment assessment = assessmentRepository.findById(Integer.valueOf(quizDetails.getAssessment()))
-                    .orElseThrow(() -> new TutorException(ASSESSMENT_NOT_FOUND, Integer.valueOf(quizDetails.getAssessment())));
+    public List<Question> filterByAssessment(List<Question> availableQuestions, StatementCreationDto quizDetails) {
+        Assessment assessment = assessmentRepository.findById(Integer.valueOf(quizDetails.getAssessment()))
+                .orElseThrow(() -> new TutorException(ASSESSMENT_NOT_FOUND, Integer.parseInt(quizDetails.getAssessment())));
 
-            return availableQuestions.stream().filter(question -> question.belongsToAssessment(assessment)).collect(Collectors.toList());
-       // }
-       // return availableQuestions;
+        return availableQuestions.stream().filter(question -> question.belongsToAssessment(assessment)).collect(Collectors.toList());
     }
-
 }
