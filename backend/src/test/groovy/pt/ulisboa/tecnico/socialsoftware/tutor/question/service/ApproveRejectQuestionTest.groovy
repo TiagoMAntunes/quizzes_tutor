@@ -134,6 +134,8 @@ class ApproveRejectQuestionTest extends Specification {
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.CANT_ADD_EXPLANATION
+        result.getQuestionStatus() == StudentQuestion.QuestionStatus.PENDING
+        result.getRejectionExplanation() == null
     }
 
     def "an explanation is added for a question that has not been aproved or rejected"() {
@@ -146,6 +148,7 @@ class ApproveRejectQuestionTest extends Specification {
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.CANT_ADD_EXPLANATION
+        result.getRejectionExplanation() == null
     }
 
     def "a student tries to approve a question"() {
@@ -158,6 +161,7 @@ class ApproveRejectQuestionTest extends Specification {
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
+        result.getQuestionStatus() == StudentQuestion.QuestionStatus.PENDING
     }
 
     @TestConfiguration

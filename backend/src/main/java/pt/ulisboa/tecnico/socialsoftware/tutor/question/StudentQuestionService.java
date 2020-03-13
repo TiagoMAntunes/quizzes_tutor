@@ -66,20 +66,6 @@ public class StudentQuestionService {
         return new StudentQuestionDto(studentQuestion);
     }
 
-    private void checkEnrolledCourseExecution(User student, Course course) {
-        List<CourseExecution> list = student.getCourseExecutions().stream().filter(
-                courseExecution -> courseExecution.getCourse() == course).collect(Collectors.toList());
-        if(list.isEmpty()) {
-            throw  new TutorException(ACCESS_DENIED);
-        }
-    }
-
-    private void checkRoleStudent(User student) {
-        if(student.getRole() != User.Role.STUDENT){
-            throw new TutorException(ACCESS_DENIED);
-        }
-    }
-
     @Retryable(
     value = { SQLException.class },
     backoff = @Backoff(delay = 5000))
@@ -90,7 +76,7 @@ public class StudentQuestionService {
         checkUserRole(teacher);
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
         checkTeacherCourse(teacher, execution);
-        checkStatusRejected(question, explanation, status);
+        checkStatusToAddExplanation(explanation, status);
 
         switch (status) {
             case REJECTED:
@@ -98,15 +84,32 @@ public class StudentQuestionService {
                 question.setRejectionExplanation(explanation);
                 break;
             case APPROVED:
-                question.setQuestionStatus(status);
-                break;
             case PENDING:
                 question.setQuestionStatus(status);
                 break;
         }
     }
 
-    private void checkStatusRejected(StudentQuestion question, String explanation, StudentQuestion.QuestionStatus status) {
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<StudentQuestion> getStudentQuestions(int studentId) {
+        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
+
+
+        List<StudentQuestion> list = studentQuestionRepository.findAll().stream()
+                .filter(studentQuestion -> studentQuestion.getUser() == student)
+                .collect(Collectors.toList());
+
+        if(list.isEmpty()){
+            throw new TutorException(NO_QUESTION_SUBMITTED);
+        }else{
+            return list;
+        }
+    }
+
+    private void checkStatusToAddExplanation(String explanation, StudentQuestion.QuestionStatus status) {
         if(explanation != null && status != StudentQuestion.QuestionStatus.REJECTED) {
             throw new TutorException(CANT_ADD_EXPLANATION);
         }
@@ -132,22 +135,18 @@ public class StudentQuestionService {
         }
     }
 
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<StudentQuestion> getStudentQuestions(int studentId) {
-        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
 
+    private void checkEnrolledCourseExecution(User student, Course course) {
+        List<CourseExecution> list = student.getCourseExecutions().stream().filter(
+                courseExecution -> courseExecution.getCourse() == course).collect(Collectors.toList());
+        if(list.isEmpty()) {
+            throw  new TutorException(ACCESS_DENIED);
+        }
+    }
 
-        List<StudentQuestion> list = studentQuestionRepository.findAll().stream()
-                .filter(studentQuestion -> studentQuestion.getUser() == student)
-                .collect(Collectors.toList());
-
-        if(list.isEmpty()){
-            throw new TutorException(NO_QUESTION_SUBMITTED);
-        }else{
-            return list;
+    private void checkRoleStudent(User student) {
+        if(student.getRole() != User.Role.STUDENT){
+            throw new TutorException(ACCESS_DENIED);
         }
     }
 }

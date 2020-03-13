@@ -1,17 +1,11 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
 @Table(name = "studentQuestions")
@@ -24,8 +18,9 @@ public class StudentQuestion extends Question {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    private String explanation;
 
+    @Column(name = "explanation")
+    private String explanation;
 
     @Enumerated(EnumType.STRING)
     private QuestionStatus questionStatus = QuestionStatus.PENDING;

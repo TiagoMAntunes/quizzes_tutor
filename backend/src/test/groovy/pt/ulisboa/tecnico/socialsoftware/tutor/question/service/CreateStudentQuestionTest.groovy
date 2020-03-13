@@ -119,7 +119,8 @@ class CreateStudentQuestionTest extends Specification {
         result.getImage() == null
         result.getOptions().size() == 1
         result.getCourse().getName() == COURSE_NAME
-        course.getQuestions().contains(result)
+        courseRepository.findAll().get(0).getQuestions().contains(result)
+        userRepository.findAll().get(0).getStudentQuestions().contains(result)
         def resOption = result.getOptions().get(0)
         resOption.getContent() == OPTION_CONTENT
         resOption.getCorrect()
@@ -148,6 +149,8 @@ class CreateStudentQuestionTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
         studentQuestionRepository.count() == 0L
+        courseRepository.findAll().get(0).getQuestions().size() == 0
+        userRepository.findAll().get(0).getStudentQuestions().size() == 0
 
     }
 
@@ -173,6 +176,8 @@ class CreateStudentQuestionTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
         studentQuestionRepository.count() == 0L
+        courseRepository.findAll().get(0).getQuestions().size() == 0
+        userRepository.findAll().get(0).getStudentQuestions().size() == 0
     }
 
 
@@ -199,6 +204,8 @@ class CreateStudentQuestionTest extends Specification {
         def error = thrown(TutorException)
         error.errorMessage == errorMessage
         studentQuestionRepository.count() == 0L
+        courseRepository.findAll().get(0).getQuestions().size() == 0
+        userRepository.findAll().get(0).getStudentQuestions().size() == 0
 
         where:
         Title             | Content            | Option             || errorMessage
@@ -251,6 +258,8 @@ class CreateStudentQuestionTest extends Specification {
         result.getImage().getUrl() == URL
         result.getImage().getWidth() == 20
         result.getOptions().size() == 2
+        courseRepository.findAll().get(0).getQuestions().contains(result)
+        userRepository.findAll().get(0).getStudentQuestions().contains(result)
     }
 
     def "create two questions"() {
@@ -277,6 +286,8 @@ class CreateStudentQuestionTest extends Specification {
         def resultOne = studentQuestionRepository.findAll().get(0)
         def resultTwo = studentQuestionRepository.findAll().get(1)
         resultOne.getKey() + resultTwo.getKey() == 3
+        courseRepository.findAll().get(0).getQuestions().size() == 2
+        userRepository.findAll().get(0).getStudentQuestions().size() == 2
     }
 
     @TestConfiguration

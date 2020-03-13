@@ -293,6 +293,10 @@ public class User implements UserDetails, Importable {
         return numberOfCorrectStudentAnswers;
     }
 
+    public Set<StudentQuestion> getStudentQuestions() {
+        return studentQuestions;
+    }
+
     public void setNumberOfCorrectStudentAnswers(Integer numberOfCorrectStudentAnswers) {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
     }
