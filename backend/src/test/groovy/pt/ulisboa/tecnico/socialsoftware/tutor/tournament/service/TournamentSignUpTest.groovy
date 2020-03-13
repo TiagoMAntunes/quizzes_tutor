@@ -131,8 +131,8 @@ class TournamentSignUpTest extends Specification {
         openTournamentId = openTournament.getId()
     }
 
-    def "tournament is not open"(){
-        given:"a tournament that is not open"
+    def "tournament has ended"(){
+        given:"a tournament that has already ended"
         openTournament.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
 
         when:
@@ -141,8 +141,28 @@ class TournamentSignUpTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_OPEN
-        !openTournament.hasSignedUp(USER)
-        !USER.hasTournament(openTournament)
+
+        def tournament = tournamentRepository.findAll().get(0)
+        def user = userRepository.findAll().get(0)
+        !tournament.hasSignedUp(user)
+        !user.hasTournament(tournament)
+    }
+
+    def "tournament has already started"(){
+        given:"a tournament that has already started"
+        openTournament.setStartTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
+
+        when:
+        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, USER_ID)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_OPEN
+
+        def tournament = tournamentRepository.findAll().get(0)
+        def user = userRepository.findAll().get(0)
+        !tournament.hasSignedUp(user)
+        !user.hasTournament(tournament)
     }
 
     def "tournament is open and student hasnt signed up for it yet"(){
@@ -150,8 +170,10 @@ class TournamentSignUpTest extends Specification {
         tournamentService.joinTournament(openTournament.getId(), COURSE_EXEC_ID, USER_ID)
 
         then:
-        openTournament.hasSignedUp(USER)
-        USER.hasTournament(openTournament)
+        def tournament = tournamentRepository.findAll().get(0)
+        def user = userRepository.findAll().get(0)
+        tournament.hasSignedUp(user)
+        user.hasTournament(tournament)
     }
 
     def "tournament is open and student has already signed up for it"(){
@@ -173,6 +195,11 @@ class TournamentSignUpTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_JOIN_WRONG_ROLE
+
+        def tournament = tournamentRepository.findAll().get(0)
+        def user = userRepository.findAll().get(1)
+        !tournament.hasSignedUp(user)
+        !user.hasTournament(tournament)
     }
 
     def "no user with the given id"(){
@@ -187,7 +214,9 @@ class TournamentSignUpTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
-        !openTournament.hasSignedUp(user)
+
+        def tournament = tournamentRepository.findAll().get(0)
+        !tournament.hasSignedUp(user)
     }
 
     def "no tournament with the given id"(){
@@ -202,7 +231,9 @@ class TournamentSignUpTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
-        !USER.hasTournament(tournament)
+
+        def user = userRepository.findAll().get(0)
+        !user.hasTournament(tournament)
     }
 
     @TestConfiguration
