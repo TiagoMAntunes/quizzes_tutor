@@ -77,6 +77,9 @@ public class StudentQuestionService {
             case APPROVED:
                 question.setQuestionStatus(status);
                 break;
+            case PENDING:
+                question.setQuestionStatus(status);
+                break;
         }
     }
 
@@ -105,7 +108,7 @@ public class StudentQuestionService {
                 .filter(studentQuestion -> studentQuestion.getUser() == student)
                 .collect(Collectors.toList());
 
-        if(list.size() == 0){
+        if(list.isEmpty()){
             throw new TutorException(NO_QUESTION_SUBMITTED);
         }else{
             return list;

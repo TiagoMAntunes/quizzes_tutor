@@ -67,8 +67,6 @@ public class StudentQuestion extends Question {
 
     public void setUser(User userDto) { this.user = userDto; }
 
-    // TODO toString
-
     private void checkConsistentUser(User user, Course course) {
         if (user.getName() == null || user.getName().trim().length() == 0 ||
                 user.getUsername() == null || user.getUsername().trim().length() == 0) {
@@ -79,7 +77,7 @@ public class StudentQuestion extends Question {
         }
         List<CourseExecution> list = user.getCourseExecutions().stream().filter(
                 courseExecution -> courseExecution.getCourse() == course).collect(Collectors.toList());
-        if(list.size() == 0) {
+        if(list.isEmpty()) {
             throw  new TutorException(ACCESS_DENIED);
         }
     }
