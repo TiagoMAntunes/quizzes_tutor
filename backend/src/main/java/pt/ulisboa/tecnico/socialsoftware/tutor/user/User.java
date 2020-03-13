@@ -7,6 +7,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.Importable;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
@@ -63,6 +64,9 @@ public class User implements UserDetails, Importable {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Tournament> createdTournaments = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
+    private Set<StudentQuestion> studentQuestions = new HashSet<>();
 
     public User() {
     }
@@ -295,6 +299,10 @@ public class User implements UserDetails, Importable {
         return numberOfCorrectStudentAnswers;
     }
 
+    public Set<StudentQuestion> getStudentQuestions() {
+        return studentQuestions;
+    }
+
     public void setNumberOfCorrectStudentAnswers(Integer numberOfCorrectStudentAnswers) {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
     }
@@ -343,6 +351,10 @@ public class User implements UserDetails, Importable {
 
     public void addQuizAnswer(QuizAnswer quizAnswer) {
         this.quizAnswers.add(quizAnswer);
+    }
+
+    public void addStudentQuestion(StudentQuestion quizAnswer) {
+        this.studentQuestions.add(quizAnswer);
     }
 
     public void addCourse(CourseExecution course) {

@@ -51,6 +51,7 @@ public enum ErrorMessage {
     FENIX_ERROR("Fenix Error"),
     AUTHENTICATION_ERROR("Authentication Error"),
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
+    USER_MISSING_DATA("Missing information for the creating of a student question"),
 
     INVALID_TOURNAMENT_TIME("Start time of a tournament must be before finish time"),
     TOURNAMENT_ALREADY_STARTED("Start time of a tournament must be after the time of creation"),
@@ -66,7 +67,9 @@ public enum ErrorMessage {
     TOURNAMENT_NOT_OPEN("Tournament is not open"),
     TOURNAMENT_JOIN_WRONG_ROLE("Only students can join tournaments"),
 
-    ACCESS_DENIED("You do not have permission to view this resource");
+    CANT_ADD_EXPLANATION("Question is not in the rejected state"),
+    ACCESS_DENIED("You do not have permission to view this resource"),
+    NO_QUESTION_SUBMITTED("The user hasn't submitted any questions yet");
 
     public final String label;
 
