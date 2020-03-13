@@ -9,6 +9,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.Importable;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -58,9 +59,14 @@ public class User implements UserDetails, Importable {
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
+    @ManyToMany
+    private Set<Tournament> signedUpTournaments = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<Tournament> createdTournaments = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
-
 
     public User() {
     }
@@ -452,4 +458,19 @@ public class User implements UserDetails, Importable {
 
         return result;
     }
+
+    public void addTournament(Tournament tournament) {
+        signedUpTournaments.add(tournament);
+    }
+
+    public Set<Tournament> getSignedUpTournaments() { return signedUpTournaments; }
+
+    public boolean hasTournament(Tournament tournament) {
+        return signedUpTournaments.contains(tournament);
+    }
+
+    public void addCreatedTournament(Tournament tournament) { createdTournaments.add(tournament); }
+
+    public Set<Tournament> getCreatedTournaments() { return createdTournaments; }
+
 }
