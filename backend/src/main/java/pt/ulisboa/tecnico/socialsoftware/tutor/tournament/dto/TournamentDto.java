@@ -28,7 +28,6 @@ public class TournamentDto implements Serializable {
         this.key = tournament.getKey();
         this.numberOfQuestions = tournament.getNumberOfQuestions();
 
-
         if (tournament.getStartTime() != null)
             this.startTime = tournament.getStartTime().format(formatter);
         if (tournament.getFinishTime() != null)
@@ -60,5 +59,4 @@ public class TournamentDto implements Serializable {
     public void setTopics(List<TopicDto> p) { topics = p; }
 
     public List<TopicDto> getTopics() { return topics; }
-
 }

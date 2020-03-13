@@ -76,10 +76,7 @@ public class TournamentService {
 
         Tournament tournament = new Tournament(tournamentDto, topics, creator);
 
-        if (tournament.getStartTime().isAfter(tournament.getFinishTime()) || tournament.getStartTime().isEqual(tournament.getFinishTime()))
-            throw new TutorException(ErrorMessage.INVALID_TOURNAMENT_TIME);
-        else if (tournament.getStartTime().isBefore(LocalDateTime.now()))
-            throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_STARTED);
+        checkTournamentTimes(tournament);
 
         topics.forEach(topic -> topic.addTournament(tournament));
 
@@ -93,6 +90,13 @@ public class TournamentService {
 
         entityManager.persist(tournament);
         return new TournamentDto(tournament);
+    }
+
+    private void checkTournamentTimes(Tournament tournament) {
+        if (tournament.getStartTime().isAfter(tournament.getFinishTime()) || tournament.getStartTime().isEqual(tournament.getFinishTime()))
+            throw new TutorException(ErrorMessage.INVALID_TOURNAMENT_TIME);
+        else if (tournament.getStartTime().isBefore(LocalDateTime.now()))
+            throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_STARTED);
     }
 
     @Retryable(
@@ -143,17 +147,27 @@ public class TournamentService {
         Tournament tournament = getTournament(tournamentId);
         User user = getUser(userId);
 
-        if (user.getRole() != User.Role.STUDENT)
-            throw new TutorException(ErrorMessage.TOURNAMENT_JOIN_WRONG_ROLE);
-
-        if(!tournamentIsOpen(tournamentId, courseExecutionId))
-            throw new TutorException(ErrorMessage.TOURNAMENT_NOT_OPEN);
-
-        if(tournament.hasSignedUp(user))
-            throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_JOINED);
+        checkIsStudentRole(user);
+        checkTournamentIsOpen(tournamentId, courseExecutionId);
+        checkNotSignedUpYet(tournament, user);
 
         tournament.signUp(user);
         user.addTournament(tournament);
+    }
+
+    private void checkNotSignedUpYet(Tournament tournament, User user) {
+        if(tournament.hasSignedUp(user))
+            throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_JOINED);
+    }
+
+    private void checkTournamentIsOpen(Integer tournamentId, Integer courseExecutionId) {
+        if(!tournamentIsOpen(tournamentId, courseExecutionId))
+            throw new TutorException(ErrorMessage.TOURNAMENT_NOT_OPEN);
+    }
+
+    private void checkIsStudentRole(User user) {
+        if (user.getRole() != User.Role.STUDENT)
+            throw new TutorException(ErrorMessage.TOURNAMENT_JOIN_WRONG_ROLE);
     }
 
     private User getUser(Integer userId) {
@@ -164,7 +178,6 @@ public class TournamentService {
         return tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
     }
-
 
     private Integer getMaxTournamentKey() {
         Integer val = tournamentRepository.getMaxTournamentKey();

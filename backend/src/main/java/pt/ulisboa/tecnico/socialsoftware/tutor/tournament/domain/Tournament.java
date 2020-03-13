@@ -114,7 +114,8 @@ public class Tournament {
     public void cancel() {
         Set<Topic> topicsSet = new HashSet<>(getTopics());
         topicsSet.forEach(topic -> topic.getTournaments().remove(this));
-        topicsSet.clear();
+
+        topics.clear();
 
         signedUp.forEach(user -> user.getSignedUpTournaments().remove(this));
         signedUp.clear();

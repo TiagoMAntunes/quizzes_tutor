@@ -188,7 +188,6 @@ class GetOpenTournamentsTest extends Specification {
 
         then:
         tournaments.size() == 1
-
     }
 
     def "3 open tournaments"(){
@@ -202,8 +201,6 @@ class GetOpenTournamentsTest extends Specification {
 
         then:"returns the 3 tournaments"
         tournaments.size() == 3
-
-
     }
 
     @TestConfiguration
