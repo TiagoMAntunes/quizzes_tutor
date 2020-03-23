@@ -9,13 +9,15 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import spock.lang.Specification
 
 @DataJpaTest
@@ -29,185 +31,145 @@ class ApproveRejectQuestionTest extends Specification {
     public static final String EXPLANATION = "explanation"
 
     @Autowired
-    QuestionService questionService
+    StudentQuestionService studentQuestionService
 
-    @AutoWired
+    @Autowired
     UserRepository userRepository
 
-    @AutoWired
+    @Autowired
     CourseRepository courseRepository
 
     @Autowired
     CourseExecutionRepository courseExecutionRepository
 
     @Autowired
-    QuestionRepository questionRepository
+    StudentQuestionRepository studentQuestionRepository
 
-    public enum Role {STUDENT, TEACHER, ADMIN, DEMO_ADMIN}
+    def course;
+    def teacher;
+    def student;
+    def questionDto;
+    def result
+    def courseExecution;
 
     def setup() {
-        def user = new User()
-        user.setRole(Role.TEACHER)
-        userRepository.save(user)
-
-        def course = new Course(COURSE_NAME, Course.Type.TECNICO)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
+        courseRepository.save(course)
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
-    }
 
-    def "a question is approved by the Teacher"(){
-        given: "a StudentquestionDto"
-        def StudentquestionDto = new StudentquestionDto()
-        
-        StudentquestionDto.setTitle(QUESTION_TITLE)
-        StudentquestionDto.setContent(QUESTION_CONTENT)
-        StudentquestionDto.setStatus(StudentQuestion.Status.AVAILABLE.name())
-        
-        and: "a optionDto"
+        teacher = new User("User1", "teacher", 1, User.Role.TEACHER)
+        userRepository.save(teacher)
+        teacher.addCourse(courseExecution)
+        student = new User("User2", "student", 2, User.Role.STUDENT)
+        userRepository.save(student)
+        student.addCourse(courseExecution)
+
+        questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(QUESTION_TITLE)
+        questionDto.setContent(QUESTION_CONTENT)
+        questionDto.setStatus(Question.Status.AVAILABLE.name())
+
         def optionDto = new OptionDto()
-        
         optionDto.setContent(OPTION_CONTENT)
         optionDto.setCorrect(true)
         def options = new ArrayList<OptionDto>()
         options.add(optionDto)
-        StudentquestionDto.setOptions(options)
-        questionService.createQuestion(course.getId(), StudentquestionDto)
+        questionDto.setOptions(options)
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
+    }
+
+    def "a question is approved by the Teacher"() {
+        given: "a student question"
+        result = studentQuestionRepository.findAll().get(0)
 
         when:
-        user.approveQuestion(StudentquestionDto) //has to be defined
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, null, teacher.getId(), courseExecution.getId())
 
         then: "the question status will be: approved"
-        questionRepository.count() = 1L 
-        def result = questionRepository.findAll().get(0)
+        studentQuestionRepository.count() == 1L
+        def result = studentQuestionRepository.findAll().get(0)
         result.getId() != null
-        result.getStatus() == APPROVED
+        result.getQuestionStatus() == StudentQuestion.QuestionStatus.APPROVED
     }
-    
 
-    def "a question is rejected by the Teacher"(){
-        given: "a StudentquestionDto"
-        def StudentquestionDto = new StudentquestionDto()
-        
-        StudentquestionDto.setTitle(QUESTION_TITLE)
-        StudentquestionDto.setContent(QUESTION_CONTENT)
-        StudentquestionDto.setStatus(StudentQuestion.Status.AVAILABLE.name())
-        
-        and: "an optionDto"
-        def optionDto = new OptionDto()
-        
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        StudentquestionDto.setOptions(options)
-        questionService.createQuestion(course.getId(), StudentquestionDto)
+
+    def "a question is rejected by the Teacher"() {
+        given: "a student question"
+        result = studentQuestionRepository.findAll().get(0)
 
         when:
-        user.rejectQuestion(StudentquestionDto) //has to be defined
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher.getId(), courseExecution.getId())
 
         then: "the question status will be: rejected"
-        questionRepository.count() = 1L 
-        def result = questionRepository.findAll().get(0)
+        studentQuestionRepository.count() == 1L
+        def result = studentQuestionRepository.findAll().get(0)
         result.getId() != null
-        result.getStatus() == REJECTED
+        result.getQuestionStatus() == StudentQuestion.QuestionStatus.REJECTED
     }
 
-    def "an explanation is added for a rejected question"(){
-        given: "a StudentquestionDto"
-        def StudentquestionDto = new StudentquestionDto()
-        
-        StudentquestionDto.setTitle(QUESTION_TITLE)
-        StudentquestionDto.setContent(QUESTION_CONTENT)
-        StudentquestionDto.setStatus(StudentQuestion.Status.AVAILABLE.name())
-        
-        and: "an optionDto"
-        def optionDto = new OptionDto()
-        
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        StudentquestionDto.setOptions(options)
-        questionService.createQuestion(course.getId(), StudentquestionDto)
-        
-        and: "a rejected question"
-        user.rejectQuestion(StudentquestionDto) //has to be defined
+    def "an explanation is added for a rejected question"() {
+        given: "a rejected question"
+        result = studentQuestionRepository.findAll().get(0)
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher.getId(), courseExecution.getId())
 
         when:
-        StudentquestionDto.addExplanation(user, EXPLANATION)
+        result.setRejectionExplanation(EXPLANATION)
 
         then: "the explanation will have been added"
-        questionRepository.count() = 1L 
-        def result = questionRepository.findAll().get(0)
+        studentQuestionRepository.count() == 1L
         result.getId() != null
-        result.getStatus() == REJECTED
-        result.getExplanation() == EXPLANATION
+        result.getQuestionStatus() == StudentQuestion.QuestionStatus.REJECTED
+        result.getRejectionExplanation() == EXPLANATION
     }
 
-    def "an explanation is added for an approved question"(){
-        given: "a StudentquestionDto"
-        def StudentquestionDto = new StudentquestionDto()
-        
-        StudentquestionDto.setTitle(QUESTION_TITLE)
-        StudentquestionDto.setContent(QUESTION_CONTENT)
-        StudentquestionDto.setStatus(StudentQuestion.Status.AVAILABLE.name())
-        
-        and: "an optionDto"
-        def optionDto = new OptionDto()
-        
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        StudentquestionDto.setOptions(options)
-        questionService.createQuestion(course.getId(), StudentquestionDto)
-        
-        and: "an approved question"
-        user.approveQuestion(StudentquestionDto) //has to be defined
+    def "an explanation is added for an approved question"() {
+        given: "a question"
+        result = studentQuestionRepository.findAll().get(0)
 
         when:
-        StudentquestionDto.addExplanation(user, EXPLANATION)
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, EXPLANATION, teacher.getId(), courseExecution.getId())
 
         then: "an exception is thrown"
-        def exception = thrown(QuestionException)
+        def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.CANT_ADD_EXPLANATION
-        questionRepository.count() = 1L 
+        result.getQuestionStatus() == StudentQuestion.QuestionStatus.PENDING
+        result.getRejectionExplanation() == null
     }
 
-    def "an explanation is added for a question that has not been aproved or rejected"(){
-        given: "a StudentquestionDto"
-        def StudentquestionDto = new StudentquestionDto()
-        
-        StudentquestionDto.setTitle(QUESTION_TITLE)
-        StudentquestionDto.setContent(QUESTION_CONTENT)
-        StudentquestionDto.setStatus(StudentQuestion.Status.AVAILABLE.name())
-        
-        and: "an optionDto"
-        def optionDto = new OptionDto()
-        
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        StudentquestionDto.setOptions(options)
-        questionService.createQuestion(course.getId(), StudentquestionDto)
+    def "an explanation is added for a question that has not been aproved or rejected"() {
+        given: "a pending question"
+        result = studentQuestionRepository.findAll().get(0)
 
         when:
-        StudentquestionDto.addExplanation(user, EXPLANATION)
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.PENDING, EXPLANATION, teacher.getId(), courseExecution.getId())
 
         then: "an exception is thrown"
-        def exception = thrown(QuestionException)
+        def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.CANT_ADD_EXPLANATION
-        questionRepository.count() = 1L 
-        expect: false;
+        result.getRejectionExplanation() == null
+    }
+
+    def "a student tries to approve a question"() {
+        given: "a pending question"
+        result = studentQuestionRepository.findAll().get(0)
+
+        when:
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, null, student.getId(), courseExecution.getId())
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
+        result.getQuestionStatus() == StudentQuestion.QuestionStatus.PENDING
     }
 
     @TestConfiguration
-    static class QuestionServiceImplTestContextConfiguration {
+    static class StudentQuestionServiceImplTestContextConfiguration {
 
         @Bean
-        QuestionService questionService() {
-            return new QuestionService()
+        StudentQuestionService studentQuestionService() {
+            return new StudentQuestionService()
         }
     }
 }

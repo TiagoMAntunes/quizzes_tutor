@@ -12,21 +12,16 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
         super();
     }
 
-    public StudentQuestionDto(StudentQuestion studentQuestion){
+    public StudentQuestionDto(StudentQuestion studentQuestion) {
         super(studentQuestion);
         this.questionStatus = studentQuestion.getStatus().name();
 
         this.user = new UserDto(studentQuestion.getUser());
-
     }
 
-    public String getQuestionStatus() {
-        return this.questionStatus;
-    }
+    public String getQuestionStatus() { return this.questionStatus; }
 
-    public void setStudentQuestionStatus(String status) {
-        this.questionStatus = status;
-    }
+    public void setStudentQuestionStatus(String status) { this.questionStatus = status; }
 
     public UserDto getUserDto() {
         return this.user;

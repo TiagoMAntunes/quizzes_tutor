@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
@@ -20,6 +21,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 import spock.lang.Unroll
+
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*
 
 @DataJpaTest
@@ -39,7 +41,6 @@ class CreateStudentQuestionTest extends Specification {
     public static final String USER_USERNAME2 = "riju"
     public static final String TEACHER_NAME = "maria"
     public static final String TEACHER_USERNAME = "appolle"
-    public static final String TOPIC_NAME = "topic_name"
 
     @Autowired
     CourseRepository courseRepository
@@ -116,12 +117,104 @@ class CreateStudentQuestionTest extends Specification {
         result.getImage() == null
         result.getOptions().size() == 1
         result.getCourse().getName() == COURSE_NAME
-        course.getQuestions().contains(result)
+        courseRepository.findAll().get(0).getQuestions().contains(result)
+        userRepository.findAll().get(0).getStudentQuestions().contains(result)
         def resOption = result.getOptions().get(0)
         resOption.getContent() == OPTION_CONTENT
         resOption.getCorrect()
 
     }
+
+    def "not a student"() {
+        given: "a questionDto"
+        def questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(QUESTION_TITLE)
+        questionDto.setContent(QUESTION_CONTENT)
+        questionDto.setStatus(Question.Status.AVAILABLE.name())
+        and: 'a optionId'
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
+
+        when:
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, teacher.getId())
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
+        studentQuestionRepository.count() == 0L
+        courseRepository.findAll().get(0).getQuestions().size() == 0
+        userRepository.findAll().get(0).getStudentQuestions().size() == 0
+
+    }
+
+    def "a student isn't in a course"() {
+        given: "a questionDto"
+        def questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(QUESTION_TITLE)
+        questionDto.setContent(QUESTION_CONTENT)
+        questionDto.setStatus(Question.Status.AVAILABLE.name())
+        and: 'a optionId'
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
+
+        when:
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student2.getId())
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
+        studentQuestionRepository.count() == 0L
+        courseRepository.findAll().get(0).getQuestions().size() == 0
+        userRepository.findAll().get(0).getStudentQuestions().size() == 0
+    }
+
+
+    @Unroll("invalid arguments:  #Title | #Content | #Option || errorMessage")
+    def "invalid input values"() {
+        given: "a questionDto"
+        def questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(Title)
+        questionDto.setContent(Content)
+        questionDto.setStatus(Question.Status.AVAILABLE.name())
+        and: 'a optionId'
+        def optionDto = new OptionDto()
+        optionDto.setContent(Option)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
+
+        when:
+        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
+
+        then: "a StudentQuestion Exception"
+        def error = thrown(TutorException)
+        error.errorMessage == errorMessage
+        studentQuestionRepository.count() == 0L
+        courseRepository.findAll().get(0).getQuestions().size() == 0
+        userRepository.findAll().get(0).getStudentQuestions().size() == 0
+
+        where:
+        Title             | Content            | Option             || errorMessage
+        BLANK             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        EMPTY             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | BLANK              | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | QUESTION_CONTENT   | BLANK              || QUESTION_MISSING_DATA
+        QUESTION_TITLE    | QUESTION_CONTENT   | EMPTY              || QUESTION_MISSING_DATA
+    }
+
 
     def "create a question with image and two options"() {
         given: "a questionDto"
@@ -163,6 +256,8 @@ class CreateStudentQuestionTest extends Specification {
         result.getImage().getUrl() == URL
         result.getImage().getWidth() == 20
         result.getOptions().size() == 2
+        courseRepository.findAll().get(0).getQuestions().contains(result)
+        userRepository.findAll().get(0).getStudentQuestions().contains(result)
     }
 
     def "create two questions"() {
@@ -189,83 +284,8 @@ class CreateStudentQuestionTest extends Specification {
         def resultOne = studentQuestionRepository.findAll().get(0)
         def resultTwo = studentQuestionRepository.findAll().get(1)
         resultOne.getKey() + resultTwo.getKey() == 3
-    }
-
-    def "not a student"() {
-        given: "a questionDto"
-        def questionDto = new QuestionDto()
-        questionDto.setKey(1)
-        questionDto.setTitle(QUESTION_TITLE)
-        questionDto.setContent(QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-        and: 'a optionId'
-        def optionDto = new OptionDto()
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        questionDto.setOptions(options)
-
-        when:
-        studentQuestionService.createStudentQuestion(course.getId(), questionDto, teacher.getId())
-
-        then:
-        thrown(TutorException)
-    }
-
-    def "a student isnt in a course"() {
-        given: "a questionDto"
-        def questionDto = new QuestionDto()
-        questionDto.setKey(1)
-        questionDto.setTitle(QUESTION_TITLE)
-        questionDto.setContent(QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-        and: 'a optionId'
-        def optionDto = new OptionDto()
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        questionDto.setOptions(options)
-
-        when:
-        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student2.getId())
-
-        then:
-        thrown(TutorException)
-    }
-
-    @Unroll("invalid arguments:  #Title | #Content | #Option || errorMessage")
-    def "invalid input values"(){
-        given: "a questionDto"
-        def questionDto = new QuestionDto()
-        questionDto.setKey(1)
-        questionDto.setTitle(Title)
-        questionDto.setContent(Content)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-        and: 'a optionId'
-        def optionDto = new OptionDto()
-        optionDto.setContent(Option)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        questionDto.setOptions(options)
-
-        when:
-        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
-
-        then: "a StudentQuestion Exception"
-        def error = thrown(TutorException)
-        error.errorMessage == errorMessage
-
-        where:
-        Title             | Content            | Option             || errorMessage
-        BLANK             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        EMPTY             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | BLANK              | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | QUESTION_CONTENT   | BLANK              || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | QUESTION_CONTENT   | EMPTY              || QUESTION_MISSING_DATA
+        courseRepository.findAll().get(0).getQuestions().size() == 2
+        userRepository.findAll().get(0).getStudentQuestions().size() == 2
     }
 
     @TestConfiguration

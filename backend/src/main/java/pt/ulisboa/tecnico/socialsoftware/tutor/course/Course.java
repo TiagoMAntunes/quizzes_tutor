@@ -33,8 +33,6 @@ public class Course {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "course", fetch=FetchType.LAZY, orphanRemoval=true)
     private Set<Question> questions = new HashSet<>();
 
-
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "course", fetch=FetchType.LAZY, orphanRemoval=true)
     private Set<Topic> topics = new HashSet<>();
 
@@ -92,8 +90,6 @@ public class Course {
     public void addQuestion(Question question) {
         questions.add(question);
     }
-
-
 
     public void addTopic(Topic topic) {
         topics.add(topic);
