@@ -243,15 +243,21 @@ export default class RemoteServices {
       });
   }
 
-  static async getEvaluationQuiz(quizId: number): Promise<StatementQuiz> {
+  static async getQuizByQRCode(quizId: number): Promise<StatementQuiz> {
     return httpClient
-      .get(`/quizzes/${quizId}/evaluation`)
+      .get(`/quizzes/${quizId}/byqrcode`)
       .then(response => {
         return new StatementQuiz(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  static async startQuiz(quizId: number) {
+    return httpClient.get(`/quizzes/${quizId}/start`).catch(async error => {
+      throw Error(await this.errorMessage(error));
+    });
   }
 
   static submitAnswer(quizId: number, answer: StatementAnswer) {

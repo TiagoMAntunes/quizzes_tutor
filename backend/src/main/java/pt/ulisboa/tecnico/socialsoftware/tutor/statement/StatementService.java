@@ -27,8 +27,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.statement.dto.StatementQuizDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -66,9 +64,6 @@ public class StatementService {
     @Autowired
     private AnswerService answerService;
 
-    @PersistenceContext
-    EntityManager entityManager;
-
     @Retryable(
       value = { SQLException.class },
       backoff = @Backoff(delay = 5000))
@@ -100,8 +95,8 @@ public class StatementService {
         quiz.setCourseExecution(courseExecution);
         courseExecution.addQuiz(quiz);
 
-        entityManager.persist(quiz);
-        entityManager.persist(quizAnswer);
+        quizRepository.save(quiz);
+        quizAnswerRepository.save(quizAnswer);
 
         return new StatementQuizDto(quizAnswer);
     }
@@ -110,7 +105,7 @@ public class StatementService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public StatementQuizDto getEvaluationQuiz(String username, int quizId) {
+    public StatementQuizDto getQuizByQRCode(String username, int quizId) {
         User user = userRepository.findByUsername(username);
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new TutorException(QUIZ_NOT_FOUND, quizId));
 
@@ -124,14 +119,19 @@ public class StatementService {
 
         QuizAnswer quizAnswer = quizAnswerRepository.findQuizAnswer(quiz.getId(), user.getId()).orElseGet(() -> {
             QuizAnswer qa = new QuizAnswer(user, quiz);
-            entityManager.persist(qa);
+            quizAnswerRepository.save(qa);
             return qa;
         });
 
         if (quizAnswer.isCompleted()) {
             throw new TutorException(QUIZ_ALREADY_COMPLETED);
+        }
 
-        } else if (quiz.getAvailableDate() == null || LocalDateTime.now().isAfter(quiz.getAvailableDate())) {
+        if (quizAnswer.getQuiz().isOneWay() && quizAnswer.getAnswerDate() != null) {
+            throw new TutorException(QUIZ_ALREADY_COMPLETED);
+        }
+
+        if (quiz.getAvailableDate() == null || LocalDateTime.now().isAfter(quiz.getAvailableDate())) {
             return new StatementQuizDto(quizAnswer);
 
         // Send timer
@@ -159,22 +159,23 @@ public class StatementService {
 
         // create QuizAnswer for quizzes
         quizRepository.findQuizzes(executionId).stream()
+                .filter(quiz -> !quiz.isQrCodeOnly())
+                .filter(quiz -> !quiz.getType().equals(Quiz.QuizType.GENERATED))
                 .filter(quiz -> quiz.getAvailableDate() == null || quiz.getAvailableDate().isBefore(now))
                 .filter(quiz -> !studentQuizIds.contains(quiz.getId()))
-                .filter(quiz -> !quiz.getType().equals(Quiz.QuizType.IN_CLASS))
-                .filter(quiz -> !quiz.getType().equals(Quiz.QuizType.GENERATED))
                 .forEach(quiz ->  {
                     if (quiz.getConclusionDate() == null || quiz.getConclusionDate().isAfter(now)) {
                         QuizAnswer quizAnswer = new QuizAnswer(user, quiz);
-                        entityManager.persist(quizAnswer);
+                        quizAnswerRepository.save(quizAnswer);
                     }
                 });
 
         return user.getQuizAnswers().stream()
-                .filter(quizAnswer -> quizAnswer.getQuiz().getConclusionDate() == null || LocalDateTime.now().isBefore(quizAnswer.getQuiz().getConclusionDate()))
-                .filter(quizAnswer -> quizAnswer.getQuiz().getCourseExecution().getId() == executionId)
-                .filter(quizAnswer -> quizAnswer.getQuiz().getAvailableDate() == null || !(quizAnswer.getQuiz().getType().equals(Quiz.QuizType.IN_CLASS) && quizAnswer.getQuiz().getAvailableDate().isAfter(now)))
                 .filter(quizAnswer -> !quizAnswer.isCompleted())
+                .filter(quizAnswer -> !quizAnswer.getQuiz().isOneWay() || quizAnswer.getCreationDate() == null)
+                .filter(quizAnswer -> quizAnswer.getQuiz().getCourseExecution().getId() == executionId)
+                .filter(quizAnswer -> quizAnswer.getQuiz().getConclusionDate() == null || LocalDateTime.now().isBefore(quizAnswer.getQuiz().getConclusionDate()))
+                .filter(quizAnswer -> quizAnswer.getQuiz().getAvailableDate().isBefore(now))
                 .map(StatementQuizDto::new)
                 .sorted(Comparator.comparing(StatementQuizDto::getAvailableDate, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
@@ -230,6 +231,33 @@ public class StatementService {
 
             quizAnswer.calculateStatistics();
         });
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void startQuiz(String username, int quizId) {
+        User user = userRepository.findByUsername(username);
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new TutorException(QUIZ_NOT_FOUND, quizId));
+
+        if (!user.getCourseExecutions().contains(quiz.getCourseExecution())) {
+            throw new TutorException(USER_NOT_ENROLLED, username);
+        }
+
+        if (quiz.getConclusionDate() != null && LocalDateTime.now().isAfter(quiz.getConclusionDate())) {
+            throw new TutorException(QUIZ_NO_LONGER_AVAILABLE);
+        }
+
+        QuizAnswer quizAnswer = quizAnswerRepository.findQuizAnswer(quizId, user.getId()).orElseThrow(() -> new TutorException(QUIZ_ANSWER_NOT_FOUND, quizId));
+
+        if (quizAnswer.isCompleted()) {
+            throw new TutorException(QUIZ_ALREADY_COMPLETED);
+        } else if (quizAnswer.getCreationDate() == null) {
+            quizAnswer.setCreationDate(LocalDateTime.now());
+        } else if (quiz.isOneWay()) {
+            throw new TutorException(QUIZ_ALREADY_STARTED);
+        }
     }
 
     public List<Question> filterByAssessment(List<Question> availableQuestions, StatementCreationDto quizDetails) {
