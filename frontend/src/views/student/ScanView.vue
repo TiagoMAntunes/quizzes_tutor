@@ -29,24 +29,27 @@ export default class ScanView extends Vue {
 
   async onDecode(decodedString: String) {
     this.quizId = Number(decodedString);
-    this.getEvaluationQuiz();
+    this.getQuizByQRCode();
   }
 
   countDownTimer() {
     if (this.secondsToRequest >= 0) {
-      this.secondsToRequest -= 1;
-      setTimeout(() => {
-        this.countDownTimer();
-      }, 1000);
+      console.log(this.$router.currentRoute.name);
+      if (this.$router.currentRoute.name === 'scan') {
+        this.secondsToRequest -= 1;
+        setTimeout(() => {
+          this.countDownTimer();
+        }, 1000);
+      }
     } else {
-      this.getEvaluationQuiz();
+      this.getQuizByQRCode();
     }
   }
 
-  async getEvaluationQuiz() {
+  async getQuizByQRCode() {
     if (this.quizId) {
       try {
-        let quiz: StatementQuiz = await RemoteServices.getEvaluationQuiz(
+        let quiz: StatementQuiz = await RemoteServices.getQuizByQRCode(
           this.quizId
         );
         if (quiz.secondsToAvailability) {
