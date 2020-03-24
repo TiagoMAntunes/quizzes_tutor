@@ -45,11 +45,11 @@
           <stringProp name="connectionProperties"></stringProp>
         </JDBCDataSource>
         <hashTree/>
-        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Clean all tournaments" enabled="true">
+        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Clean all tournaments by demo user (id=676)" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
-DELETE FROM tournaments;
+DELETE FROM tournaments WHERE creator_id = 676;
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
@@ -64,7 +64,7 @@ END TRANSACTION;</stringProp>
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
-INSERT INTO tournaments (start_time, finish_time, number_of_questions, course_execution_id) VALUES (&apos;2022-04-30 04:20&apos;, &apos;2022-05-17 04:20&apos;, &apos;1&apos;, &apos;11&apos;);
+INSERT INTO tournaments (start_time, finish_time, number_of_questions, course_execution_id, creator_id) VALUES (&apos;2022-04-30 04:20&apos;, &apos;2022-05-17 04:20&apos;, &apos;1&apos;, &apos;11&apos;, &apos;676&apos;);
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
@@ -314,11 +314,11 @@ END TRANSACTION;</stringProp>
           <stringProp name="connectionProperties"></stringProp>
         </JDBCDataSource>
         <hashTree/>
-        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
+        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Clean up all tournaments by demo user (id=676)" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
-DELETE FROM tournaments;
+DELETE FROM tournaments WHERE creator_id = 676;
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
