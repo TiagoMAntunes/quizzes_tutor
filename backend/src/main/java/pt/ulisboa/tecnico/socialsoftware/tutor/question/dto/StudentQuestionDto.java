@@ -10,7 +10,6 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
     private String questionStatus;
     private String explanation;
     private UserDto userDto;
-    private User user;
 
     public StudentQuestionDto(){
         super();
@@ -20,7 +19,6 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
         super(studentQuestion);
         this.questionStatus = studentQuestion.getQuestionStatus().name();
         this.explanation = studentQuestion.getRejectionExplanation();
-        this.user = studentQuestion.getUser();
         this.userDto = new UserDto(studentQuestion.getUser());
     }
 
@@ -31,10 +29,6 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
     public String getRejectionExplanation() { return this.explanation; }
 
     public void setRejectionExplanation(String explanation) { this.explanation = explanation; }
-
-    public User getUser() {
-        return this.user;
-    }
 
     public UserDto getUserDto() {
         return this.userDto;
