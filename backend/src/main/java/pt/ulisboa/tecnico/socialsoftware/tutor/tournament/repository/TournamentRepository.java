@@ -11,6 +11,4 @@ import javax.transaction.Transactional;
 @Repository
 @Transactional
 public interface  TournamentRepository extends JpaRepository<Tournament, Integer> {
-        @Query(value = "SELECT MAX(key) from tournaments", nativeQuery = true)
-        Integer getMaxTournamentKey();
 }

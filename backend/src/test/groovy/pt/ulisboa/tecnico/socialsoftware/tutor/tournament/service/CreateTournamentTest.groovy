@@ -109,7 +109,6 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 1L
         def result = tournamentRepository.findAll().get(0)
         result != null
-        result.getKey() != null
         result.getStartTime().format(formatter) == NOW_TIME
         result.getFinishTime().format(formatter) == FINISH_TIME
         result.getCreator() == user
