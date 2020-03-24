@@ -62,7 +62,7 @@ public class User implements UserDetails {
     @ManyToMany
     private Set<Tournament> signedUpTournaments = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<Tournament> createdTournaments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
