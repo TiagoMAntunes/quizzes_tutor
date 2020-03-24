@@ -14,7 +14,7 @@ import javax.validation.Valid;
 import java.io.Serializable;
 
 @RestController
-public class StudentQuestionController implements Serializable{
+public class StudentQuestionController{
 
     static class Information{
         public String status;
