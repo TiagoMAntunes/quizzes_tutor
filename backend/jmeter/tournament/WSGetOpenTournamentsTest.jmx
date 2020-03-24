@@ -12,6 +12,16 @@
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
     </TestPlan>
     <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="tournament_id" elementType="Argument">
+            <stringProp name="Argument.name">tournament_id</stringProp>
+            <stringProp name="Argument.value">5</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
       <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp Thread Group" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
@@ -49,6 +59,8 @@
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
+DELETE FROM topics_tournaments WHERE tournaments_id = ${tournament_id};
+
 DELETE FROM tournaments WHERE creator_id = 676;
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
@@ -64,7 +76,12 @@ END TRANSACTION;</stringProp>
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
-INSERT INTO tournaments (start_time, finish_time, number_of_questions, course_execution_id, creator_id) VALUES (&apos;2022-04-30 04:20&apos;, &apos;2022-05-17 04:20&apos;, &apos;1&apos;, &apos;11&apos;, &apos;676&apos;);
+INSERT INTO tournaments (id, start_time, finish_time, number_of_questions, course_execution_id, creator_id) 
+VALUES (${tournament_id}, &apos;2022-04-30 04:20&apos;, &apos;2022-05-17 04:20&apos;, &apos;1&apos;, &apos;11&apos;, &apos;676&apos;);
+
+INSERT INTO topics_tournaments (topics_id, tournaments_id) 
+VALUES (&apos;82&apos;, ${tournament_id});
+
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
@@ -241,6 +258,15 @@ END TRANSACTION;</stringProp>
               <boolProp name="ISREGEX">false</boolProp>
             </JSONPathAssertion>
             <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert open tournament topics" enabled="true">
+              <stringProp name="JSON_PATH">$[0].topics</stringProp>
+              <stringProp name="EXPECTED_VALUE"></stringProp>
+              <boolProp name="JSONVALIDATION">false</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
           </hashTree>
         </hashTree>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Tournament Creation Results" enabled="true">
@@ -318,6 +344,8 @@ END TRANSACTION;</stringProp>
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
+DELETE FROM topics_tournaments WHERE tournaments_id = ${tournament_id};
+
 DELETE FROM tournaments WHERE creator_id = 676;
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
