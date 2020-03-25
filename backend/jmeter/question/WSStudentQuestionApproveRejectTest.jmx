@@ -40,8 +40,8 @@
           <stringProp name="checkQuery"></stringProp>
           <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true</stringProp>
           <stringProp name="driver">org.postgresql.Driver</stringProp>
-          <stringProp name="username">mariab</stringProp>
-          <stringProp name="password">1234</stringProp>
+          <stringProp name="username">db_admin</stringProp>
+          <stringProp name="password">db_pass</stringProp>
           <stringProp name="connectionProperties"></stringProp>
         </JDBCDataSource>
         <hashTree/>
@@ -382,7 +382,7 @@ if (!explanation.equals(&quot;explanation&quot;) || !status.equals(&quot;REJECTE
       </PostThreadGroup>
       <hashTree>
         <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="JDBC Connection Configuration" enabled="true">
-          <stringProp name="dataSource">sanoke</stringProp>
+          <stringProp name="dataSource">test_student_question</stringProp>
           <stringProp name="poolMax">0</stringProp>
           <stringProp name="timeout">10000</stringProp>
           <stringProp name="trimInterval">60000</stringProp>
@@ -401,7 +401,7 @@ if (!explanation.equals(&quot;explanation&quot;) || !status.equals(&quot;REJECTE
         </JDBCDataSource>
         <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
-          <stringProp name="dataSource">sample</stringProp>
+          <stringProp name="dataSource">test_student_question</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
 DELETE FROM student_questions WHERE user_id = 676;
