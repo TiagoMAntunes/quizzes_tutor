@@ -50,7 +50,7 @@ public class TournamentController {
 
         return ResponseEntity.ok().build();
     }
-
+  
     @GetMapping("/executions/{executionId}/tournaments")
     @PreAuthorize("hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public List<TournamentDto> getOpenTournaments(@PathVariable int executionId) {
