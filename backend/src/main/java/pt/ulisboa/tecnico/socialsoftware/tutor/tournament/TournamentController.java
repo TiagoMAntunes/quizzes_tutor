@@ -1,12 +1,14 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
@@ -23,9 +25,6 @@ public class TournamentController {
     @Autowired
     private TournamentService tournamentService;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @PostMapping("/executions/{executionId}/tournaments")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public TournamentDto createTournament(@PathVariable int executionId, @Valid @RequestBody TournamentDto tournament, Principal principal) {
@@ -38,6 +37,20 @@ public class TournamentController {
         return this.tournamentService.createTournament(tournament, executionId, user.getId());
     }
 
+    @DeleteMapping("/tournaments/{tournamentId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.CANCEL')")
+    public ResponseEntity deleteTournament(@PathVariable Integer tournamentId, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+
+        tournamentService.cancelTournament(tournamentId, user.getId());
+
+        return ResponseEntity.ok().build();
+    }
+  
     @GetMapping("/executions/{executionId}/tournaments")
     @PreAuthorize("hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public List<TournamentDto> getOpenTournaments(@PathVariable int executionId) {
