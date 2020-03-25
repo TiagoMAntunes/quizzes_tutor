@@ -50,14 +50,6 @@ public class TournamentService {
     @PersistenceContext
     EntityManager entityManager;
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public CourseDto findTournamentCourseExecution(int tournamentId) {
-        return tournamentRepository.findById(tournamentId)
-                .map(Tournament::getCourseExecution)
-                .map(CourseDto::new)
-                .orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
-    }
-
     @Retryable(
         value = {SQLException.class },
         backoff = @Backoff(delay = 5000))
