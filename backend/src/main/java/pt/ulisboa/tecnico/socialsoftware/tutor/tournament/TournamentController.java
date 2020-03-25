@@ -6,12 +6,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
-<<<<<<< HEAD
-=======
 import java.util.List;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthDto;
->>>>>>> 31a0feb... defined web service issue #68
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
