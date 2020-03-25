@@ -395,8 +395,8 @@ if (!explanation.equals(&quot;explanation&quot;) || !status.equals(&quot;REJECTE
           <stringProp name="checkQuery"></stringProp>
           <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true</stringProp>
           <stringProp name="driver">org.postgresql.Driver</stringProp>
-          <stringProp name="username">mariab</stringProp>
-          <stringProp name="password">1234</stringProp>
+          <stringProp name="username">db_admin</stringProp>
+          <stringProp name="password">db_pass</stringProp>
           <stringProp name="connectionProperties"></stringProp>
         </JDBCDataSource>
         <hashTree/>
