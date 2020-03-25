@@ -94,6 +94,7 @@
           <stringProp name="dataSource">test_student_question</stringProp>
           <stringProp name="query">START TRANSACTION;
 DELETE FROM student_questions WHERE user_id = 676;
+DELETE FROM questions WHERE id &gt; 1999;
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
@@ -122,7 +123,7 @@ END TRANSACTION;</stringProp>
             <stringProp name="variableNames">student_question_id,explanation,content,number_answers,number_correct,title,student_question_status,creation_date,course_id</stringProp>
           </CSVDataSet>
           <hashTree/>
-          <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Add tournaments to Demo Student" enabled="true">
+          <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Add student questions to Demo Student" enabled="true">
             <stringProp name="dataSource">test_student_question</stringProp>
             <stringProp name="queryType">Update Statement</stringProp>
             <stringProp name="query">START TRANSACTION;
