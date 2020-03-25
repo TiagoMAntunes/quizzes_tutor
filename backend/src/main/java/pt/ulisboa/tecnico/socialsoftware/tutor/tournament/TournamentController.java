@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
 
 import javax.validation.Valid;
@@ -33,12 +35,6 @@ public class TournamentController {
         }
 
         return this.tournamentService.createTournament(tournament, executionId, user.getId());
-    }
-
-    @PutMapping("/executions/{executionId}/tournaments/{tournamentId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
-    public void joinTournament(@PathVariable int executionId, @PathVariable int tournamentId, @RequestParam int userId, Principal principal) {
-        this.tournamentService.joinTournament(tournamentId, executionId, userId);
     }
 
     @DeleteMapping("/tournaments/{tournamentId}")
