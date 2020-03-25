@@ -26,6 +26,42 @@
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </SetupThreadGroup>
       <hashTree>
+        <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="JDBC Connection Configuration" enabled="true">
+          <boolProp name="autocommit">true</boolProp>
+          <stringProp name="checkQuery"></stringProp>
+          <stringProp name="connectionAge">5000</stringProp>
+          <stringProp name="connectionProperties"></stringProp>
+          <stringProp name="dataSource">test_student_question</stringProp>
+          <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true</stringProp>
+          <stringProp name="driver">org.postgresql.Driver</stringProp>
+          <stringProp name="initQuery"></stringProp>
+          <boolProp name="keepAlive">true</boolProp>
+          <stringProp name="password">db_pass</stringProp>
+          <stringProp name="poolMax">0</stringProp>
+          <boolProp name="preinit">false</boolProp>
+          <stringProp name="timeout">10000</stringProp>
+          <stringProp name="transactionIsolation">DEFAULT</stringProp>
+          <stringProp name="trimInterval">60000</stringProp>
+          <stringProp name="username">db_admin</stringProp>
+        </JDBCDataSource>
+        <hashTree/>
+        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
+          <stringProp name="dataSource">test_student_question</stringProp>
+          <stringProp name="query">START TRANSACTION;
+DELETE FROM options WHERE content = &apos;content_test&apos;;
+DELETE FROM questions WHERE content = &apos;content_test&apos;;
+DELETE FROM student_questions WHERE user_id = 676;
+END TRANSACTION;</stringProp>
+          <stringProp name="queryArguments"></stringProp>
+          <stringProp name="queryArgumentsTypes"></stringProp>
+          <stringProp name="queryTimeout"></stringProp>
+          <stringProp name="queryType">Callable Statement</stringProp>
+          <stringProp name="resultSetHandler">Store as String</stringProp>
+          <stringProp name="resultSetMaxRows"></stringProp>
+          <stringProp name="resultVariable"></stringProp>
+          <stringProp name="variableNames"></stringProp>
+        </JDBCSampler>
+        <hashTree/>
         <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
           <collectionProp name="Arguments.arguments">
             <elementProp name="server" elementType="Argument">
@@ -98,11 +134,11 @@
                   <stringProp name="Argument.value">{&#xd;
   &quot;key&quot; : 1,&#xd;
   &quot;title&quot; : &quot;title&quot;,&#xd;
-  &quot;content&quot; : &quot;content&quot;,&#xd;
+  &quot;content&quot; : &quot;content_test&quot;,&#xd;
   &quot;status&quot; : &quot;AVAILABLE&quot;,&#xd;
   &quot;options&quot; : [&#xd;
   	{&#xd;
-  	  &quot;content&quot; : &quot;content_option&quot;,&#xd;
+  	  &quot;content&quot; : &quot;content_test&quot;,&#xd;
   	  &quot;correct&quot; : true&#xd;
   	}&#xd;
   ]&#xd;
@@ -130,28 +166,28 @@
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert key" enabled="true">
               <stringProp name="JSON_PATH">$.key</stringProp>
               <stringProp name="EXPECTED_VALUE">1</stringProp>
-              <boolProp name="JSONVALIDATION">false</boolProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">true</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
             </JSONPathAssertion>
             <hashTree/>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert title" enabled="true">
               <stringProp name="JSON_PATH">$.title</stringProp>
               <stringProp name="EXPECTED_VALUE">title</stringProp>
-              <boolProp name="JSONVALIDATION">false</boolProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">true</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
             </JSONPathAssertion>
             <hashTree/>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert content" enabled="true">
               <stringProp name="JSON_PATH">$.content</stringProp>
-              <stringProp name="EXPECTED_VALUE">content</stringProp>
-              <boolProp name="JSONVALIDATION">false</boolProp>
+              <stringProp name="EXPECTED_VALUE">content_test</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">true</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
             </JSONPathAssertion>
             <hashTree/>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert status" enabled="true">
@@ -174,11 +210,11 @@
             <hashTree/>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert option content" enabled="true">
               <stringProp name="JSON_PATH">$[&apos;options&apos;][0].content</stringProp>
-              <stringProp name="EXPECTED_VALUE">content_option</stringProp>
+              <stringProp name="EXPECTED_VALUE">content_test</stringProp>
               <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">true</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
             </JSONPathAssertion>
             <hashTree/>
           </hashTree>
@@ -277,7 +313,7 @@
           <stringProp name="checkQuery"></stringProp>
           <stringProp name="connectionAge">5000</stringProp>
           <stringProp name="connectionProperties"></stringProp>
-          <stringProp name="dataSource">sampleReq</stringProp>
+          <stringProp name="dataSource">test_student_question</stringProp>
           <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true</stringProp>
           <stringProp name="driver">org.postresql.Driver</stringProp>
           <stringProp name="initQuery"></stringProp>
@@ -292,14 +328,16 @@
         </JDBCDataSource>
         <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
-          <stringProp name="dataSource">sampleReq</stringProp>
+          <stringProp name="dataSource">test_student_question</stringProp>
           <stringProp name="query">START TRANSACTION;
-DELETE FROM student_questions WHERE id = &apos;676&apos;;
+DELETE FROM options WHERE content = &apos;content_test&apos;;
+DELETE FROM questions WHERE content = &apos;content_test&apos;;
+DELETE FROM student_questions WHERE user_id = 676;
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
           <stringProp name="queryTimeout"></stringProp>
-          <stringProp name="queryType">Update Statement</stringProp>
+          <stringProp name="queryType">Callable Statement</stringProp>
           <stringProp name="resultSetHandler">Store as String</stringProp>
           <stringProp name="resultSetMaxRows"></stringProp>
           <stringProp name="resultVariable"></stringProp>
