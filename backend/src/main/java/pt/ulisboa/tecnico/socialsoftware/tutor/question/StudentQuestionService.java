@@ -70,6 +70,7 @@ public class StudentQuestionService {
     value = { SQLException.class },
     backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    //this method should receive a studentQuestionDto
     public void studentQuestionApproveReject(int questionId, StudentQuestion.QuestionStatus status, String explanation, int teacherId, int courseExecutionId) {
         User teacher = userRepository.findById(teacherId).orElseThrow(() -> new TutorException(ACCESS_DENIED, teacherId));
         CourseExecution execution = courseExecutionRepository.findById(courseExecutionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, courseExecutionId));

@@ -49,7 +49,7 @@ public class TournamentService {
     @Retryable(
         value = {SQLException.class },
         backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public TournamentDto createTournament(TournamentDto tournamentDto, int courseExecutionId, int creatorId) {
         if (tournamentDto.getKey() == null)
             tournamentDto.setKey(getMaxTournamentKey() + 1);

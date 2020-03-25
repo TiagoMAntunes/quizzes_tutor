@@ -93,9 +93,9 @@ class CreateTournamentTest extends Specification {
     }
 
     def "create the tournament"() {
-        given: "a tournamentDto"
+        given: "a user"
         def user = userRepository.findAll().get(0)
-
+        and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(NOW_TIME)
         tournamentDto.setFinishTime(FINISH_TIME)
