@@ -2,12 +2,14 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.question.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+
 import java.io.Serializable;
 
 public class StudentQuestionDto extends QuestionDto implements Serializable {
     private String questionStatus;
     private String explanation;
-    private UserDto user;
+    private UserDto userDto;
 
     public StudentQuestionDto(){
         super();
@@ -15,9 +17,9 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
 
     public StudentQuestionDto(StudentQuestion studentQuestion) {
         super(studentQuestion);
-        this.questionStatus = studentQuestion.getStatus().name();
+        this.questionStatus = studentQuestion.getQuestionStatus().name();
         this.explanation = studentQuestion.getRejectionExplanation();
-        this.user = new UserDto(studentQuestion.getUser());
+        this.userDto = new UserDto(studentQuestion.getUser());
     }
 
     public String getQuestionStatus() { return this.questionStatus; }
@@ -29,11 +31,11 @@ public class StudentQuestionDto extends QuestionDto implements Serializable {
     public void setRejectionExplanation(String explanation) { this.explanation = explanation; }
 
     public UserDto getUserDto() {
-        return this.user;
+        return this.userDto;
     }
 
     public void setUserDto(UserDto userDto) {
-        this.user = userDto;
+        this.userDto = userDto;
     }
 
 }

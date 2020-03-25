@@ -99,9 +99,9 @@ class getQuestionsStatusTest extends Specification {
 
         then:
         result.size() == 1
-        result.get(0).getQuestionStatus() == StudentQuestion.QuestionStatus.PENDING
+        result.get(0).getQuestionStatus() == 'PENDING'
         result.get(0).getId() != null
-        result.get(0).getUser() == student
+        result.get(0).getUserDto().getId() == student.getId();
     }
 
     def "get status of a question that was approved question"(){
@@ -115,9 +115,9 @@ class getQuestionsStatusTest extends Specification {
 
         then:
         result.size() == 1
-        result.get(0).getQuestionStatus() == StudentQuestion.QuestionStatus.APPROVED
+        result.get(0).getQuestionStatus() == 'APPROVED'
         result.get(0).getId() != null
-        result.get(0).getUser() == student
+        result.get(0).getUserDto().getId() == student.getId();
     }
 
     def "get status of a question that was rejected with no explanation"(){
@@ -131,9 +131,9 @@ class getQuestionsStatusTest extends Specification {
 
         then:
         result.size() == 1
-        result.get(0).getQuestionStatus() == StudentQuestion.QuestionStatus.REJECTED
+        result.get(0).getQuestionStatus() == 'REJECTED'
         result.get(0).getId() != null
-        result.get(0).getUser() == student
+        result.get(0).getUserDto().getId() == student.getId();
         result.get(0).getRejectionExplanation() == null
     }
 
@@ -148,9 +148,9 @@ class getQuestionsStatusTest extends Specification {
 
         then:
         result.size() == 1
-        result.get(0).getQuestionStatus() == StudentQuestion.QuestionStatus.REJECTED
+        result.get(0).getQuestionStatus() == 'REJECTED'
         result.get(0).getId() != null
-        result.get(0).getUser() == student
+        result.get(0).getUserDto().getId() == student.getId();
         result.get(0).getRejectionExplanation() == EXPLANATION
     }
 
@@ -174,12 +174,12 @@ class getQuestionsStatusTest extends Specification {
 
         then:
         result.size() == 2
-        result.get(0).getQuestionStatus() == StudentQuestion.QuestionStatus.APPROVED
+        result.get(0).getQuestionStatus() == 'APPROVED'
         result.get(0).getId() != null
-        result.get(0).getUser() == student
-        result.get(1).getQuestionStatus() == StudentQuestion.QuestionStatus.REJECTED
+        result.get(0).getUserDto().getId() == student.getId();
+        result.get(1).getQuestionStatus() == 'REJECTED'
         result.get(1).getId() != null
-        result.get(1).getUser() == student
+        result.get(1).getUserDto().getId() == student.getId();
         result.get(1).getRejectionExplanation() == EXPLANATION
     }
     @TestConfiguration

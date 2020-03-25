@@ -94,12 +94,13 @@ public class StudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<StudentQuestion> getStudentQuestions(int studentId) {
+    public List<StudentQuestionDto> getStudentQuestions(int studentId) {
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
 
 
-        List<StudentQuestion> list = studentQuestionRepository.findAll().stream()
+        List<StudentQuestionDto> list = studentQuestionRepository.findAll().stream()
                 .filter(studentQuestion -> studentQuestion.getUser() == student)
+                .map(StudentQuestionDto::new)
                 .collect(Collectors.toList());
 
         if(list.isEmpty()){
