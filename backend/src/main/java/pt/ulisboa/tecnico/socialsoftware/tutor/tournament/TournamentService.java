@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -28,6 +29,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUIZ_NOT_FOUND;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.TOURNAMENT_NOT_FOUND;
+
 @Service
 public class TournamentService {
 
@@ -45,6 +49,14 @@ public class TournamentService {
 
     @PersistenceContext
     EntityManager entityManager;
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public CourseDto findTournamentCourseExecution(int tournamentId) {
+        return tournamentRepository.findById(tournamentId)
+                .map(Tournament::getCourseExecution)
+                .map(CourseDto::new)
+                .orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
+    }
 
     @Retryable(
         value = {SQLException.class },
