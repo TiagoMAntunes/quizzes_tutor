@@ -22,7 +22,7 @@ import java.io.Serializable;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.AUTHENTICATION_ERROR;
 
 @RestController
-public class StudentQuestionController implements Serializable{
+public class StudentQuestionController{
 
     static class Information{
         public String status;
@@ -42,7 +42,7 @@ public class StudentQuestionController implements Serializable{
     }
 
     @PostMapping("/student_questions/{questionId}/approve-reject")
-    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity studentQuestionApproveRejectStatus(@PathVariable Integer questionId, @Valid @RequestBody Information inform) {
         studentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.valueOf(inform.status), inform.explanation, inform.teacherId,  inform.courseExecutionId);
         return ResponseEntity.ok().build();

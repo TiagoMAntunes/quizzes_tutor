@@ -27,26 +27,26 @@
       </SetupThreadGroup>
       <hashTree>
         <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="JDBC Connection Configuration" enabled="true">
+          <stringProp name="dataSource">test_student_question</stringProp>
+          <stringProp name="poolMax">0</stringProp>
+          <stringProp name="timeout">10000</stringProp>
+          <stringProp name="trimInterval">60000</stringProp>
           <boolProp name="autocommit">true</boolProp>
-          <stringProp name="checkQuery"></stringProp>
-          <stringProp name="connectionAge">5000</stringProp>
-          <stringProp name="connectionProperties"></stringProp>
-          <stringProp name="dataSource">sample</stringProp>
-          <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true</stringProp>
-          <stringProp name="driver">org.postgresql.Driver</stringProp>
+          <stringProp name="transactionIsolation">DEFAULT</stringProp>
+          <boolProp name="preinit">false</boolProp>
           <stringProp name="initQuery"></stringProp>
           <boolProp name="keepAlive">true</boolProp>
-          <stringProp name="password">1234</stringProp>
-          <stringProp name="poolMax">0</stringProp>
-          <boolProp name="preinit">false</boolProp>
-          <stringProp name="timeout">10000</stringProp>
-          <stringProp name="transactionIsolation">DEFAULT</stringProp>
-          <stringProp name="trimInterval">60000</stringProp>
-          <stringProp name="username">mariab</stringProp>
+          <stringProp name="connectionAge">5000</stringProp>
+          <stringProp name="checkQuery"></stringProp>
+          <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true</stringProp>
+          <stringProp name="driver">org.postgresql.Driver</stringProp>
+          <stringProp name="username">db_admin</stringProp>
+          <stringProp name="password">db_pass</stringProp>
+          <stringProp name="connectionProperties"></stringProp>
         </JDBCDataSource>
         <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
-          <stringProp name="dataSource">sample</stringProp>
+          <stringProp name="dataSource">test_student_question</stringProp>
           <stringProp name="query">START TRANSACTION;
 DELETE FROM student_questions WHERE user_id = 676;
 END TRANSACTION;</stringProp>
@@ -58,6 +58,21 @@ END TRANSACTION;</stringProp>
           <stringProp name="resultSetMaxRows"></stringProp>
           <stringProp name="resultVariable"></stringProp>
           <stringProp name="variableNames"></stringProp>
+        </JDBCSampler>
+        <hashTree/>
+        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Create StudentQuestion" enabled="true">
+          <stringProp name="dataSource">test_student_question</stringProp>
+          <stringProp name="queryType">Update Statement</stringProp>
+          <stringProp name="query">START TRANSACTION;
+INSERT INTO student_questions (explanation, question_status, id, user_id) VALUES (&apos;explanation&apos;, &apos;PENDING&apos;, &apos;1339&apos;, &apos;676&apos;);
+END TRANSACTION;</stringProp>
+          <stringProp name="queryArguments"></stringProp>
+          <stringProp name="queryArgumentsTypes"></stringProp>
+          <stringProp name="variableNames"></stringProp>
+          <stringProp name="resultVariable">student_question</stringProp>
+          <stringProp name="queryTimeout"></stringProp>
+          <stringProp name="resultSetMaxRows"></stringProp>
+          <stringProp name="resultSetHandler">Store as String</stringProp>
         </JDBCSampler>
         <hashTree/>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
@@ -209,40 +224,6 @@ END TRANSACTION;</stringProp>
             </collectionProp>
           </HeaderManager>
           <hashTree/>
-          <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="JDBC Connection Configuration" enabled="true">
-            <stringProp name="dataSource">test_student_question</stringProp>
-            <stringProp name="poolMax">0</stringProp>
-            <stringProp name="timeout">10000</stringProp>
-            <stringProp name="trimInterval">60000</stringProp>
-            <boolProp name="autocommit">true</boolProp>
-            <stringProp name="transactionIsolation">DEFAULT</stringProp>
-            <boolProp name="preinit">false</boolProp>
-            <stringProp name="initQuery"></stringProp>
-            <boolProp name="keepAlive">true</boolProp>
-            <stringProp name="connectionAge">5000</stringProp>
-            <stringProp name="checkQuery"></stringProp>
-            <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true</stringProp>
-            <stringProp name="driver">org.postgresql.Driver</stringProp>
-            <stringProp name="username">mariab</stringProp>
-            <stringProp name="password">1234</stringProp>
-            <stringProp name="connectionProperties"></stringProp>
-          </JDBCDataSource>
-          <hashTree/>
-          <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Create StudentQuestion" enabled="true">
-            <stringProp name="dataSource">test_student_question</stringProp>
-            <stringProp name="queryType">Update Statement</stringProp>
-            <stringProp name="query">START TRANSACTION;
-INSERT INTO student_questions (explanation, question_status, id, user_id) VALUES (&apos;explanation&apos;, &apos;PENDING&apos;, &apos;1339&apos;, &apos;676&apos;);
-END TRANSACTION;</stringProp>
-            <stringProp name="queryArguments"></stringProp>
-            <stringProp name="queryArgumentsTypes"></stringProp>
-            <stringProp name="variableNames"></stringProp>
-            <stringProp name="resultVariable">student_question</stringProp>
-            <stringProp name="queryTimeout"></stringProp>
-            <stringProp name="resultSetMaxRows"></stringProp>
-            <stringProp name="resultSetHandler">Store as String</stringProp>
-          </JDBCSampler>
-          <hashTree/>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request" enabled="true">
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
@@ -386,7 +367,7 @@ if (!explanation.equals(&quot;explanation&quot;) || !status.equals(&quot;REJECTE
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown Thread Group" enabled="false">
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown Thread Group" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -401,7 +382,7 @@ if (!explanation.equals(&quot;explanation&quot;) || !status.equals(&quot;REJECTE
       </PostThreadGroup>
       <hashTree>
         <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="JDBC Connection Configuration" enabled="true">
-          <stringProp name="dataSource">sanoke</stringProp>
+          <stringProp name="dataSource">test_student_question</stringProp>
           <stringProp name="poolMax">0</stringProp>
           <stringProp name="timeout">10000</stringProp>
           <stringProp name="trimInterval">60000</stringProp>
@@ -414,13 +395,13 @@ if (!explanation.equals(&quot;explanation&quot;) || !status.equals(&quot;REJECTE
           <stringProp name="checkQuery"></stringProp>
           <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true</stringProp>
           <stringProp name="driver">org.postgresql.Driver</stringProp>
-          <stringProp name="username">mariab</stringProp>
-          <stringProp name="password">1234</stringProp>
+          <stringProp name="username">db_admin</stringProp>
+          <stringProp name="password">db_pass</stringProp>
           <stringProp name="connectionProperties"></stringProp>
         </JDBCDataSource>
         <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
-          <stringProp name="dataSource">sample</stringProp>
+          <stringProp name="dataSource">test_student_question</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
 DELETE FROM student_questions WHERE user_id = 676;
