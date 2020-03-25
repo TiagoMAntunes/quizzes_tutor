@@ -57,7 +57,7 @@ public class StudentQuestionController{
         if(user == null){
             throw new TutorException(AUTHENTICATION_ERROR);
         }
-
+        question.setStatus(Question.Status.AVAILABLE.name());
         return this.studentQuestionService.createStudentQuestion(courseId, question, user.getId());
     }
 }
