@@ -122,4 +122,6 @@ public class Tournament {
     }
 
     public Set<User> getSignedUp() { return signedUp; }
+
+    public int getSignedUpNumber(){ return signedUp.size();}
 }
