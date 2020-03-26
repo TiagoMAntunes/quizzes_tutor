@@ -23,7 +23,7 @@ import spock.lang.Specification
 import java.util.ArrayList;
 
 @DataJpaTest
-class ApproveRejectQuestionServicePerfomanceTest extends Specification {
+class ApproveRejectQuestionServicePerformanceTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -32,13 +32,11 @@ class ApproveRejectQuestionServicePerfomanceTest extends Specification {
     public static final String OPTION_CONTENT = "optionId content"
     public static final String EXPLANATION = "explanation"
 
-    public static final int N_STUDENT_QUESTIONS = 20
+    public static final int N_STUDENT_QUESTIONS = 100
 
     @Autowired
     StudentQuestionService studentQuestionService
 
-    @Autowired
-    QuestionService questionService
 
     @Autowired
     UserRepository userRepository
@@ -75,7 +73,6 @@ class ApproveRejectQuestionServicePerfomanceTest extends Specification {
         student.addCourse(courseExecution)
 
         questionDto = new QuestionDto()
-        questionDto.setKey(1)
         questionDto.setTitle(QUESTION_TITLE)
         questionDto.setContent(QUESTION_CONTENT)
         questionDto.setStatus(Question.Status.AVAILABLE.name())
@@ -86,23 +83,21 @@ class ApproveRejectQuestionServicePerfomanceTest extends Specification {
         def options = new ArrayList<OptionDto>()
         options.add(optionDto)
         questionDto.setOptions(options)
-        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
     }
 
     def "performance testing to get 750k student questions"() {
         given: "750k questions and student questions"
-        1.upto(N_STUDENT_QUESTIONS, {questionService.createQuestion(course.getId(), questionDto)})
-        1.upto(N_STUDENT_QUESTIONS, {studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())})
+        1.upto(N_STUDENT_QUESTIONS, {key-> questionDto.setKey(key); studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())})
 
         when:
-        1.upto(N_STUDENT_QUESTIONS, {questionId -> StudentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.APPROVED, EXPLANATION, teacher.getId(), courseExecution.getId())})
+        1.upto(N_STUDENT_QUESTIONS, {questionId -> studentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.REJECTED, EXPLANATION, teacher.getId(), courseExecution.getId())})
 
         then:
-        true
+        studentQuestionRepository.count() == N_STUDENT_QUESTIONS;
     }
 
     @TestConfiguration
-    static class StudentQuestionServiceImplTestContextConfiguration {
+    static class ApproveRejectQuestionServicePerformanceTestContextConfiguration {
 
         @Bean
         StudentQuestionService studentQuestionService() {
