@@ -14,9 +14,9 @@
     <hashTree>
       <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
         <collectionProp name="Arguments.arguments">
-          <elementProp name="tournament_id" elementType="Argument">
-            <stringProp name="Argument.name">tournament_id</stringProp>
-            <stringProp name="Argument.value">5</stringProp>
+          <elementProp name="student_id" elementType="Argument">
+            <stringProp name="Argument.name">student_id</stringProp>
+            <stringProp name="Argument.value">676</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -55,13 +55,13 @@
           <stringProp name="connectionProperties"></stringProp>
         </JDBCDataSource>
         <hashTree/>
-        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Clean all tournaments by demo user (id=676)" enabled="true">
+        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Clean all tournaments by demo user" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
-DELETE FROM topics_tournaments WHERE tournaments_id = ${tournament_id};
+DELETE FROM topics_tournaments WHERE tournaments_id in (SELECT id FROM tournaments WHERE creator_id = ${student_id});
 
-DELETE FROM tournaments WHERE creator_id = 676;
+DELETE FROM tournaments WHERE creator_id = ${student_id};
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
@@ -72,26 +72,45 @@ END TRANSACTION;</stringProp>
           <stringProp name="resultSetHandler">Store as String</stringProp>
         </JDBCSampler>
         <hashTree/>
-        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Create tournament in database" enabled="true">
-          <stringProp name="dataSource">sampleReq</stringProp>
-          <stringProp name="queryType">Update Statement</stringProp>
-          <stringProp name="query">START TRANSACTION;
-INSERT INTO tournaments (id, start_time, finish_time, number_of_questions, course_execution_id, creator_id) 
-VALUES (${tournament_id}, &apos;2022-04-30 04:20&apos;, &apos;2022-05-17 04:20&apos;, &apos;1&apos;, &apos;11&apos;, &apos;676&apos;);
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Add 250 tournaments to course execution" enabled="true">
+          <boolProp name="LoopController.continue_forever">true</boolProp>
+          <stringProp name="LoopController.loops">250</stringProp>
+        </LoopController>
+        <hashTree>
+          <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
+            <stringProp name="filename">new_tournaments.csv</stringProp>
+            <stringProp name="fileEncoding"></stringProp>
+            <stringProp name="variableNames">tournament_id,start_time,finish_time,number_of_questions,course_execution_id,topic_id</stringProp>
+            <boolProp name="ignoreFirstLine">false</boolProp>
+            <stringProp name="delimiter">,</stringProp>
+            <boolProp name="quotedData">false</boolProp>
+            <boolProp name="recycle">true</boolProp>
+            <boolProp name="stopThread">false</boolProp>
+            <stringProp name="shareMode">shareMode.group</stringProp>
+          </CSVDataSet>
+          <hashTree/>
+          <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Add tournaments to course exec" enabled="true">
+            <stringProp name="dataSource">sampleReq</stringProp>
+            <stringProp name="queryType">Update Statement</stringProp>
+            <stringProp name="query">START TRANSACTION;
 
-INSERT INTO topics_tournaments (topics_id, tournaments_id) 
-VALUES (&apos;82&apos;, ${tournament_id});
+INSERT INTO tournaments(id, start_time, finish_time, number_of_questions, course_execution_id, creator_id)
+VALUES (${tournament_id}, &apos;${start_time}&apos;, &apos;${finish_time}&apos;, ${number_of_questions}, ${course_execution_id}, ${student_id});
+
+INSERT INTO topics_tournaments(topics_id, tournaments_id)
+VALUES (${topic_id}, ${tournament_id});
 
 END TRANSACTION;</stringProp>
-          <stringProp name="queryArguments"></stringProp>
-          <stringProp name="queryArgumentsTypes"></stringProp>
-          <stringProp name="variableNames"></stringProp>
-          <stringProp name="resultVariable"></stringProp>
-          <stringProp name="queryTimeout"></stringProp>
-          <stringProp name="resultSetMaxRows"></stringProp>
-          <stringProp name="resultSetHandler">Store as String</stringProp>
-        </JDBCSampler>
-        <hashTree/>
+            <stringProp name="queryArguments"></stringProp>
+            <stringProp name="queryArgumentsTypes"></stringProp>
+            <stringProp name="variableNames"></stringProp>
+            <stringProp name="resultVariable"></stringProp>
+            <stringProp name="queryTimeout"></stringProp>
+            <stringProp name="resultSetMaxRows"></stringProp>
+            <stringProp name="resultSetHandler">Store as String</stringProp>
+          </JDBCSampler>
+          <hashTree/>
+        </hashTree>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Setup" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
@@ -238,7 +257,7 @@ END TRANSACTION;</stringProp>
             <hashTree/>
           </hashTree>
         </hashTree>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Tournament Creation Results" enabled="true">
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Get open tournaments Results" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -350,9 +369,9 @@ END TRANSACTION;</stringProp>
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
-DELETE FROM topics_tournaments WHERE tournaments_id = ${tournament_id};
+DELETE FROM topics_tournaments WHERE tournaments_id in (SELECT id FROM tournaments WHERE creator_id = ${student_id});
 
-DELETE FROM tournaments WHERE creator_id = 676;
+DELETE FROM tournaments WHERE creator_id = ${student_id};
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
