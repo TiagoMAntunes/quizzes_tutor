@@ -30,7 +30,7 @@ class CreateStudentQuestionPerformanceTest extends Specification {
     public static final String OPTION_CONTENT = "optionId content"
     public static final String USER_NAME = "pedro"
     public static final String USER_USERNAME = "lamegow"
-    public static final int N_STUDENT_QUESTIONS   = 100
+    public static final int N_STUDENT_QUESTIONS   = 1 //should be 1000000
 
     @Autowired
     CourseRepository courseRepository
@@ -65,7 +65,7 @@ class CreateStudentQuestionPerformanceTest extends Specification {
         student.addCourse(courseExecution)
     }
 
-    def "create N_STUDENT_QUESTIONS questions with no image and one option"() {
+    def "create 1M questions with no image and one option"() {
         given: "a questionDto"
         def questionDto = new QuestionDto()
         questionDto.setTitle(QUESTION_TITLE)
@@ -80,13 +80,13 @@ class CreateStudentQuestionPerformanceTest extends Specification {
         questionDto.setOptions(options)
 
         when:
-        1.upto(N_STUDENT_QUESTIONS, {studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId()); questionDto.setKey(null)})
+        1.upto(N_STUDENT_QUESTIONS, { key-> questionDto.setKey(key); studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())})
 
         then:
         studentQuestionRepository.count() == N_STUDENT_QUESTIONS
     }
 
-        @TestConfiguration
+    @TestConfiguration
     static class StudentQuestionServiceImplTestContextConfiguration {
 
         @Bean
