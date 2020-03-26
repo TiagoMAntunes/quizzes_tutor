@@ -156,6 +156,10 @@ public class TournamentService {
         user.addTournament(tournament);
     }
 
+    public int getTournamentSignedUpNumber(Integer tournamentId){
+        return getTournament(tournamentId).getSignedUpNumber();
+    }
+
     private void checkNotSignedUpYet(Tournament tournament, User user) {
         if(tournament.hasSignedUp(user))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_JOINED);
