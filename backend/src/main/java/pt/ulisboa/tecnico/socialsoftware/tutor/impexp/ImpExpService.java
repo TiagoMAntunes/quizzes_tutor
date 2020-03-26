@@ -96,7 +96,7 @@ public class ImpExpService {
 
         String filename = "tutor-" + timeStamp + ".zip";
         try (FileOutputStream fos = new FileOutputStream(directory.getPath() + PATH_DELIMITER + filename);
-        ZipOutputStream zos = new ZipOutputStream(fos);){
+             ZipOutputStream zos = new ZipOutputStream(fos);) {
 
             zos.putNextEntry(new ZipEntry("users.xml"));
             InputStream in = generateUsersInputStream();
@@ -144,7 +144,7 @@ public class ImpExpService {
     }
 
     private InputStream generateQuestionsInputStream() {
-        QuestionsXmlExport generator = new QuestionsXmlExport();
+        XMLQuestionExportVisitor generator = new XMLQuestionExportVisitor();
         return IOUtils.toInputStream(generator.export(questionRepository.findAll()), StandardCharsets.UTF_8);
     }
 

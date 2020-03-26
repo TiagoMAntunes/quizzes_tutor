@@ -57,8 +57,12 @@ public class StudentQuestionService {
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
         checkRoleStudent(student);
+
+        if (questionDto.getCreationDate() == null) {
+            questionDto.setCreationDate(LocalDateTime.now().format(Course.formatter));
+        }
+
         checkEnrolledCourseExecution(student, course);
-        checkQuestionKey(questionDto);
         StudentQuestion studentQuestion = new StudentQuestion(course, questionDto, student);
         studentQuestion.setCreationDate(LocalDateTime.now());
         this.entityManager.persist(studentQuestion);
@@ -113,14 +117,6 @@ public class StudentQuestionService {
     private void checkStatusToAddExplanation(String explanation, StudentQuestion.QuestionStatus status) {
         if(explanation != null && status != StudentQuestion.QuestionStatus.REJECTED) {
             throw new TutorException(CANT_ADD_EXPLANATION);
-        }
-    }
-
-    private void checkQuestionKey(QuestionDto questionDto) {
-        if (questionDto.getKey() == null) {
-            int maxQuestionNumber = questionRepository.getMaxQuestionNumber() != null ?
-                    questionRepository.getMaxQuestionNumber() : 0;
-            questionDto.setKey(maxQuestionNumber + 1);
         }
     }
 
