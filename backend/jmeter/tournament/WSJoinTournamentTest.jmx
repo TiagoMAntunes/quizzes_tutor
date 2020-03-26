@@ -362,11 +362,13 @@ if ( tournament != ${tournament_id}) {
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
+
 DELETE FROM users_signed_up_tournaments WHERE signed_up_id = ${student_id};
 
 DELETE FROM topics_tournaments WHERE tournaments_id = ${tournament_id};
 
 DELETE FROM tournaments WHERE creator_id = ${student_id};
+
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
