@@ -1,5 +1,4 @@
-package pt.ulisboa.tecnico.socialsoftware.tutor.question.service
-}
+package pt.ulisboa.tecnico.socialsoftware.tutor.question.servic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -11,8 +10,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
@@ -20,8 +17,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuesti
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
-
-import java.util.ArrayList;
 
 @DataJpaTest
 class getQuestionStatusServicePerfomanceTest extends Specification {
@@ -31,15 +26,11 @@ class getQuestionStatusServicePerfomanceTest extends Specification {
     public static final String QUESTION_TITLE = "question title"
     public static final String QUESTION_CONTENT = "question content"
     public static final String OPTION_CONTENT = "optionId content"
-    public static final String EXPLANATION = "explanation"
 
-    public static final int N_STUDENT_QUESTIONS = 20
+    public static final int N_STUDENT_QUESTIONS = 100
 
     @Autowired
     StudentQuestionService studentQuestionService
-
-    @Autowired
-    QuestionService questionService
 
     @Autowired
     UserRepository userRepository
@@ -57,10 +48,11 @@ class getQuestionStatusServicePerfomanceTest extends Specification {
     StudentQuestionRepository studentQuestionRepository
 
     def course;
-    def teacher;
     def student;
     def questionDto;
     def courseExecution;
+    def course_id;
+    def student_id;
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -73,7 +65,6 @@ class getQuestionStatusServicePerfomanceTest extends Specification {
         student.addCourse(courseExecution)
 
         questionDto = new QuestionDto()
-        questionDto.setKey(1)
         questionDto.setTitle(QUESTION_TITLE)
         questionDto.setContent(QUESTION_CONTENT)
         questionDto.setStatus(Question.Status.AVAILABLE.name())
@@ -84,16 +75,16 @@ class getQuestionStatusServicePerfomanceTest extends Specification {
         def options = new ArrayList<OptionDto>()
         options.add(optionDto)
         questionDto.setOptions(options)
-        studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
+        course_id = course.getId();
+        student_id = student.getId();
     }
 
     def "performance testing to get 750k student questions"() {
         given: "750k questions and student questions"
-        1.upto(N_STUDENT_QUESTIONS, {questionService.createQuestion(course.getId(), questionDto)})
-        1.upto(N_STUDENT_QUESTIONS, {studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())})
+        1.upto(N_STUDENT_QUESTIONS, {key -> questionDto.setKey(key); studentQuestionService.createStudentQuestion(course_id, questionDto, student_id)})
 
         when:
-        1.upto(N_STUDENT_QUESTIONS, {questionId -> StudentQuestionService.getStudentQuestions(student.getId()})
+        1.upto(N_STUDENT_QUESTIONS, {questionId -> studentQuestionService.getStudentQuestions(student_id)})
 
         then:
         true
