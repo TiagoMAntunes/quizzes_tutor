@@ -32,7 +32,8 @@ class ApproveRejectQuestionServicePerformanceTest extends Specification {
     public static final String OPTION_CONTENT = "optionId content"
     public static final String EXPLANATION = "explanation"
 
-    public static final int N_STUDENT_QUESTIONS = 100
+    //Should be 750000
+    public static final int N_STUDENT_QUESTIONS = 1 
 
     @Autowired
     StudentQuestionService studentQuestionService
