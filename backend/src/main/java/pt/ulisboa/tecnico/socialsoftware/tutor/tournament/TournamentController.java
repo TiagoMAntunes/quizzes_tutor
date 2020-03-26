@@ -39,6 +39,7 @@ public class TournamentController {
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public void joinTournament(@PathVariable int executionId, @PathVariable int tournamentId, @RequestParam int userId, Principal principal) {
         this.tournamentService.joinTournament(tournamentId, executionId, userId);
+        
     }
 
     @DeleteMapping("/tournaments/{tournamentId}")
