@@ -299,9 +299,11 @@
         <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
-          <stringProp name="query">DELETE FROM options WHERE content = &apos;Option_Content_FOR_TEST&apos;;
+          <stringProp name="query">START TRANSACTION;
+DELETE FROM options WHERE content = &apos;Option_Content_FOR_TEST&apos;;
+DELETE FROM student_questions WHERE user_id = 676;
 DELETE FROM questions WHERE title = &apos;Question_Title_FOR_TEST&apos;;
-DELETE FROM student_questions WHERE user_id = 676;</stringProp>
+END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
           <stringProp name="queryTimeout"></stringProp>

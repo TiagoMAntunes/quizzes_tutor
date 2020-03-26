@@ -331,8 +331,8 @@ END TRANSACTION;</stringProp>
           <stringProp name="dataSource">test_student_question</stringProp>
           <stringProp name="query">START TRANSACTION;
 DELETE FROM options WHERE content = &apos;content_test&apos;;
-DELETE FROM questions WHERE content = &apos;content_test&apos;;
 DELETE FROM student_questions WHERE user_id = 676;
+DELETE FROM questions WHERE content = &apos;content_test&apos;;
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
