@@ -37,6 +37,13 @@ public class TournamentController {
         return this.tournamentService.createTournament(tournament, executionId, user.getId());
     }
 
+    @PutMapping("/executions/{executionId}/tournaments/{tournamentId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    public void joinTournament(@PathVariable int executionId, @PathVariable int tournamentId, @RequestParam int userId, Principal principal) {
+        this.tournamentService.joinTournament(tournamentId, executionId, userId);
+    }
+
+
     @DeleteMapping("/tournaments/{tournamentId}")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.CANCEL')")
     public ResponseEntity deleteTournament(@PathVariable Integer tournamentId, Principal principal) {

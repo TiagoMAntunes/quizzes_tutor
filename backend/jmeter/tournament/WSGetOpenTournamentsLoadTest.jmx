@@ -372,6 +372,7 @@ END TRANSACTION;</stringProp>
 DELETE FROM topics_tournaments WHERE tournaments_id in (SELECT id FROM tournaments WHERE creator_id = ${student_id});
 
 DELETE FROM tournaments WHERE creator_id = ${student_id};
+
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
