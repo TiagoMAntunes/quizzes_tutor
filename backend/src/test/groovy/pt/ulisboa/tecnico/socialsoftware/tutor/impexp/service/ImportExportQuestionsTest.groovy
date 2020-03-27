@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.socialsoftware.tutor.impexp
+package pt.ulisboa.tecnico.socialsoftware.tutor.impexp.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -16,13 +16,15 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import spock.lang.Specification
 
+import java.time.LocalDateTime
+
 @DataJpaTest
 class ImportExportQuestionsTest extends Specification {
     public static final String COURSE_NAME = "Arquitetura de Software"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
     public static final String QUESTION_TITLE = 'question title'
-    public static final String QUESTION_CONTENT = 'question content'
+    public static final String QUESTION_CONTENT = 'question content\n ![image][image]\n question content'
     public static final String OPTION_CONTENT = "optionId content"
     public static final String URL = 'URL'
 
@@ -75,21 +77,24 @@ class ImportExportQuestionsTest extends Specification {
         questionId = questionService.createQuestion(course.getId(), questionDto).getId()
     }
 
-    def 'export and import questions'() {
+    def 'export and import questions to xml'() {
         given: 'a xml with questions'
-        def questionsXml = questionService.exportQuestions()
+        def questionsXml = questionService.exportQuestionsToXml()
+        System.out.println(questionsXml)
         and: 'a clean database'
         questionService.removeQuestion(questionId)
 
         when:
-        questionService.importQuestions(questionsXml)
+        questionService.importQuestionsFromXml(questionsXml)
 
         then:
-        questionService.findQuestions(course.getId()).size() == 1
+        questionRepository.findQuestions(course.getId()).size() == 1
         def questionResult = questionService.findQuestions(course.getId()).get(0)
+        questionResult.getKey() == null
         questionResult.getTitle() == QUESTION_TITLE
         questionResult.getContent() == QUESTION_CONTENT
         questionResult.getStatus() == Question.Status.AVAILABLE.name()
+        questionResult.getCreationDate() == LocalDateTime.now().format(Course.formatter)
         def imageResult = questionResult.getImage()
         imageResult.getWidth() == 20
         imageResult.getUrl() == URL
@@ -101,6 +106,15 @@ class ImportExportQuestionsTest extends Specification {
         optionTwoResult.getContent() == OPTION_CONTENT
         !(optionOneResult.getCorrect() && optionTwoResult.getCorrect())
         optionOneResult.getCorrect() || optionTwoResult.getCorrect()
+    }
+
+    def 'export to latex'() {
+        when:
+        def questionsLatex = questionService.exportQuestionsToLatex()
+
+        then:
+        questionsLatex != null
+        System.out.println(questionsLatex)
     }
 
     @TestConfiguration
