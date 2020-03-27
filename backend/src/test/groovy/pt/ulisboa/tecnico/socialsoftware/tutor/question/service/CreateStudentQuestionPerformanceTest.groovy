@@ -30,7 +30,7 @@ class CreateStudentQuestionPerformanceTest extends Specification {
     public static final String OPTION_CONTENT = "optionId content"
     public static final String USER_NAME = "pedro"
     public static final String USER_USERNAME = "lamegow"
-    public static final int N_STUDENT_QUESTIONS   = 100000//should be 1000000
+    public static final int N_STUDENT_QUESTIONS   = 1//should be 1000000
 
     @Autowired
     CourseRepository courseRepository
