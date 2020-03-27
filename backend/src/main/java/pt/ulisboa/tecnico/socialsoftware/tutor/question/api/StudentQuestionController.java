@@ -17,7 +17,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import java.security.Principal;
 import java.util.List;
 import javax.validation.Valid;
-import java.io.Serializable;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.AUTHENTICATION_ERROR;
 

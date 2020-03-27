@@ -184,7 +184,6 @@ END TRANSACTION;</stringProp>
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.value">{&#xd;
-  &quot;key&quot; : 1,&#xd;
   &quot;title&quot; : &quot;title&quot;,&#xd;
   &quot;content&quot; : &quot;content_test&quot;,&#xd;
   &quot;status&quot; : &quot;AVAILABLE&quot;,&#xd;
@@ -215,15 +214,6 @@ END TRANSACTION;</stringProp>
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert key" enabled="true">
-              <stringProp name="JSON_PATH">$.key</stringProp>
-              <stringProp name="EXPECTED_VALUE">1</stringProp>
-              <boolProp name="JSONVALIDATION">true</boolProp>
-              <boolProp name="EXPECT_NULL">false</boolProp>
-              <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">false</boolProp>
-            </JSONPathAssertion>
-            <hashTree/>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert title" enabled="true">
               <stringProp name="JSON_PATH">$.title</stringProp>
               <stringProp name="EXPECTED_VALUE">title</stringProp>
