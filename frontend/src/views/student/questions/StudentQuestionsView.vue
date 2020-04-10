@@ -46,10 +46,7 @@
       </template>
 
       <template v-slot:item.topics="{ item }">
-        <show-question-topics
-                :question="item"
-                :topics="topics"
-        />
+        <show-question-topics :question="item" :topics="topics" />
       </template>
 
       <template v-slot:item.action="{ item }">
