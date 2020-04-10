@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -27,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUIZ_NOT_FOUND;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.TOURNAMENT_NOT_FOUND;
 
 @Service
 public class TournamentService {
@@ -51,9 +55,6 @@ public class TournamentService {
         backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public TournamentDto createTournament(TournamentDto tournamentDto, int courseExecutionId, int creatorId) {
-        if (tournamentDto.getKey() == null)
-            tournamentDto.setKey(getMaxTournamentKey() + 1);
-
         if (tournamentDto.getTopics() == null)
             throw new TutorException(ErrorMessage.NO_TOPICS_SELECTED);
 
@@ -155,6 +156,10 @@ public class TournamentService {
         user.addTournament(tournament);
     }
 
+    public int getTournamentSignedUpNumber(Integer tournamentId){
+        return getTournament(tournamentId).getSignedUpNumber();
+    }
+
     private void checkNotSignedUpYet(Tournament tournament, User user) {
         if(tournament.hasSignedUp(user))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_JOINED);
@@ -177,10 +182,5 @@ public class TournamentService {
     private Tournament getTournament(Integer tournamentId) {
         return tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
-    }
-
-    private Integer getMaxTournamentKey() {
-        Integer val = tournamentRepository.getMaxTournamentKey();
-        return val != null ? val : 0;
     }
 }

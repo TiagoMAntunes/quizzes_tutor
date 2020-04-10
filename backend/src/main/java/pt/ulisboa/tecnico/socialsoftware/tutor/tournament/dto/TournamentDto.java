@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 public class TournamentDto implements Serializable {
 
     private Integer id;
-    private Integer key;
     private String startTime = null;
     private String finishTime = null;
     private Integer numberOfQuestions;
@@ -25,7 +24,6 @@ public class TournamentDto implements Serializable {
 
     public TournamentDto(Tournament tournament) {
         this.id = tournament.getId();
-        this.key = tournament.getKey();
         this.numberOfQuestions = tournament.getNumberOfQuestions();
 
         if (tournament.getStartTime() != null)
@@ -39,10 +37,6 @@ public class TournamentDto implements Serializable {
     public void setId(int id) { this.id = id; }
 
     public Integer getId() { return id; }
-
-    public void setKey(int key) { this.key = key; }
-
-    public Integer getKey() { return key; }
 
     public void setStartTime(String time) { startTime = time; }
 

@@ -15,11 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(
-        name = "tournaments",
-        indexes = {
-                @Index(name = "tournaments_indx_0", columnList = "key")
-})
+@Table(name = "tournaments")
 public class Tournament {
 
     @Transient
@@ -28,9 +24,6 @@ public class Tournament {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(unique=true, nullable = false)
-    private Integer key;
 
     @Column(name = "start_time")
     private LocalDateTime startTime = null;
@@ -57,7 +50,6 @@ public class Tournament {
 
     public Tournament(TournamentDto tournamentDto, List<Topic> topic, User creator) {
         this.id = tournamentDto.getId();
-        this.key = tournamentDto.getKey();
         this.startTime = LocalDateTime.parse(tournamentDto.getStartTime(), formatter);
         this.finishTime = LocalDateTime.parse(tournamentDto.getFinishTime(), formatter);
         this.creator = creator;
@@ -70,12 +62,6 @@ public class Tournament {
     }
 
     public void setId(int id) { this.id = id; }
-
-    public int getKey() {
-        return key;
-    }
-
-    public void setKey(int key) { this.key = key; }
 
     public LocalDateTime getStartTime() { return startTime; }
 
@@ -136,4 +122,6 @@ public class Tournament {
     }
 
     public Set<User> getSignedUp() { return signedUp; }
+
+    public int getSignedUpNumber(){ return signedUp.size();}
 }

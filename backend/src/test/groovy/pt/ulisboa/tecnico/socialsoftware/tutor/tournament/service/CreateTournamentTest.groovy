@@ -94,13 +94,15 @@ class CreateTournamentTest extends Specification {
 
     def "create the tournament"() {
         given: "a tournamentDto"
-        def user = userRepository.findAll().get(0)
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(NOW_TIME)
         tournamentDto.setFinishTime(FINISH_TIME)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
+
+        and: "a user"
+        def user = userRepository.findAll().get(0)
 
         when:
         tournamentService.createTournament(tournamentDto, courseExecution, user.getId())
@@ -109,7 +111,6 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 1L
         def result = tournamentRepository.findAll().get(0)
         result != null
-        result.getKey() != null
         result.getStartTime().format(formatter) == NOW_TIME
         result.getFinishTime().format(formatter) == FINISH_TIME
         result.getCreator() == user
@@ -128,8 +129,6 @@ class CreateTournamentTest extends Specification {
 
     def "the tournament is created with a start time after finish time"() {
         given: "a tournamentDto with start time after finish time"
-        def user = userRepository.findAll().get(0).getId()
-
         def tournamentDto = new TournamentDto()
 
         tournamentDto.setStartTime(FINISH_TIME)
@@ -137,8 +136,11 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
+        and: "a user"
+        def user = userRepository.findAll().get(0)
+
         when:
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
+        tournamentService.createTournament(tournamentDto, courseExecution, user.getId())
 
         then:
         def exception = thrown(TutorException)
@@ -148,7 +150,6 @@ class CreateTournamentTest extends Specification {
 
     def "the tournament is created with a start time before the time of creation"() {
         given: "a tournament with a finish time before the time of creation"
-        def user = userRepository.findAll().get(0).getId()
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTopics(TOPIC_LIST)
@@ -157,8 +158,11 @@ class CreateTournamentTest extends Specification {
 
         tournamentDto.setStartTime(LocalDateTime.now().minusDays(3).format(formatter))
 
+        and: "a user"
+        def user = userRepository.findAll().get(0)
+
         when:
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
+        tournamentService.createTournament(tournamentDto, courseExecution, user.getId())
 
         then:
         def exception = thrown(TutorException)
@@ -168,7 +172,6 @@ class CreateTournamentTest extends Specification {
 
     def "the tournament is created with 0 topics"() {
         given: "a tournament with no topics"
-        def user = userRepository.findAll().get(0).getId()
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(NOW_TIME)
@@ -179,8 +182,11 @@ class CreateTournamentTest extends Specification {
         List<Topic> lst = new ArrayList<>();
         tournamentDto.setTopics(lst)
 
+        and: "a user"
+        def user = userRepository.findAll().get(0)
+
         when:
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
+        tournamentService.createTournament(tournamentDto, courseExecution, user.getId())
 
         then:
         def exception = thrown(TutorException)
@@ -190,7 +196,6 @@ class CreateTournamentTest extends Specification {
 
     def "the tournament is created with 0 or less questions"() {
         given: "a tournament with no questions"
-        def user = userRepository.findAll().get(0).getId()
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(NOW_TIME)
@@ -199,8 +204,11 @@ class CreateTournamentTest extends Specification {
 
         tournamentDto.setNumberOfQuestions(0)
 
+        and: "a user"
+        def user = userRepository.findAll().get(0)
+
         when:
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
+        tournamentService.createTournament(tournamentDto, courseExecution, user.getId())
 
         then:
         def exception = thrown(TutorException)
@@ -210,7 +218,6 @@ class CreateTournamentTest extends Specification {
 
     def "the tournament is created with repeated topics"() {
         given: "a tournament with repeated topics"
-        def user = userRepository.findAll().get(0).getId()
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(NOW_TIME)
@@ -232,8 +239,11 @@ class CreateTournamentTest extends Specification {
 
         tournamentDto.setTopics(topicList)
 
+        and: "a user"
+        def user = userRepository.findAll().get(0)
+
         when:
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
+        tournamentService.createTournament(tournamentDto, courseExecution, user.getId())
 
         then:
         tournamentRepository.count() == 1L
@@ -244,7 +254,6 @@ class CreateTournamentTest extends Specification {
 
     def "the user does not exist"() {
         given: "a tournament"
-        def user = userRepository.findAll().get(0).getId()
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(NOW_TIME)
@@ -252,8 +261,11 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
+        and: "a user"
+        def user = userRepository.findAll().get(0)
+
         when: "created with a wrong user id"
-        tournamentService.createTournament(tournamentDto, courseExecution, user+1)
+        tournamentService.createTournament(tournamentDto, courseExecution, user.getId()+1)
 
         then:
         def exception = thrown(TutorException)
@@ -263,17 +275,21 @@ class CreateTournamentTest extends Specification {
 
     def "the user is not a student" () {
         given: "a tournamentDto"
-        def user = new User()
-        user.setKey(2)
-        user.setRole(User.Role.TEACHER)
-        userRepository.save(user)
-        user = userRepository.findByKey(2)
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(NOW_TIME)
         tournamentDto.setFinishTime(FINISH_TIME)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
+
+
+        and: "and a non-student user"
+
+        def user = new User()
+        user.setKey(2)
+        user.setRole(User.Role.TEACHER)
+        userRepository.save(user)
+        user = userRepository.findByKey(2)
 
         when:
         tournamentService.createTournament(tournamentDto, courseExecution, user.getId())
@@ -286,7 +302,6 @@ class CreateTournamentTest extends Specification {
 
     def "topics are null" () {
         given: "a tournamentDto"
-        def user = userRepository.findAll().get(0).getId()
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(NOW_TIME)
@@ -294,8 +309,11 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setTopics(null)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
+        and: "a user"
+        def user = userRepository.findAll().get(0)
+
         when:
-        tournamentService.createTournament(tournamentDto, courseExecution, user)
+        tournamentService.createTournament(tournamentDto, courseExecution, user.getId())
 
         then:
         def exception = thrown(TutorException)
