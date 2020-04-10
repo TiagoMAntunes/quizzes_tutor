@@ -12,6 +12,7 @@ import TopicsView from './views/teacher/TopicsView.vue';
 import QuizzesView from './views/teacher/quizzes/QuizzesView.vue';
 import StudentsView from './views/teacher/students/StudentsView.vue';
 import StudentView from '@/views/student/StudentView.vue';
+import StudentQuestionsManageView from '@/views/teacher/questions/StudentQuestionManageView.vue';
 import AvailableQuizzesView from './views/student/AvailableQuizzesView.vue';
 import SolvedQuizzesView from './views/student/SolvedQuizzesView.vue';
 import QuizView from './views/student/quiz/QuizView.vue';
@@ -61,6 +62,15 @@ let router = new Router({
       name: 'management',
       component: ManagementView,
       children: [
+        {
+          path: 'student_questions',
+          name: 'student-questions',
+          component: StudentQuestionsManageView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - StudentQuestionsManage',
+            requiredAuth: 'Teacher'
+          }
+        },
         {
           path: 'questions',
           name: 'questions-management',
