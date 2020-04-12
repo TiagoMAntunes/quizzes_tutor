@@ -155,6 +155,11 @@
           </v-list>
         </v-menu>
 
+        <v-btn to="/student/questions" v-if="isStudent" text dark>
+          Questions
+          <v-icon>question_answer</v-icon>
+        </v-btn>
+
         <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
           Stats
           <v-icon>fas fa-user</v-icon>

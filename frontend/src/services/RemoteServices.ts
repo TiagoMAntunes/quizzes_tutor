@@ -9,6 +9,7 @@ import StatementQuiz from '@/models/statement/StatementQuiz';
 import SolvedQuiz from '@/models/statement/SolvedQuiz';
 import Topic from '@/models/management/Topic';
 import { Student } from '@/models/management/Student';
+import StudentQuestion from '@/models/management/StudentQuestion';
 import Assessment from '@/models/management/Assessment';
 import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
@@ -50,6 +51,7 @@ export default class RemoteServices {
     return httpClient
       .get('/auth/demo/student')
       .then(response => {
+        console.log(response);
         return new AuthDto(response.data);
       })
       .catch(async error => {
@@ -98,6 +100,32 @@ export default class RemoteServices {
       .then(response => {
         return response.data.map((question: any) => {
           return new Question(question);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getStudentQuestions(): Promise<StudentQuestion[]> {
+    return httpClient
+      .get(`/student_questions/${Store.getters.getCurrentCourse.courseId}/${Store.getters.getUser.id}`)
+      .then(response => {
+        return response.data.map((question: any) => {
+          return new StudentQuestion(question);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getAllStudentQuestions(): Promise<StudentQuestion[]> {
+    return httpClient
+      .get(`/student_questions/${Store.getters.getCurrentCourse.courseId}/all`)
+      .then(response => {
+        return response.data.map((question: any) => {
+          return new StudentQuestion(question);
         });
       })
       .catch(async error => {
@@ -159,6 +187,20 @@ export default class RemoteServices {
       .post(`/questions/${questionId}/set-status`, status, {})
       .then(response => {
         return new Question(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static setStudentQuestionStatus(
+    questionId: number,
+    status: string,
+  ): Promise<StudentQuestion> {
+    return httpClient
+      .post(`/student_questions/evaluate/${questionId}/${status}`, {})
+      .then(response => {
+        return new StudentQuestion(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));

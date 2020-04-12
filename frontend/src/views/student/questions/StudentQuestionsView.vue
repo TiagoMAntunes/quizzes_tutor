@@ -36,27 +36,17 @@
         >
       </template>
 
-      <template v-slot:item.topics="{ item }">
-        <edit-question-topics
-          :question="item"
-          :topics="topics"
-          v-on:question-changed-topics="onQuestionChangedTopics"
-        />
+      <template v-slot:item.questionStatus="{ item }">
+        <v-chip
+          v-if="item.questionStatus"
+          :color="getStatusColor(item.questionStatus)"
+          small
+          ><span>{{ item.questionStatus }}</span></v-chip
+        >
       </template>
 
-      <template v-slot:item.questionStatus="{ item }">
-        <v-select
-          v-model="item.questionStatus"
-          :items="statusList"
-          dense
-          @change="setStatus(item.id, item.questionStatus)"
-        >
-          <template v-slot:selection="{ item }">
-            <v-chip :color="getStatusColor(item)" small>
-              <span>{{ item }}</span>
-            </v-chip>
-          </template>
-        </v-select>
+      <template v-slot:item.topics="{ item }">
+        <show-question-topics :question="item" :topics="topics" />
       </template>
 
       <template v-slot:item.action="{ item }">
@@ -74,7 +64,7 @@
         </v-tooltip>
       </template>
     </v-data-table>
-    <show-question-dialog
+    <show-student-question-dialog
       v-if="currentQuestion"
       :dialog="questionDialog"
       :question="currentQuestion"
@@ -91,22 +81,20 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/questions/ShowStudentQuestionDialog.vue';
-import EditQuestionTopics from '@/views/teacher/questions/EditQuestionTopics.vue';
+import ShowQuestionTopics from '@/views/student/questions/ShowQuestionTopics.vue';
 
 @Component({
   components: {
-    'show-question-dialog': ShowStudentQuestionDialog,
-    'edit-question-topics': EditQuestionTopics
+    'show-student-question-dialog': ShowStudentQuestionDialog,
+    'show-question-topics': ShowQuestionTopics
   }
 })
-export default class StudentQuestionManageView extends Vue {
+export default class StudentQuestionsView extends Vue {
   questions: StudentQuestion[] = [];
   topics: Topic[] = [];
   currentQuestion: StudentQuestion | null = null;
-  editQuestionDialog: boolean = false;
   questionDialog: boolean = false;
   search: string = '';
-  statusList = ['APPROVED', 'REJECTED', 'PENDING'];
 
   headers: object = [
     { text: 'Title', value: 'title', align: 'center' },
@@ -133,19 +121,12 @@ export default class StudentQuestionManageView extends Vue {
     }
   ];
 
-  @Watch('editQuestionDialog')
-  closeError() {
-    if (!this.editQuestionDialog) {
-      this.currentQuestion = null;
-    }
-  }
-
   async created() {
     await this.$store.dispatch('loading');
     try {
       [this.topics, this.questions] = await Promise.all([
         RemoteServices.getTopics(),
-        RemoteServices.getAllStudentQuestions()
+        RemoteServices.getStudentQuestions()
       ]);
     } catch (error) {
       await this.$store.dispatch('error', error);
@@ -189,22 +170,8 @@ export default class StudentQuestionManageView extends Vue {
     else return 'green';
   }
 
-  async setStatus(questionId: number, status: string) {
-    try {
-      await RemoteServices.setStudentQuestionStatus(questionId, status);
-      let question = this.questions.find(
-        question => question.id === questionId
-      );
-      if (question) {
-        question.questionStatus = status;
-      }
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-  }
-
-  showStudentQuestionDialog(question: StudentQuestion) {
-    this.currentQuestion = question;
+  showStudentQuestionDialog(studentQuestion: StudentQuestion) {
+    this.currentQuestion = studentQuestion;
     this.questionDialog = true;
   }
 
