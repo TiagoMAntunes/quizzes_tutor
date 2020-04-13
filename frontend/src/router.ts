@@ -18,6 +18,8 @@ import QuizView from './views/student/quiz/QuizView.vue';
 import ResultsView from './views/student/quiz/ResultsView.vue';
 import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
+import TournamentView from '@/views/student/tournament/TournamentView.vue';
+import CreateTournamentView from '@/views/student/tournament/CreateTournamentView.vue';
 
 import AdminManagementView from './views/admin/AdminManagementView.vue';
 import NotFoundView from './views/NotFoundView.vue';
@@ -122,6 +124,22 @@ let router = new Router({
       name: 'student',
       component: StudentView,
       children: [
+        {
+          path: 'tournament',
+          name: 'tournament',
+          component: TournamentView,
+          children: [
+            {
+              path: 'create',
+              name: 'create-tournament',
+              component: CreateTournamentView,
+              meta: {
+                title: process.env.VUE_APP_NAME + ' - Create Tournament',
+                requiredAuth: 'Student'
+              }
+            }
+          ]
+        },
         {
           path: 'available',
           name: 'available-quizzes',
