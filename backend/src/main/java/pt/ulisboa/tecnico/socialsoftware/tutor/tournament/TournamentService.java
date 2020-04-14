@@ -6,7 +6,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -24,13 +23,11 @@ import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUIZ_NOT_FOUND;
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.TOURNAMENT_NOT_FOUND;
 
 @Service
 public class TournamentService {
@@ -67,6 +64,18 @@ public class TournamentService {
 
         if (tournamentDto.getNumberOfQuestions() <= 0)
             throw new TutorException(ErrorMessage.TOURNAMENT_HAS_NO_QUESTIONS);
+
+        try {
+            LocalDateTime.parse(tournamentDto.getStartTime(),Tournament.formatter);
+        } catch (DateTimeParseException e) {
+            throw new TutorException(ErrorMessage.TOURNAMENT_INVALID_START_TIME);
+        }
+
+        try {
+            LocalDateTime.parse(tournamentDto.getFinishTime(),Tournament.formatter);
+        } catch (DateTimeParseException e) {
+            throw new TutorException(ErrorMessage.TOURNAMENT_INVALID_FINISH_TIME);
+        }
 
         User creator = userRepository.findById(creatorId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, creatorId));
 

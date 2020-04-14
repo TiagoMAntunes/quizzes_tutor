@@ -607,4 +607,14 @@ export default class RemoteServices {
       return 'Unknown Error - Contact admin';
     }
   }
+
+  static async createTournament(params: object) {
+    return httpClient
+      .post(`/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`, params)
+      .then(response => response)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
 }

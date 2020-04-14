@@ -61,6 +61,8 @@ public enum ErrorMessage {
     NO_TOPICS_SELECTED("Tournament requires at least one topic to be valid"),
     TOURNAMENT_HAS_NO_QUESTIONS("Tournament requires at least 1 question"),
     TOURNAMENT_CREATION_INCORRECT_ROLE("Only students can create a tournament"),
+    TOURNAMENT_INVALID_START_TIME("Invalid start time"),
+    TOURNAMENT_INVALID_FINISH_TIME("Invalid finish time"),
 
     TOURNAMENT_HAS_STARTED("Can only cancel a tournament before it has started"),
     TOURNAMENT_NOT_FOUND("Tournament not found with id %d"),

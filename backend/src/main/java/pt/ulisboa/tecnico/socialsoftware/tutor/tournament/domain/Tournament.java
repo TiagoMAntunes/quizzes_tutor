@@ -19,7 +19,7 @@ import java.util.Set;
 public class Tournament {
 
     @Transient
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)

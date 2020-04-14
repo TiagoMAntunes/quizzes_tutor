@@ -88,7 +88,7 @@
           </template>
           <span>Show Question</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
             <v-icon small class="mr-2" v-on="on" @click="editQuestion(item)"
               >edit</v-icon
@@ -131,7 +131,7 @@
     />
     <show-question-dialog
       v-if="currentQuestion"
-      :dialog="questionDialog"
+      v-model="questionDialog"
       :question="currentQuestion"
       v-on:close-show-question-dialog="onCloseShowQuestionDialog"
     />
