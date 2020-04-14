@@ -41,9 +41,9 @@
       <v-container>
         <p>Number of Questions</p>
         <v-btn-toggle mandatory class="button-group" v-model="tournamentManager.numberOfQuestions">
-          <v-btn text value="5">5</v-btn>
-          <v-btn text value="10">10</v-btn>
-          <v-btn text value="20">20</v-btn>
+          <v-btn text data-cy="select5Questions" value="5">5</v-btn>
+          <v-btn text data-cy="select10Questions" value="10">10</v-btn>
+          <v-btn text data-cy="select20Questions" value="20">20</v-btn>
         </v-btn-toggle>
       </v-container>
       <v-container>
@@ -68,8 +68,6 @@ export default class CreateTournamentView extends Vue {
   async created() {
     await this.$store.dispatch('loading');
     this.tournamentManager.reset();
-    console.log(this.tournamentManager.startTime);
-
     try {
       this.availableTopics = await RemoteServices.getTopics();
     } catch (error) {
