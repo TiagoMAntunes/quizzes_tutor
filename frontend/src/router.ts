@@ -134,7 +134,8 @@ let router = new Router({
             title: process.env.VUE_APP_NAME + ' - Status of Questions',
             requiredAuth: 'Student'
           }
-
+        },
+        {
           path: 'tournament',
           name: 'tournament',
           component: TournamentView,
@@ -148,6 +149,7 @@ let router = new Router({
                 requiredAuth: 'Student'
               }
             }
+          ]
         },
         {
           path: 'available',
