@@ -5,6 +5,7 @@
       :custom-filter="customFilter"
       :items="questions"
       :search="search"
+      :explanation="explanation"
       multi-sort
       :mobile-breakpoint="0"
       :items-per-page="15"
@@ -19,6 +20,16 @@
             class="mx-2"
           />
         </v-card-title>
+      </template>
+
+      <template v-slot:item.rejectionExplanation="{ item }">
+        <v-text-field
+          :disabled="isDisabled(item.id, item)"
+          v-model="item.rejectionExplanation"
+          name="rejectionExplanation"
+          type="string"
+          @change="setExplanation(item.id, item.rejectionExplanation)"
+        ></v-text-field>
       </template>
 
       <template v-slot:item.content="{ item }">
@@ -37,7 +48,7 @@
       </template>
 
       <template v-slot:item.topics="{ item }">
-        <edit-question-topics
+        <edit-student-question-topics
           :question="item"
           :topics="topics"
           v-on:question-changed-topics="onQuestionChangedTopics"
@@ -49,8 +60,10 @@
           v-model="item.questionStatus"
           :items="statusList"
           dense
-          @change="setStatus(item.id, item.questionStatus)"
-        >
+          @change="
+            setStatus(item.id, item.questionStatus), isDisabled(item.id, item)
+          "
+          >visibility
           <template v-slot:selection="{ item }">
             <v-chip :color="getStatusColor(item)" small>
               <span>{{ item }}</span>
@@ -91,21 +104,21 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/questions/ShowStudentQuestionDialog.vue';
-import EditQuestionTopics from '@/views/teacher/questions/EditQuestionTopics.vue';
+import EditStudentQuestionTopics from '@/views/teacher/questions/EditStudentQuestionTopics.vue';
 
 @Component({
   components: {
     'show-question-dialog': ShowStudentQuestionDialog,
-    'edit-question-topics': EditQuestionTopics
+    'edit-student-question-topics': EditStudentQuestionTopics
   }
 })
 export default class StudentQuestionManageView extends Vue {
   questions: StudentQuestion[] = [];
   topics: Topic[] = [];
   currentQuestion: StudentQuestion | null = null;
-  editQuestionDialog: boolean = false;
   questionDialog: boolean = false;
   search: string = '';
+  explanation: string = 'No explanation';
   statusList = ['APPROVED', 'REJECTED', 'PENDING'];
 
   headers: object = [
@@ -132,13 +145,6 @@ export default class StudentQuestionManageView extends Vue {
       sortable: false
     }
   ];
-
-  @Watch('editQuestionDialog')
-  closeError() {
-    if (!this.editQuestionDialog) {
-      this.currentQuestion = null;
-    }
-  }
 
   async created() {
     await this.$store.dispatch('loading');
@@ -198,6 +204,12 @@ export default class StudentQuestionManageView extends Vue {
       if (question) {
         question.questionStatus = status;
       }
+      if (status === 'APPROVED' || status === 'PENDING') {
+        await RemoteServices.setStudentQuestionExplanation(
+          questionId,
+          'No explanation'
+        );
+      }
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
@@ -206,6 +218,27 @@ export default class StudentQuestionManageView extends Vue {
   showStudentQuestionDialog(question: StudentQuestion) {
     this.currentQuestion = question;
     this.questionDialog = true;
+  }
+
+  isDisabled(questionId: number, question: StudentQuestion) {
+    return question.questionStatus !== 'REJECTED';
+  }
+
+  async setExplanation(questionId: number, explanation: string) {
+    try {
+      await RemoteServices.setStudentQuestionExplanation(
+        questionId,
+        explanation
+      );
+      let question = this.questions.find(
+        question => question.id === questionId
+      );
+      if (question) {
+        question.rejectionExplanation = explanation;
+      }
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 
   onCloseShowStudentQuestionDialog() {

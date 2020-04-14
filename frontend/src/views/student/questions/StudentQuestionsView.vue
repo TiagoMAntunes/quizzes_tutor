@@ -46,7 +46,9 @@
       </template>
 
       <template v-slot:item.topics="{ item }">
-        <show-question-topics :question="item" :topics="topics" />
+        <v-card-title :disabled="isDisabled(item)">
+          <show-student-question-topics :question="item" :topics="topics" />
+        </v-card-title>
       </template>
 
       <template v-slot:item.action="{ item }">
@@ -81,12 +83,12 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/questions/ShowStudentQuestionDialog.vue';
-import ShowQuestionTopics from '@/views/student/questions/ShowQuestionTopics.vue';
+import ShowStudentQuestionTopics from '@/views/student/questions/ShowStudentQuestionTopics.vue';
 
 @Component({
   components: {
     'show-student-question-dialog': ShowStudentQuestionDialog,
-    'show-question-topics': ShowQuestionTopics
+    'show-student-question-topics': ShowStudentQuestionTopics
   }
 })
 export default class StudentQuestionsView extends Vue {
@@ -148,15 +150,6 @@ export default class StudentQuestionsView extends Vue {
     return convertMarkDownNoFigure(text, image);
   }
 
-  onQuestionChangedTopics(questionId: Number, changedTopics: Topic[]) {
-    let question = this.questions.find(
-      (question: StudentQuestion) => question.id == questionId
-    );
-    if (question) {
-      question.topics = changedTopics;
-    }
-  }
-
   getDifficultyColor(difficulty: number) {
     if (difficulty < 25) return 'green';
     else if (difficulty < 50) return 'lime';
@@ -168,6 +161,9 @@ export default class StudentQuestionsView extends Vue {
     if (status === 'REJECTED') return 'red';
     else if (status === 'PENDING') return 'orange';
     else return 'green';
+  }
+
+  isDisabled(question: StudentQuestion) {
   }
 
   showStudentQuestionDialog(studentQuestion: StudentQuestion) {

@@ -91,7 +91,6 @@ public class StudentQuestionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void studentQuestionExplanation(int questionId, String explanation) {
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
-        checkStatusToAddExplanation(explanation, question.getQuestionStatus());
         question.setRejectionExplanation(explanation);
     }
 
@@ -141,13 +140,6 @@ public class StudentQuestionService {
                 filter(course -> course.getCourse().getId() == id && id == currentCourseId)
                 .findAny()
                 .isPresent();
-
-    }
-
-    private void checkStatusToAddExplanation(String explanation, StudentQuestion.QuestionStatus status) {
-        if(explanation != null && status != StudentQuestion.QuestionStatus.REJECTED) {
-            throw new TutorException(CANT_ADD_EXPLANATION);
-        }
     }
 
     private void checkQuestionKey(QuestionDto questionDto) {
@@ -157,19 +149,6 @@ public class StudentQuestionService {
             questionDto.setKey(maxQuestionNumber + 1);
         }
     }
-
-    private void checkTeacherCourse(User teacher, CourseExecution execution) {
-        if(!teacher.getCourseExecutions().contains(execution)){
-            throw new TutorException(ACCESS_DENIED);
-        }
-    }
-
-    private void checkUserRole(User teacher) {
-        if (teacher.getRole() != User.Role.TEACHER) {
-            throw new TutorException(ACCESS_DENIED);
-        }
-    }
-
 
     private void checkEnrolledCourseExecution(User student, Course course) {
         List<CourseExecution> list = student.getCourseExecutions().stream().filter(

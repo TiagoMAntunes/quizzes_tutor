@@ -51,7 +51,6 @@ export default class RemoteServices {
     return httpClient
       .get('/auth/demo/student')
       .then(response => {
-        console.log(response);
         return new AuthDto(response.data);
       })
       .catch(async error => {
@@ -109,7 +108,9 @@ export default class RemoteServices {
 
   static async getStudentQuestions(): Promise<StudentQuestion[]> {
     return httpClient
-      .get(`/student_questions/${Store.getters.getCurrentCourse.courseId}/${Store.getters.getUser.id}`)
+      .get(
+        `/student_questions/${Store.getters.getCurrentCourse.courseId}/logged_student`
+      )
       .then(response => {
         return response.data.map((question: any) => {
           return new StudentQuestion(question);
@@ -195,10 +196,24 @@ export default class RemoteServices {
 
   static setStudentQuestionStatus(
     questionId: number,
-    status: string,
+    status: string
   ): Promise<StudentQuestion> {
     return httpClient
       .post(`/student_questions/evaluate/${questionId}/${status}`, {})
+      .then(response => {
+        return new StudentQuestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static setStudentQuestionExplanation(
+    questionId: number,
+    explanation: string | null
+  ): Promise<StudentQuestion> {
+    return httpClient
+      .post(`/student_questions/${questionId}/explanation`, explanation)
       .then(response => {
         return new StudentQuestion(response.data);
       })

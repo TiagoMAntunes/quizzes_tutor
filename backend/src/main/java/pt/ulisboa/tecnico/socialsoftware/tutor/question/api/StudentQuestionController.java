@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
@@ -36,10 +35,14 @@ public class StudentQuestionController{
         }
         return this.studentQuestionService.getStudentQuestionsByCourses(user.getCourseExecutions(), courseId);
     }
-    @GetMapping("/student_questions/{courseId}/{studentId}")
+    @GetMapping("/student_questions/{courseId}/logged_student")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public List<StudentQuestionDto> getSpecificStudentQuestions(@PathVariable int courseId, @PathVariable int studentId){
-        return this.studentQuestionService.getStudentQuestions(courseId, studentId);
+    public List<StudentQuestionDto> getSpecificStudentQuestions(@PathVariable int courseId, Principal principal){
+        User user = (User) ((Authentication) principal).getPrincipal();
+        if(user == null){
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+        return this.studentQuestionService.getStudentQuestions(courseId, user.getId());
     }
 
     @PostMapping("/student_questions/evaluate/{questionId}/{status}")
