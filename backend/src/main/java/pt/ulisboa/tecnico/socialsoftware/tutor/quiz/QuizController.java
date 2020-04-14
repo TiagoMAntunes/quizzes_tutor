@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuizAnswersDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto.QuizDto;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -52,12 +54,21 @@ public class QuizController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping(value = "/quizzes/{quizId}/export")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#quizId, 'QUIZ.ACCESS')")
+    public void exportQuiz(HttpServletResponse response, @PathVariable Integer quizId) throws IOException {
+        response.setHeader("Content-Disposition", "attachment; filename=file.zip");
+        response.setContentType("application/zip");
+        response.getOutputStream().write(this.quizService.exportQuiz(quizId).toByteArray());
+
+        response.flushBuffer();
+    }
+
     @GetMapping("/quizzes/{quizId}/answers")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#quizId, 'QUIZ.ACCESS')")
     public QuizAnswersDto getQuizAnswers(@PathVariable Integer quizId) {
         return this.quizService.getQuizAnswers(quizId);
     }
-
 
     private void formatDates(QuizDto quiz) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

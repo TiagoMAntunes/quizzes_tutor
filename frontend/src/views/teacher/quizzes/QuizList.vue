@@ -81,6 +81,14 @@
           </template>
           <span>Show QR Code</span>
         </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon small class="mr-2" v-on="on" @click="exportQuiz(item.id)"
+              >fas fa-download</v-icon
+            >
+          </template>
+          <span>Export</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <show-quiz-dialog v-if="quiz" v-model="quizDialog" :quiz="quiz" />
@@ -142,7 +150,7 @@ export default class QuizList extends Vue {
 
   qrValue: number | null = null;
   headers: object = [
-    { text: 'Title', value: 'title', align: 'left', width: '30%' },
+    { text: 'Title', value: 'title', align: 'left', width: '20%' },
     {
       text: 'Creation Date',
       value: 'creationDate',
@@ -161,40 +169,40 @@ export default class QuizList extends Vue {
       align: 'center',
       width: '10%'
     },
-    { text: 'Scramble', value: 'scramble', align: 'center', width: '10%' },
-    { text: 'QRCode Only', value: 'qrCodeOnly', align: 'center', width: '10%' },
+    { text: 'Scramble', value: 'scramble', align: 'center', width: '5%' },
+    { text: 'QRCode Only', value: 'qrCodeOnly', align: 'center', width: '5%' },
     {
       text: 'One Way Quiz',
       value: 'oneWay',
       align: 'center',
-      width: '10%'
+      width: '5%'
     },
-    { text: 'Type', value: 'type', align: 'center', width: '10%' },
+    { text: 'Type', value: 'type', align: 'center', width: '5%' },
     { text: 'Series', value: 'series', align: 'center', width: '5%' },
     { text: 'Version', value: 'version', align: 'center', width: '5%' },
     {
       text: 'Questions',
       value: 'numberOfQuestions',
       align: 'center',
-      width: '10%'
+      width: '5%'
     },
     {
       text: 'Timer to submission',
       value: 'timerToSubmission',
       align: 'center',
-      width: '10%'
+      width: '5%'
     },
     {
       text: 'Answers',
       value: 'numberOfAnswers',
       align: 'center',
-      width: '10%'
+      width: '5%'
     },
     {
       text: 'Actions',
       value: 'action',
       align: 'center',
-      width: '1%',
+      width: '10%',
       sortable: false
     }
   ];
@@ -226,6 +234,22 @@ export default class QuizList extends Vue {
   showQrCode(quizId: number) {
     this.qrValue = quizId;
     this.qrcodeDialog = true;
+  }
+
+  async exportQuiz(quizId: number) {
+    let fileName =
+      this.quizzes.filter(quiz => quiz.id == quizId)[0].title + '.zip';
+    try {
+      let result = await RemoteServices.exportQuiz(quizId);
+      const url = window.URL.createObjectURL(result);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 
   async deleteQuiz(quizId: number) {

@@ -4,6 +4,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 
@@ -38,7 +39,7 @@ public class QuizzesXmlExport {
 	}
 
 	private void exportQuiz(Element element, Quiz quiz) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		DateTimeFormatter formatter = Course.formatter;
 
 		Element quizElement = new Element("quiz");
 		quizElement.setAttribute("courseExecutionType",quiz.getCourseExecution().getType().name());
@@ -46,6 +47,8 @@ public class QuizzesXmlExport {
         quizElement.setAttribute("academicTerm",quiz.getCourseExecution().getAcademicTerm());
         quizElement.setAttribute("key", String.valueOf(quiz.getKey()));
 		quizElement.setAttribute("scramble", String.valueOf(quiz.getScramble()));
+		quizElement.setAttribute("qrCodeOnly", String.valueOf(quiz.isQrCodeOnly()));
+		quizElement.setAttribute("oneWay", String.valueOf(quiz.isOneWay()));
 		quizElement.setAttribute("type", quiz.getType().name());
 		quizElement.setAttribute("title", quiz.getTitle());
 

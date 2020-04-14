@@ -21,6 +21,9 @@
 
           <v-spacer />
           <v-btn color="primary" dark @click="newQuestion">New Question</v-btn>
+          <v-btn color="primary" dark @click="exportCourseQuestions"
+            >Export Questions</v-btn
+          >
         </v-card-title>
       </template>
 
@@ -85,7 +88,7 @@
           </template>
           <span>Show Question</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
             <v-icon small class="mr-2" v-on="on" @click="editQuestion(item)"
               >edit</v-icon
@@ -128,7 +131,7 @@
     />
     <show-question-dialog
       v-if="currentQuestion"
-      :dialog="questionDialog"
+      v-model="questionDialog"
       :question="currentQuestion"
       v-on:close-show-question-dialog="onCloseShowQuestionDialog"
     />
@@ -316,6 +319,21 @@ export default class QuestionsView extends Vue {
     this.questions.unshift(question);
     this.editQuestionDialog = false;
     this.currentQuestion = null;
+  }
+
+  async exportCourseQuestions() {
+    let fileName = this.$store.getters.getCurrentCourse.name + '-Questions.zip';
+    try {
+      let result = await RemoteServices.exportCourseQuestions();
+      const url = window.URL.createObjectURL(result);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 
   async deleteQuestion(toDeletequestion: Question) {

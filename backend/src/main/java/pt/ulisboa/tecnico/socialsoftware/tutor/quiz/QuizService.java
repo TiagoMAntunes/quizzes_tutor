@@ -1,19 +1,27 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.quiz;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuizAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuizAnswersDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.Demo;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.CSVQuizExportVisitor;
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.LatexQuizExportVisitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.QuizzesXmlExport;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.QuizzesXmlImport;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
@@ -25,15 +33,18 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto.QuizQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -50,6 +61,12 @@ public class QuizService {
 
     @Autowired
     private QuizQuestionRepository quizQuestionRepository;
+
+    @Autowired
+    private AnswerService answerService;
+
+    @Autowired
+    private QuestionService questionService;
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public CourseDto findQuizCourseExecution(int quizId) {
@@ -221,20 +238,101 @@ public class QuizService {
       value = { SQLException.class },
       backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public String exportQuizzes() {
+    public String exportQuizzesToXml() {
         QuizzesXmlExport xmlExport = new QuizzesXmlExport();
 
         return xmlExport.export(quizRepository.findAll());
     }
 
-
     @Retryable(
       value = { SQLException.class },
       backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void importQuizzes(String quizzesXml) {
+    public void importQuizzesFromXml(String quizzesXml) {
         QuizzesXmlImport xmlImport = new QuizzesXmlImport();
 
         xmlImport.importQuizzes(quizzesXml, this, questionRepository, quizQuestionRepository, courseExecutionRepository);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public String exportQuizzesToLatex(int quizId) {
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new TutorException(QUIZ_NOT_FOUND, quizId));
+
+        LatexQuizExportVisitor latexExport = new LatexQuizExportVisitor();
+
+        return latexExport.export(quiz);
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public ByteArrayOutputStream exportQuiz(int quizId) {
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new TutorException(QUIZ_NOT_FOUND, quizId));
+
+        String name = quiz.getTitle();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ZipOutputStream zos = new ZipOutputStream(baos)) {
+
+            List<Quiz> quizzes = new ArrayList<>();
+            quizzes.add(quiz);
+
+            QuizzesXmlExport xmlExport = new QuizzesXmlExport();
+            InputStream in = IOUtils.toInputStream(xmlExport.export(quizzes), StandardCharsets.UTF_8);
+            zos.putNextEntry(new ZipEntry(name + ".xml"));
+            copyToZipStream(zos, in);
+            zos.closeEntry();
+
+            LatexQuizExportVisitor latexExport = new LatexQuizExportVisitor();
+            zos.putNextEntry(new ZipEntry(name + ".tex"));
+            in = IOUtils.toInputStream(latexExport.export(quiz), StandardCharsets.UTF_8);
+            copyToZipStream(zos, in);
+            zos.closeEntry();
+
+            CSVQuizExportVisitor csvExport = new CSVQuizExportVisitor();
+            zos.putNextEntry(new ZipEntry(name + ".csv"));
+            in = IOUtils.toInputStream( csvExport.export(quiz), StandardCharsets.UTF_8);
+            copyToZipStream(zos, in);
+            zos.closeEntry();
+
+            baos.flush();
+
+            return baos;
+        } catch (IOException ex) {
+            throw new TutorException(ErrorMessage.CANNOT_OPEN_FILE);
+        }
+    }
+
+    private void copyToZipStream(ZipOutputStream zos, InputStream in) throws IOException {
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = in.read(buffer)) > 0) {
+            zos.write(buffer, 0, len);
+        }
+        in.close();
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void resetDemoQuizzes() {
+        quizRepository.findQuizzes(Demo.COURSE_EXECUTION_ID).stream().filter(quiz -> quiz.getId() > 5360).forEach(quiz -> {
+            for (QuizAnswer quizAnswer : new ArrayList<>(quiz.getQuizAnswers())) {
+                answerService.deleteQuizAnswer(quizAnswer);
+            }
+
+            for (QuizQuestion quizQuestion : quiz.getQuizQuestions().stream().filter(quizQuestion -> quizQuestion.getQuestionAnswers().isEmpty()).collect(Collectors.toList())) {
+                questionService.deleteQuizQuestion(quizQuestion);
+            }
+
+            quiz.remove();
+            this.quizRepository.delete(quiz);
+        });
+
+        // remove questions that werent in any quiz
+        for (Question question: questionRepository.findQuestions(Demo.COURSE_ID).stream().filter(question -> question.getQuizQuestions().isEmpty()).collect(Collectors.toList())) {
+            questionService.deleteQuestion(question);
+        }
     }
 }

@@ -106,6 +106,7 @@ export default class RemoteServices {
       });
   }
 
+
   static async getStudentQuestions(): Promise<StudentQuestion[]> {
     return httpClient
       .get(
@@ -133,6 +134,25 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
+      
+  static async exportCourseQuestions(): Promise<Blob> {
+    return httpClient
+      .get(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/questions/export`,
+        {
+          responseType: 'blob'
+        }
+      )
+      .then(response => {
+        return new Blob([response.data], {
+          type: 'application/zip, application/octet-stream'  
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
 
   static async getAvailableQuestions(): Promise<Question[]> {
     return httpClient
@@ -305,6 +325,21 @@ export default class RemoteServices {
       .get(`/quizzes/${quizId}/byqrcode`)
       .then(response => {
         return new StatementQuiz(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async exportQuiz(quizId: number): Promise<Blob> {
+    return httpClient
+      .get(`/quizzes/${quizId}/export`, {
+        responseType: 'blob'
+      })
+      .then(response => {
+        return new Blob([response.data], {
+          type: 'application/zip, application/octet-stream'
+        });
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -615,4 +650,14 @@ export default class RemoteServices {
       return 'Unknown Error - Contact admin';
     }
   }
+
+  static async createTournament(params: object) {
+    return httpClient
+      .post(`/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`, params)
+      .then(response => response)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
 }

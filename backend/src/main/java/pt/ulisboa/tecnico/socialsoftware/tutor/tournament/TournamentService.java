@@ -23,6 +23,7 @@ import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -51,9 +52,6 @@ public class TournamentService {
         backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public TournamentDto createTournament(TournamentDto tournamentDto, int courseExecutionId, int creatorId) {
-        if (tournamentDto.getKey() == null)
-            tournamentDto.setKey(getMaxTournamentKey() + 1);
-
         if (tournamentDto.getTopics() == null)
             throw new TutorException(ErrorMessage.NO_TOPICS_SELECTED);
 
@@ -66,6 +64,18 @@ public class TournamentService {
 
         if (tournamentDto.getNumberOfQuestions() <= 0)
             throw new TutorException(ErrorMessage.TOURNAMENT_HAS_NO_QUESTIONS);
+
+        try {
+            LocalDateTime.parse(tournamentDto.getStartTime(),Tournament.formatter);
+        } catch (DateTimeParseException e) {
+            throw new TutorException(ErrorMessage.TOURNAMENT_INVALID_START_TIME);
+        }
+
+        try {
+            LocalDateTime.parse(tournamentDto.getFinishTime(),Tournament.formatter);
+        } catch (DateTimeParseException e) {
+            throw new TutorException(ErrorMessage.TOURNAMENT_INVALID_FINISH_TIME);
+        }
 
         User creator = userRepository.findById(creatorId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, creatorId));
 
@@ -155,6 +165,10 @@ public class TournamentService {
         user.addTournament(tournament);
     }
 
+    public int getTournamentSignedUpNumber(Integer tournamentId){
+        return getTournament(tournamentId).getSignedUpNumber();
+    }
+
     private void checkNotSignedUpYet(Tournament tournament, User user) {
         if(tournament.hasSignedUp(user))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_JOINED);
@@ -177,10 +191,5 @@ public class TournamentService {
     private Tournament getTournament(Integer tournamentId) {
         return tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
-    }
-
-    private Integer getMaxTournamentKey() {
-        Integer val = tournamentRepository.getMaxTournamentKey();
-        return val != null ? val : 0;
     }
 }

@@ -27,7 +27,7 @@ class getQuestionStatusServicePerfomanceTest extends Specification {
     public static final String QUESTION_CONTENT = "question content"
     public static final String OPTION_CONTENT = "optionId content"
 
-    public static final int N_STUDENT_QUESTIONS = 100
+    public static final int N_STUDENT_QUESTIONS = 1
 
     @Autowired
     StudentQuestionService studentQuestionService
