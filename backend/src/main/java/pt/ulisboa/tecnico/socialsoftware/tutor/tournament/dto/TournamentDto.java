@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public class TournamentDto implements Serializable {
 
     private Integer id;
+    private Boolean isCreator;
     private String startTime = null;
     private String finishTime = null;
     private Integer numberOfQuestions;
@@ -34,9 +35,18 @@ public class TournamentDto implements Serializable {
         this.topics = tournament.getTopics().stream().map(TopicDto::new).collect(Collectors.toList());
     }
 
+    public TournamentDto(Tournament tournament, Integer userId) {
+        this(tournament);
+        this.isCreator = tournament.getCreator().getId().equals(userId);
+    }
+
     public void setId(int id) { this.id = id; }
 
     public Integer getId() { return id; }
+
+    public void setIsCreator(Boolean creator) { isCreator = creator; }
+
+    public Boolean getIsCreator() { return isCreator; }
 
     public void setStartTime(String time) { startTime = time; }
 

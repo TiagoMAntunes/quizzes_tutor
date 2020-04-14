@@ -58,8 +58,14 @@ public class TournamentController {
   
     @GetMapping("/executions/{executionId}/tournaments")
     @PreAuthorize("hasPermission(#executionId, 'EXECUTION.ACCESS')")
-    public List<TournamentDto> getOpenTournaments(@PathVariable int executionId) {
-        return this.tournamentService.getOpenTournaments(executionId);
+    public List<TournamentDto> getOpenTournaments(@PathVariable int executionId, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+
+        return this.tournamentService.getOpenTournaments(executionId, user.getId());
     }
 
 }
