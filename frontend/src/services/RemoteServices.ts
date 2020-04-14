@@ -51,7 +51,6 @@ export default class RemoteServices {
     return httpClient
       .get('/auth/demo/student')
       .then(response => {
-        console.log(response);
         return new AuthDto(response.data);
       })
       .catch(async error => {
