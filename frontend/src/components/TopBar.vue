@@ -125,7 +125,9 @@
                 <v-icon>create</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Create</v-list-item-title>
+                <v-list-item-title data-cy="createTournament"
+                  >Create</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -173,6 +175,11 @@
             </v-list-item>
           </v-list>
         </v-menu>
+
+        <v-btn to="/student/questions" v-if="isStudent" text dark>
+          Questions
+          <v-icon>question_answer</v-icon>
+        </v-btn>
 
         <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
           Stats
@@ -353,8 +360,14 @@
             <v-list-item-action>
               <v-icon>assignment</v-icon>
             </v-list-item-action>
+            <v-list-item-content>Available</v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/student/tournament/create">
+            <v-list-item-action>
+              <v-icon>create</v-icon>
+            </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-content>Available</v-list-item-content>
+              <v-list-item-content>Create</v-list-item-content>
             </v-list-item-content>
           </v-list-item>
         </v-list-group>

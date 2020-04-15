@@ -31,6 +31,11 @@ Cypress.Commands.add('demoAdminLogin', () => {
     cy.contains('Manage Courses').click()
 })
 
+Cypress.Commands.add('demoStudentLogin', () => {
+    cy.visit('/')
+    cy.get('[data-cy="studentButton"]').click()
+})
+
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
     cy.get('[data-cy="createButton"]').click()
     cy.get('[data-cy="Name"]').type(name)
@@ -69,3 +74,31 @@ Cypress.Commands.add('createFromCourseExecution', (name, acronym, academicTerm) 
     cy.get('[data-cy="saveButton"]').click()
 })
 
+Cypress.Commands.add('createTournament', (topics, startDay, finishDay, numberOfQuestions) => {
+    cy.contains('Select the tournament topics').parent().click()
+    for (let topic of topics)
+        cy.contains(topic).click() //selects the given topics from the list
+    
+    cy.contains("Start time").click({force : true})
+
+    cy.get(".v-dialog--active").find('.mdi-chevron-right').click().wait(1000) //needs to wait for element to load
+    cy.get(".v-dialog--active").contains(startDay).click()
+    cy.get(".v-dialog--active").contains("OK").click()
+
+
+    cy.contains("Finish time").click({force: true})
+
+    cy.get(".v-dialog--active").find('.mdi-chevron-right').click().wait(1000) //needs to wait for element to load
+    cy.get(".v-dialog--active").contains(finishDay).click()
+    cy.get(".v-dialog--active").contains("OK").click()
+
+    cy.get('[data-cy="select' + numberOfQuestions + 'Questions"]').click()
+
+    cy.get("button").contains("Create Tournament").click({force: true})
+})
+
+
+Cypress.Commands.add('openCreateTournament', () => {
+    cy.contains('Tournaments').click()
+    cy.get('[data-cy="createTournament"]').click()
+})
