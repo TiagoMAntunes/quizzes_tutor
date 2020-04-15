@@ -47,7 +47,9 @@
         </v-btn-toggle>
       </v-container>
       <v-container>
-        <v-btn color="primary" @click="createTournament">Create Tournament</v-btn>
+        <v-btn color="primary" @click="createTournament"
+          >Create Tournament</v-btn
+        >
       </v-container>
     </v-container>
   </div>
@@ -77,14 +79,14 @@ export default class CreateTournamentView extends Vue {
   }
 
   async createTournament() {
-    this.tournamentManager.createTournament()
-    .then(() => {
-      this.$router.push({ name: 'home' }); //TODO change to list tournaments when finished
-    })
-    .catch(err => {
-      this.$store.dispatch('error', err);
-    });
-    
+    this.tournamentManager
+      .createTournament()
+      .then(() => {
+        this.$router.push({ name: 'home' }); //TODO change to list tournaments when finished
+      })
+      .catch(err => {
+        this.$store.dispatch('error', err);
+      });
   }
 }
 </script>
