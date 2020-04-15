@@ -595,7 +595,10 @@ export default class RemoteServices {
 
   static async createTournament(params: object) {
     return httpClient
-      .post(`/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`, params)
+      .post(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`,
+        params
+      )
       .then(response => response)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -604,7 +607,9 @@ export default class RemoteServices {
 
   static async getOpenTournaments(): Promise<Tournament[]> {
     return httpClient
-      .get(`/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`)
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`
+      )
       .then(response => {
         return response.data.map((tournament: any) => {
           return new Tournament(tournament);
@@ -614,6 +619,4 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
-
-
 }

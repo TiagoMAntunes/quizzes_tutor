@@ -354,7 +354,7 @@
               <v-icon>assignment</v-icon>
             </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-content >Available</v-list-item-content>
+              <v-list-item-content>Available</v-list-item-content>
             </v-list-item-content>
           </v-list-item>
         </v-list-group>

@@ -21,13 +21,15 @@
           {{ tournament.finishTime }}
         </div>
         <div class="col topics">
-          <v-chip v-for="topic in sortAlpha(tournament.topics)" :key="topic.id + '-topic'"
+          <v-chip
+            v-for="topic in sortAlpha(tournament.topics)"
+            :key="topic.id + '-topic'"
             class="ma-2 topic-chip"
             small
             outlined
-          ><span>
-            {{ topic.name }}
-          </span>
+            ><span>
+              {{ topic.name }}
+            </span>
           </v-chip>
         </div>
         <div class="col">
@@ -64,12 +66,16 @@ export default class AvailableTournamentsView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
-  sortAlpha(list: Topic[]){
-    return list.slice().sort((a, b) => a.name.localeCompare(b.name) );
+  sortAlpha(list: Topic[]) {
+    return list.slice().sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  sortDate(list: Tournament[]){
-    return list.slice().sort((a, b) => moment(a.startTime).isBefore(moment(b.startTime)) ? -1 : 1 );
+  sortDate(list: Tournament[]) {
+    return list
+      .slice()
+      .sort((a, b) =>
+        moment(a.startTime).isBefore(moment(b.startTime)) ? -1 : 1
+      );
   }
 }
 </script>
@@ -124,22 +130,22 @@ export default class AvailableTournamentsView extends Vue {
       display: flex;
     }
 
-    .topics{
+    .topics {
       flex-grow: 2.5;
       overflow: auto;
     }
 
-    .topic-chip{
+    .topic-chip {
       margin: 4px !important;
       overflow: visible;
       padding: 0px;
       font-size: 13px;
     }
 
-    .topic-chip span{
+    .topic-chip span {
       background-color: #e0e0e0;
-      border-color: rgba(0,0,0,.12);
-      color: rgba(0,0,0,.87);
+      border-color: rgba(0, 0, 0, 0.12);
+      color: rgba(0, 0, 0, 0.87);
       border-radius: 12px;
       padding: 2px 10px;
       margin: none;
@@ -147,4 +153,3 @@ export default class AvailableTournamentsView extends Vue {
   }
 }
 </style>
-
