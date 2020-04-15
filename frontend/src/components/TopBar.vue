@@ -112,12 +112,22 @@
             </v-btn>
           </template>
           <v-list dense>
+            <v-list-item to="/student/tournament/available">
+              <v-list-item-action>
+                <v-icon>assignment</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Available</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item to="/student/tournament/create">
               <v-list-item-action>
                 <v-icon>create</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Create</v-list-item-title>
+                <v-list-item-title data-cy="createTournament"
+                  >Create</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -335,6 +345,30 @@
               <v-icon>fas fa-user</v-icon>
             </v-list-item-action>
             <v-list-item-content>Stats</v-list-item-content>
+          </v-list-item>
+        </v-list-group>
+
+        <v-list-group
+          prepend-icon="fas fa-trophy"
+          :value="false"
+          v-if="isStudent && currentCourse"
+        >
+          <template v-slot:activator>
+            <v-list-item-title>Tournaments</v-list-item-title>
+          </template>
+          <v-list-item to="/student/tournament/available">
+            <v-list-item-action>
+              <v-icon>assignment</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Available</v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/student/tournament/create">
+            <v-list-item-action>
+              <v-icon>create</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-content>Create</v-list-item-content>
+            </v-list-item-content>
           </v-list-item>
         </v-list-group>
 
