@@ -9,6 +9,7 @@ import StatementQuiz from '@/models/statement/StatementQuiz';
 import SolvedQuiz from '@/models/statement/SolvedQuiz';
 import Topic from '@/models/management/Topic';
 import { Student } from '@/models/management/Student';
+import StudentQuestion from '@/models/management/StudentQuestion';
 import Assessment from '@/models/management/Assessment';
 import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
@@ -105,6 +106,20 @@ export default class RemoteServices {
       });
   }
 
+
+  static async getStudentQuestions(): Promise<StudentQuestion[]> {
+    return httpClient
+      .get(`/student_questions/${Store.getters.getUser.id}`)
+      .then(response => {
+        return response.data.map((question: any) => {
+          return new StudentQuestion(question);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+      
   static async exportCourseQuestions(): Promise<Blob> {
     return httpClient
       .get(
@@ -115,13 +130,14 @@ export default class RemoteServices {
       )
       .then(response => {
         return new Blob([response.data], {
-          type: 'application/zip, application/octet-stream'
+          type: 'application/zip, application/octet-stream'  
         });
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
   }
+
 
   static async getAvailableQuestions(): Promise<Question[]> {
     return httpClient
