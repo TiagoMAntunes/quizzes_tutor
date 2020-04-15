@@ -93,7 +93,7 @@ public class StudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void studentQuestionExplanation(int questionId, String explanation) {
+    public void setStudentQuestionExplanation(int questionId, String explanation) {
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
         question.setRejectionExplanation(explanation);
     }

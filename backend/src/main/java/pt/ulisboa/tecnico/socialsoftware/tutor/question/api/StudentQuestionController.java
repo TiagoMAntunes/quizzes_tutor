@@ -58,7 +58,7 @@ public class StudentQuestionController{
     @PostMapping("/student_questions/{questionId}/explanation")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity studentQuestionAddExplanation(@PathVariable Integer questionId, @Valid @RequestBody String explanation) {
-        studentQuestionService.studentQuestionExplanation(questionId, explanation);
+        studentQuestionService.setStudentQuestionExplanation(questionId, explanation);
         return ResponseEntity.ok().build();
     }
 

@@ -247,6 +247,14 @@
           <template v-slot:activator>
             <v-list-item-title>Management</v-list-item-title>
           </template>
+          <v-list-item to="/management/student_questions">
+            <v-list-item-action>
+              <v-icon>fas fa-user-graduate</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Student Questions</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
           <v-list-item to="/management/questions">
             <v-list-item-action>
               <v-icon>question_answer</v-icon>
@@ -315,6 +323,16 @@
               <v-icon>assignment</v-icon>
             </v-list-item-action>
             <v-list-item-content>Available Quizzes</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item
+            to="/student/questions"
+            v-if="isStudent && currentCourse"
+          >
+            <v-list-item-action>
+              <v-icon>question_answer</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Questions</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/create">
