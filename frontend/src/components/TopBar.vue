@@ -333,6 +333,24 @@
           </v-list-item>
         </v-list-group>
 
+        <v-list-group
+          prepend-icon="fas fa-trophy"
+          :value="false"
+          v-if="isStudent && currentCourse"
+        >
+          <template v-slot:activator>
+            <v-list-item-title>Tournaments</v-list-item-title>
+          </template>
+          <v-list-item to="/student/tournament/create">
+            <v-list-item-action>
+              <v-icon>create</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-content >Create</v-list-item-content>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-group>
+
         <v-list-item to="/courses" v-if="isLoggedIn && moreThanOneCourse">
           <v-list-item-action>
             <v-icon>fas fa-book</v-icon>
