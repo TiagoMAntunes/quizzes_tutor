@@ -1,6 +1,7 @@
 <template>
   <v-form>
     <v-autocomplete
+      :disabled="isDisabled()"
       v-model="questionTopics"
       :items="topics"
       multiple
@@ -9,7 +10,7 @@
       item-value="name"
       @change="saveTopics"
     >
-      <template v-slot:selection="data">
+      <template v-slot:selection="data" :disabled="isDisabled()">
         <v-chip
           v-bind="data.attrs"
           :input-value="data.selected"
@@ -44,7 +45,7 @@ export default class ShowQuestionTopics extends Vue {
   questionTopics: Topic[] = JSON.parse(JSON.stringify(this.question.topics));
 
   async saveTopics() {
-    if (this.question.id) {
+    if (this.question.id && this.question.questionStatus != 'APPROVED') {
       try {
         await RemoteServices.updateQuestionTopics(
           this.question.id,
@@ -67,6 +68,14 @@ export default class ShowQuestionTopics extends Vue {
       element => element.id != topic.id
     );
     this.saveTopics();
+  }
+
+  isDisabled() {
+    if (this.question.questionStatus === 'APPROVED') {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 </script>

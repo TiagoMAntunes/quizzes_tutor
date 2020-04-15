@@ -9,7 +9,7 @@ export default class StudentQuestion {
   numberOfCorrect!: number;
   difficulty!: number | null;
   content: string = '';
-  rejectionExplanation: null;
+  rejectionExplanation: string = '';
   creationDate!: string | null;
   image: Image | null = null;
   sequence: number | null = null;

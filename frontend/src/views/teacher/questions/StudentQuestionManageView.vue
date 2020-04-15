@@ -5,6 +5,7 @@
       :custom-filter="customFilter"
       :items="questions"
       :search="search"
+      :explanation="explanation"
       multi-sort
       :mobile-breakpoint="0"
       :items-per-page="15"
@@ -19,6 +20,16 @@
             class="mx-2"
           />
         </v-card-title>
+      </template>
+
+      <template v-slot:item.rejectionExplanation="{ item }">
+        <v-text-field
+          :disabled="isDisabled(item.id, item)"
+          v-model="item.rejectionExplanation"
+          name="rejectionExplanation"
+          type="string"
+          @change="setExplanation(item.id, item.rejectionExplanation)"
+        ></v-text-field>
       </template>
 
       <template v-slot:item.content="{ item }">
@@ -36,19 +47,29 @@
         >
       </template>
 
-      <template v-slot:item.questionStatus="{ item }">
-        <v-chip
-          v-if="item.questionStatus"
-          :color="getStatusColor(item.questionStatus)"
-          small
-          ><span>{{ item.questionStatus }}</span></v-chip
-        >
+      <template v-slot:item.topics="{ item }">
+        <edit-student-question-topics
+          :question="item"
+          :topics="topics"
+          v-on:question-changed-topics="onQuestionChangedTopics"
+        />
       </template>
 
-      <template v-slot:item.topics="{ item }">
-        <v-card-title :disabled="isDisabled(item)">
-          <show-student-question-topics :question="item" :topics="topics" />
-        </v-card-title>
+      <template v-slot:item.questionStatus="{ item }">
+        <v-select
+          v-model="item.questionStatus"
+          :items="statusList"
+          dense
+          @change="
+            setStatus(item.id, item.questionStatus), isDisabled(item.id, item)
+          "
+          >visibility
+          <template v-slot:selection="{ item }">
+            <v-chip :color="getStatusColor(item)" small>
+              <span>{{ item }}</span>
+            </v-chip>
+          </template>
+        </v-select>
       </template>
 
       <template v-slot:item.action="{ item }">
@@ -66,7 +87,7 @@
         </v-tooltip>
       </template>
     </v-data-table>
-    <show-student-question-dialog
+    <show-question-dialog
       v-if="currentQuestion"
       :dialog="questionDialog"
       :question="currentQuestion"
@@ -83,20 +104,22 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/questions/ShowStudentQuestionDialog.vue';
-import ShowStudentQuestionTopics from '@/views/student/questions/ShowStudentQuestionTopics.vue';
+import EditStudentQuestionTopics from '@/views/teacher/questions/EditStudentQuestionTopics.vue';
 
 @Component({
   components: {
-    'show-student-question-dialog': ShowStudentQuestionDialog,
-    'show-student-question-topics': ShowStudentQuestionTopics
+    'show-question-dialog': ShowStudentQuestionDialog,
+    'edit-student-question-topics': EditStudentQuestionTopics
   }
 })
-export default class StudentQuestionsView extends Vue {
+export default class StudentQuestionManageView extends Vue {
   questions: StudentQuestion[] = [];
   topics: Topic[] = [];
   currentQuestion: StudentQuestion | null = null;
   questionDialog: boolean = false;
   search: string = '';
+  explanation: string = 'No explanation';
+  statusList = ['APPROVED', 'REJECTED', 'PENDING'];
 
   headers: object = [
     { text: 'Title', value: 'title', align: 'center' },
@@ -128,7 +151,7 @@ export default class StudentQuestionsView extends Vue {
     try {
       [this.topics, this.questions] = await Promise.all([
         RemoteServices.getTopics(),
-        RemoteServices.getStudentQuestions()
+        RemoteServices.getAllStudentQuestions()
       ]);
     } catch (error) {
       await this.$store.dispatch('error', error);
@@ -150,6 +173,15 @@ export default class StudentQuestionsView extends Vue {
     return convertMarkDownNoFigure(text, image);
   }
 
+  onQuestionChangedTopics(questionId: Number, changedTopics: Topic[]) {
+    let question = this.questions.find(
+      (question: StudentQuestion) => question.id == questionId
+    );
+    if (question) {
+      question.topics = changedTopics;
+    }
+  }
+
   getDifficultyColor(difficulty: number) {
     if (difficulty < 25) return 'green';
     else if (difficulty < 50) return 'lime';
@@ -163,12 +195,50 @@ export default class StudentQuestionsView extends Vue {
     else return 'green';
   }
 
-  isDisabled(question: StudentQuestion) {
+  async setStatus(questionId: number, status: string) {
+    try {
+      await RemoteServices.setStudentQuestionStatus(questionId, status);
+      let question = this.questions.find(
+        question => question.id === questionId
+      );
+      if (question) {
+        question.questionStatus = status;
+      }
+      if (status === 'APPROVED' || status === 'PENDING') {
+        await RemoteServices.setStudentQuestionExplanation(
+          questionId,
+          'No explanation'
+        );
+      }
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 
-  showStudentQuestionDialog(studentQuestion: StudentQuestion) {
-    this.currentQuestion = studentQuestion;
+  showStudentQuestionDialog(question: StudentQuestion) {
+    this.currentQuestion = question;
     this.questionDialog = true;
+  }
+
+  isDisabled(questionId: number, question: StudentQuestion) {
+    return question.questionStatus !== 'REJECTED';
+  }
+
+  async setExplanation(questionId: number, explanation: string) {
+    try {
+      await RemoteServices.setStudentQuestionExplanation(
+        questionId,
+        explanation
+      );
+      let question = this.questions.find(
+        question => question.id === questionId
+      );
+      if (question) {
+        question.rejectionExplanation = explanation;
+      }
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 
   onCloseShowStudentQuestionDialog() {

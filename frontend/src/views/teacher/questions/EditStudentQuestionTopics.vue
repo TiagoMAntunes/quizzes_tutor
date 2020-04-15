@@ -1,7 +1,7 @@
 <template>
   <v-form>
     <v-autocomplete
-      v-model="questionTopics"
+      v-model="studentQuestionTopics"
       :items="topics"
       multiple
       return-object
@@ -36,19 +36,21 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import RemoteServices from '@/services/RemoteServices';
 
 @Component
-export default class ShowQuestionTopics extends Vue {
+export default class EditStudentQuestionTopics extends Vue {
   @Prop({ type: StudentQuestion, required: true })
   readonly question!: StudentQuestion;
   @Prop({ type: Array, required: true }) readonly topics!: Topic[];
 
-  questionTopics: Topic[] = JSON.parse(JSON.stringify(this.question.topics));
+  studentQuestionTopics: Topic[] = JSON.parse(
+    JSON.stringify(this.question.topics)
+  );
 
   async saveTopics() {
     if (this.question.id) {
       try {
         await RemoteServices.updateQuestionTopics(
           this.question.id,
-          this.questionTopics
+          this.studentQuestionTopics
         );
       } catch (error) {
         await this.$store.dispatch('error', error);
@@ -58,12 +60,12 @@ export default class ShowQuestionTopics extends Vue {
     this.$emit(
       'question-changed-topics',
       this.question.id,
-      this.questionTopics
+      this.studentQuestionTopics
     );
   }
 
   removeTopic(topic: Topic) {
-    this.questionTopics = this.questionTopics.filter(
+    this.studentQuestionTopics = this.studentQuestionTopics.filter(
       element => element.id != topic.id
     );
     this.saveTopics();
