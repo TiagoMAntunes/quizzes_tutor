@@ -5,14 +5,14 @@
       <li class="list-header">
         <div class="col">Start Time</div>
         <div class="col">Finish Time</div>
-        <div class="col">Topics</div>
+        <div class="col topics">Topics</div>
         <div class="col">Number of Questions</div>
         <div class="col last-col"></div>
       </li>
       <li
         class="list-row"
-        v-for="tournament in tournaments"
-        :key="tournament.id"
+        v-for="tournament in sortDate(tournaments)"
+        :key="tournament.id + '-tournament'"
       >
         <div class="col">
           {{ tournament.startTime }}
@@ -21,17 +21,20 @@
           {{ tournament.finishTime }}
         </div>
         <div class="col topics">
-          <v-chip v-for="topic in tournament.topics" :key="topic.id"
-            class="ma-2"
+          <v-chip v-for="topic in sortAlpha(tournament.topics)" :key="topic.id + '-topic'"
+            class="ma-2 topic-chip"
             small
-          >
+            outlined
+          ><span>
             {{ topic.name }}
+          </span>
           </v-chip>
         </div>
         <div class="col">
           {{ tournament.numberOfQuestions }}
         </div>
         <div class="col last-col">
+          <!-- placeholder button -->
           <i class="fas fa-chevron-circle-right"></i>
         </div>
       </li>
@@ -42,7 +45,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Tournament from '@/models/tournament/Tournament';
+import Topic from '@/models/management/Topic';
 import RemoteServices from '@/services/RemoteServices';
+import moment from 'moment';
 
 @Component
 export default class AvailableTournamentsView extends Vue {
@@ -57,6 +62,14 @@ export default class AvailableTournamentsView extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  sortAlpha(list: Topic[]){
+    return list.slice().sort((a, b) => a.name.localeCompare(b.name) );
+  }
+
+  sortDate(list: Tournament[]){
+    return list.slice().sort((a, b) => moment(a.startTime).isBefore(moment(b.startTime)) ? -1 : 1 );
   }
 }
 </script>
@@ -80,13 +93,12 @@ export default class AvailableTournamentsView extends Vue {
 
   ul {
     overflow: hidden;
-    padding: 0 5px;
+    padding: 0 3px;
 
     li {
       border-radius: 3px;
       padding: 15px 10px;
       display: flex;
-      justify-content: space-between;
       margin-bottom: 10px;
     }
 
@@ -100,16 +112,37 @@ export default class AvailableTournamentsView extends Vue {
     }
 
     .col {
-      font-size: 12px;
-      flex-basis: 25% !important;
-      margin: auto; /* Important */
+      font-size: 13px;
       text-align: center;
+      margin: auto;
+      min-width: 5%;
     }
 
     .list-row {
       background-color: #ffffff;
       box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.1);
       display: flex;
+    }
+
+    .topics{
+      flex-grow: 2.5;
+      overflow: auto;
+    }
+
+    .topic-chip{
+      margin: 4px !important;
+      overflow: visible;
+      padding: 0px;
+      font-size: 13px;
+    }
+
+    .topic-chip span{
+      background-color: #e0e0e0;
+      border-color: rgba(0,0,0,.12);
+      color: rgba(0,0,0,.87);
+      border-radius: 12px;
+      padding: 2px 10px;
+      margin: none;
     }
   }
 }

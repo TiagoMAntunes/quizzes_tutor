@@ -25,6 +25,8 @@ export default class TournamentSkeleton {
             finishTime: moment(this.finishTime).format(TournamentSkeleton.FORMAT),
             numberOfQuestions: this.numberOfQuestions
         }
+
+        console.log(this.topics);
         
         await RemoteServices.createTournament(params);
     }
