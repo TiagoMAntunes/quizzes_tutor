@@ -182,6 +182,19 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
+  static createStudentQuestion(question: Question): Promise<StudentQuestion> {
+    return httpClient
+        .post(
+            `/courses/${Store.getters.getCurrentCourse.courseId}/student_questions/`,
+            question
+        )
+        .then(response => {
+          return new StudentQuestion(response.data);
+        })
+        .catch(async error => {
+          throw Error(await this.errorMessage(error));
+        });
+  }
 
   static updateQuestion(question: Question): Promise<Question> {
     return httpClient
