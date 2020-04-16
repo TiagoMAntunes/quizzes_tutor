@@ -36,8 +36,19 @@
           {{ tournament.numberOfQuestions }}
         </div>
         <div class="col last-col">
-          <!-- placeholder button -->
-          <i class="fas fa-chevron-circle-right"></i>
+          <v-tooltip bottom v-if=tournament.isCreator>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="cancelTournament(tournament.id)"
+              color="red"
+              >delete</v-icon
+            >
+          </template>
+          <span>Cancel Tournament</span>
+        </v-tooltip>
         </div>
       </li>
     </ul>
@@ -64,6 +75,17 @@ export default class AvailableTournamentsView extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  async cancelTournament(tournamentId: number) {
+    if (confirm('Are you sure you want to cancel this tournament?')) {
+      try {
+        await RemoteServices.cancelTournament(tournamentId);
+        this.tournaments.filter( tournament => tournament.id != tournamentId );
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
   }
 
   sortAlpha(list: Topic[]) {
