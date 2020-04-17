@@ -75,16 +75,6 @@ class getQuestionsStatusTest extends Specification {
         questionDto.setOptions(options)
     }
 
-    def "no questions submitted by the student"(){
-        when:
-        studentQuestionService.getStudentQuestions(course.getId(), student.getId())
-
-        then: "an exception is thrown"
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.NO_QUESTION_SUBMITTED
-        studentQuestionRepository.count() == 0L
-    }
-
     def "get status of question that is waiting for approval"(){
         given: "a student that has submitted a question"
         studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())
