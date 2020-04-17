@@ -55,7 +55,6 @@ class ApproveRejectQuestionServicePerformanceTest extends Specification {
     StudentQuestionRepository studentQuestionRepository
 
     def course;
-    def teacher;
     def student;
     def questionDto;
     def courseExecution;
@@ -66,9 +65,6 @@ class ApproveRejectQuestionServicePerformanceTest extends Specification {
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
 
-        teacher = new User("User1", "teacher", 1, User.Role.TEACHER)
-        userRepository.save(teacher)
-        teacher.addCourse(courseExecution)
         student = new User("User2", "student", 2, User.Role.STUDENT)
         userRepository.save(student)
         student.addCourse(courseExecution)
@@ -86,12 +82,12 @@ class ApproveRejectQuestionServicePerformanceTest extends Specification {
         questionDto.setOptions(options)
     }
 
-    def "performance testing to get 750k student questions"() {
+    def "performance testing to reject 750k student questions"() {
         given: "750k questions and student questions"
         1.upto(N_STUDENT_QUESTIONS, {key-> questionDto.setKey(key); studentQuestionService.createStudentQuestion(course.getId(), questionDto, student.getId())})
 
         when:
-        1.upto(N_STUDENT_QUESTIONS, {questionId -> studentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.REJECTED, EXPLANATION, teacher.getId(), courseExecution.getId())})
+        1.upto(N_STUDENT_QUESTIONS, {questionId -> studentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.REJECTED)})
 
         then:
         studentQuestionRepository.count() == N_STUDENT_QUESTIONS;

@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AuthUserDto implements Serializable {
-    private int id;
     private String name;
     private String username;
     private User.Role role;

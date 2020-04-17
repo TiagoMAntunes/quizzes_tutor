@@ -15,8 +15,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import java.security.Principal;
 
-
-import java.security.Principal;
 import java.util.List;
 import javax.validation.Valid;
 
