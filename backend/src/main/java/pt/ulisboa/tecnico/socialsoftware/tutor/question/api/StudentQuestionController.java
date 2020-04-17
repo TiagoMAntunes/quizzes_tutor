@@ -23,6 +23,7 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.AU
 @RestController
 public class StudentQuestionController{
 
+    // should be a dto
     static class Information{
         public String status;
         public String explanation;
@@ -40,6 +41,7 @@ public class StudentQuestionController{
         return this.studentQuestionService.getStudentQuestions(studentId);
     }
 
+    // should be a put
     @PostMapping("/student_questions/{questionId}/approve-reject")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity studentQuestionApproveRejectStatus(@PathVariable Integer questionId, @Valid @RequestBody Information inform) {
@@ -56,6 +58,7 @@ public class StudentQuestionController{
         if(user == null){
             throw new TutorException(AUTHENTICATION_ERROR);
         }
+        // a proposed question is not available yet
         question.setStatus(Question.Status.AVAILABLE.name());
         return this.studentQuestionService.createStudentQuestion(courseId, question, user.getId());
     }
