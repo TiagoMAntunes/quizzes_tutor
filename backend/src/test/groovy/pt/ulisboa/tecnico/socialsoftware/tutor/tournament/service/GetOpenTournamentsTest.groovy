@@ -162,7 +162,7 @@ class GetOpenTournamentsTest extends Specification {
         result.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
 
         when:
-        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID, user)
 
         then:
         tournaments.size() == 0
@@ -173,21 +173,34 @@ class GetOpenTournamentsTest extends Specification {
         tournamentService.createTournament(diffCourseTournament, DIFF_COURSE_EXEC_ID, user)
 
         when:
-        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID, user)
 
         then:
         tournaments.size() == 0
     }
 
-    def "one open tournament"(){
+    def "one open tournament and is the creator"(){
         given:"an open tournament for this course"
         tournamentService.createTournament(openTournament1, COURSE_EXEC_ID, user)
 
         when:
-        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID, user)
 
         then:
         tournaments.size() == 1
+        tournaments[0].isCreator
+    }
+
+    def "one open tournament and is not the creator"(){
+        given:"an open tournament for this course"
+        tournamentService.createTournament(openTournament1, COURSE_EXEC_ID, user)
+
+        when:
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID, user+1)
+
+        then:
+        tournaments.size() == 1
+        !tournaments[0].isCreator
     }
 
     def "3 open tournaments"(){
@@ -197,7 +210,7 @@ class GetOpenTournamentsTest extends Specification {
         tournamentService.createTournament(openTournament3, COURSE_EXEC_ID, user)
 
         when:
-        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID)
+        def tournaments = tournamentService.getOpenTournaments(COURSE_EXEC_ID, user)
 
         then:"returns the 3 tournaments"
         tournaments.size() == 3
