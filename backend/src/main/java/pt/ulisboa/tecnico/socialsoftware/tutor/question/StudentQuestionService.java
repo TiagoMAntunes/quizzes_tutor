@@ -93,7 +93,7 @@ public class StudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void studentQuestionExplanation(int questionId, String explanation) {
+    public void setStudentQuestionExplanation(int questionId, String explanation) {
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
         question.setRejectionExplanation(explanation);
     }
@@ -106,16 +106,10 @@ public class StudentQuestionService {
     public List<StudentQuestionDto> getStudentQuestions(int courseId, int studentId) {
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
 
-        List<StudentQuestionDto> list = studentQuestionRepository.findAll().stream()
+        return studentQuestionRepository.findAll().stream()
                 .filter(studentQuestion -> studentQuestion.getUser() == student && studentQuestion.getCourse().getId() == courseId)
                 .map(StudentQuestionDto::new)
                 .collect(Collectors.toList());
-
-        if(list.isEmpty()){
-            throw new TutorException(NO_QUESTION_SUBMITTED);
-        }else{
-            return list;
-        }
     }
 
     @Retryable(
@@ -124,46 +118,19 @@ public class StudentQuestionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<StudentQuestionDto> getStudentQuestionsByCourses(Set<CourseExecution> courses, int currentCourseId) {
 
-        List<StudentQuestionDto> list = studentQuestionRepository.findAll().stream()
-                .filter(studentQuestion -> equals_courses(studentQuestion.getCourse().getId(), courses, currentCourseId))
+        return studentQuestionRepository.findAll().stream()
+                .filter(studentQuestion -> equalsCourses(studentQuestion.getCourse().getId(), courses, currentCourseId))
                 .map(StudentQuestionDto::new)
                 .collect(Collectors.toList());
-
-        if(list.isEmpty()){
-            throw new TutorException(NO_QUESTION_SUBMITTED);
-        }else{
-            return list;
-        }
     }
+
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public boolean equals_courses(int id, Set<CourseExecution> courses, int currentCourseId) {
+    public boolean equalsCourses(int id, Set<CourseExecution> courses, int currentCourseId) {
         return courses.stream().
-                filter(course -> course.getCourse().getId() == id && id == currentCourseId)
-                .findAny()
-                .isPresent();
-    }
-
-    private void checkQuestionKey(QuestionDto questionDto) {
-        if (questionDto.getKey() == null) {
-            int maxQuestionNumber = questionRepository.getMaxQuestionNumber() != null ?
-                    questionRepository.getMaxQuestionNumber() : 0;
-            questionDto.setKey(maxQuestionNumber + 1);
-        }
-    }
-
-    private void checkTeacherCourse(User teacher, CourseExecution execution) {
-        if(!teacher.getCourseExecutions().contains(execution)){
-            throw new TutorException(ACCESS_DENIED);
-        }
-    }
-
-    private void checkUserRole(User teacher) {
-        if (teacher.getRole() != User.Role.TEACHER) {
-            throw new TutorException(ACCESS_DENIED);
-        }
+                anyMatch(course -> course.getCourse().getId() == id && id == currentCourseId);
     }
 
     private void checkEnrolledCourseExecution(User student, Course course) {
