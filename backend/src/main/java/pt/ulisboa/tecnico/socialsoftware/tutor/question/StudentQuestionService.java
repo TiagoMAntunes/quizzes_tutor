@@ -118,17 +118,12 @@ public class StudentQuestionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<StudentQuestionDto> getStudentQuestionsByCourses(Set<CourseExecution> courses, int currentCourseId) {
 
-        List<StudentQuestionDto> list = studentQuestionRepository.findAll().stream()
+        return studentQuestionRepository.findAll().stream()
                 .filter(studentQuestion -> equalsCourses(studentQuestion.getCourse().getId(), courses, currentCourseId))
                 .map(StudentQuestionDto::new)
                 .collect(Collectors.toList());
-
-        if(list.isEmpty()){
-            throw new TutorException(NO_QUESTION_SUBMITTED);
-        }else{
-            return list;
-        }
     }
+
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
