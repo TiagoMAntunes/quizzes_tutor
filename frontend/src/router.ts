@@ -22,7 +22,7 @@ import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
 import TournamentView from '@/views/student/tournament/TournamentView.vue';
 import CreateTournamentView from '@/views/student/tournament/CreateTournamentView.vue';
-
+import CreateStudentQuestionView from '@/views/student/questions/CreateStudentQuestionView.vue';
 import AdminManagementView from './views/admin/AdminManagementView.vue';
 import NotFoundView from './views/NotFoundView.vue';
 import ImpExpView from '@/views/teacher/impexp/ImpExpView.vue';
@@ -142,6 +142,15 @@ let router = new Router({
           component: StudentQuestionsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Status of Questions',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'createQuestion',
+          name: 'createQuestion',
+          component: CreateStudentQuestionView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Create a Question',
             requiredAuth: 'Student'
           }
         },
