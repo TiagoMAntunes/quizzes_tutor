@@ -15,8 +15,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import java.security.Principal;
 
-
-import java.security.Principal;
 import java.util.List;
 import javax.validation.Valid;
 
@@ -58,7 +56,7 @@ public class StudentQuestionController{
     @PostMapping("/student_questions/{questionId}/explanation")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity studentQuestionAddExplanation(@PathVariable Integer questionId, @Valid @RequestBody String explanation) {
-        studentQuestionService.studentQuestionExplanation(questionId, explanation);
+        studentQuestionService.setStudentQuestionExplanation(questionId, explanation);
         return ResponseEntity.ok().build();
     }
 

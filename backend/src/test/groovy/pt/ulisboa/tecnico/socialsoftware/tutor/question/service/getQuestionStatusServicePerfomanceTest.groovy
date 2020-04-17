@@ -84,7 +84,7 @@ class getQuestionStatusServicePerfomanceTest extends Specification {
         1.upto(N_STUDENT_QUESTIONS, {key -> questionDto.setKey(key); studentQuestionService.createStudentQuestion(course_id, questionDto, student_id)})
 
         when:
-        1.upto(N_STUDENT_QUESTIONS, {questionId -> studentQuestionService.getStudentQuestions(student_id)})
+        1.upto(N_STUDENT_QUESTIONS, {questionId -> studentQuestionService.getStudentQuestions(course_id, student_id)})
 
         then:
         true

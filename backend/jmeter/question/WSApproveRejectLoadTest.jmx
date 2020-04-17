@@ -68,6 +68,11 @@
               <stringProp name="Argument.value">677</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
+            <elementProp name="status" elementType="Argument">
+              <stringProp name="Argument.name">status</stringProp>
+              <stringProp name="Argument.value">REJECTED</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
           </collectionProp>
         </Arguments>
         <hashTree/>
@@ -250,7 +255,7 @@ END TRANSACTION;</stringProp>
               <boolProp name="recycle">true</boolProp>
               <stringProp name="shareMode">shareMode.group</stringProp>
               <boolProp name="stopThread">false</boolProp>
-              <stringProp name="variableNames">student_question_id,explanation,content,number_answers,number_correct,title,student_question_status,creation_date,course_id</stringProp>
+              <stringProp name="variableNames">student_question_id,explanation,content,number_answers,number_correct,title,student_question_status,creation_date,course_id,status</stringProp>
             </CSVDataSet>
             <hashTree/>
             <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request" enabled="true">
@@ -259,12 +264,7 @@ END TRANSACTION;</stringProp>
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">{&#xd;
-	&quot;courseExecutionId&quot;: &quot;11&quot;,&#xd;
-  	&quot;explanation&quot;: &quot;${explanation}&quot;,&#xd;
-  	&quot;status&quot;: &quot;REJECTED&quot;,&#xd;
-  	&quot;teacherId&quot;: &quot;${teacher_id}&quot;&#xd;
-}&#xd;
+                    <stringProp name="Argument.value">&#xd;
 </stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                   </elementProp>
@@ -274,7 +274,7 @@ END TRANSACTION;</stringProp>
               <stringProp name="HTTPSampler.port">${port}</stringProp>
               <stringProp name="HTTPSampler.protocol"></stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/student_questions/${student_question_id}/approve-reject</stringProp>
+              <stringProp name="HTTPSampler.path">/student_questions/evaluate/${student_question_id}/${status}</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
