@@ -117,7 +117,9 @@
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Available</v-list-item-title>
+                <v-list-item-title data-cy="availableTournaments"
+                  >Available</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/student/tournament/create">
