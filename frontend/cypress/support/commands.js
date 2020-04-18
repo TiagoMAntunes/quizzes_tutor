@@ -96,7 +96,7 @@ Cypress.Commands.add('showStudentQuestion', (explanation) => {
         .children()
         .should('have.length', 8)
         .find('[data-cy="showQuestionCy"]')
-        .click()
+        .click({force: true})
 })
 
 Cypress.Commands.add('addTopicStudentQuestion', (explanation, topic) => {
@@ -106,6 +106,8 @@ Cypress.Commands.add('addTopicStudentQuestion', (explanation, topic) => {
         .children()
         .should('have.length', 8)
         .find('[data-cy="topicsCy"]')
+        .parent()
+        .click({force: true})
         cy.contains('Adventure Builder').click()
     //missing selecting the topic
 })

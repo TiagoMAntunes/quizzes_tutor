@@ -9,15 +9,15 @@ describe('Questions walkthrough', () => {
         cy.contains('Logout').click()
     })
 
-    it ('Get student questions and show a question', () => {
-        //cy.createStudentQuestion('test30', 'What question?', OPTIONS)
+    it ('Create a question, get the questions and show a question', () => {
+        cy.createStudentQuestion('test30', 'What question?', OPTIONS)
         cy.openAvailableQuestions();
-        cy.showStudentQuestion('question');
+        cy.showStudentQuestion('test30');
     });
 
-    it ('Get student questions and add a topic to a question', () => {
-        //cy.createStudentQuestion('test50', 'Whats a question?', OPTIONS)
+    it ('Create a question, get the questions and add a topic to the question', () => {
+        cy.createStudentQuestion('test50', 'Whats a question?', OPTIONS)
         cy.openAvailableQuestions();
-        cy.addTopicStudentQuestion('question','Adventure Builder');
+        cy.addTopicStudentQuestion('test50','Adventure Builder');
     });
 });
