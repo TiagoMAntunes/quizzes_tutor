@@ -107,7 +107,6 @@ export default class RemoteServices {
       });
   }
 
-
   static async getStudentQuestions(): Promise<StudentQuestion[]> {
     return httpClient
       .get(`/student_questions/${Store.getters.getUser.id}`)
@@ -120,7 +119,7 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
-      
+
   static async exportCourseQuestions(): Promise<Blob> {
     return httpClient
       .get(
@@ -131,14 +130,13 @@ export default class RemoteServices {
       )
       .then(response => {
         return new Blob([response.data], {
-          type: 'application/zip, application/octet-stream'  
+          type: 'application/zip, application/octet-stream'
         });
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
   }
-
 
   static async getAvailableQuestions(): Promise<Question[]> {
     return httpClient
@@ -639,6 +637,19 @@ export default class RemoteServices {
   static async cancelTournament(tournamentId: number) {
     return httpClient
       .delete(`/tournaments/${tournamentId}`)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async joinTournament(tournamentId: number): Promise<Tournament> {
+    return httpClient
+      .put(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/${tournamentId}`
+      )
+      .then(response => {
+        return new Tournament(response.data);
+      })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });

@@ -7,6 +7,7 @@
         <div class="col">Finish Time</div>
         <div class="col topics">Topics</div>
         <div class="col">Number of Questions</div>
+        <div class="col">Number of Participants</div>
         <div class="col last-col"></div>
       </li>
       <li
@@ -35,7 +36,23 @@
         <div class="col">
           {{ tournament.numberOfQuestions }}
         </div>
+        <div class="col">
+          {{ tournament.numberOfParticipants }}
+        </div>
         <div class="col last-col">
+          <v-tooltip bottom v-if="!tournament.hasSignedUp">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                small
+                class="mr-2"
+                v-on="on"
+                @click="$emit('joinTournament', tournament.id)"
+                color="dark grey"
+                >fas fa-chevron-circle-right</v-icon
+              >
+            </template>
+            <span>Sign Up for Tournament</span>
+          </v-tooltip>
           <v-tooltip bottom v-if="tournament.isCreator">
             <template v-slot:activator="{ on }">
               <v-icon
@@ -99,11 +116,11 @@ export default class TournamentList extends Vue {
 
   ul {
     overflow: hidden;
-    padding: 0 3px;
+    padding: 0px;
 
     li {
       border-radius: 3px;
-      padding: 15px 10px;
+      padding: 15px 5px;
       display: flex;
       margin-bottom: 10px;
     }
@@ -111,17 +128,19 @@ export default class TournamentList extends Vue {
     .list-header {
       background-color: #1976d2;
       color: white;
-      font-size: 14px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.03em;
       text-align: center;
     }
 
     .col {
-      font-size: 13px;
+      font-size: 12px;
       text-align: center;
       margin: auto;
-      min-width: 5%;
+      min-width: 15%;
+      padding: 12px 5px;
+      overflow: auto;
     }
 
     .list-row {

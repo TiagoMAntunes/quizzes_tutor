@@ -151,7 +151,7 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void joinTournament(Integer tournamentId, Integer courseExecutionId, Integer userId){
+    public TournamentDto joinTournament(Integer tournamentId, Integer courseExecutionId, Integer userId){
         Tournament tournament = getTournament(tournamentId);
         User user = getUser(userId);
 
@@ -161,6 +161,8 @@ public class TournamentService {
 
         tournament.signUp(user);
         user.addTournament(tournament);
+
+        return new TournamentDto(tournament, userId);
     }
 
     public int getTournamentSignedUpNumber(Integer tournamentId){

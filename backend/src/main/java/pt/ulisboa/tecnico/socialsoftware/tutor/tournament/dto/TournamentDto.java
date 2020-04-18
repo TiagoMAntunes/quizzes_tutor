@@ -14,10 +14,12 @@ import java.util.stream.Collectors;
 public class TournamentDto implements Serializable {
 
     private Integer id;
+    private Boolean hasSignedUp;
     private Boolean isCreator;
     private String startTime = null;
     private String finishTime = null;
     private Integer numberOfQuestions;
+    private Integer numberOfParticipants;
     private Set<TopicDto> topics;
 
     @Transient
@@ -28,6 +30,7 @@ public class TournamentDto implements Serializable {
     public TournamentDto(Tournament tournament) {
         this.id = tournament.getId();
         this.numberOfQuestions = tournament.getNumberOfQuestions();
+        this.numberOfParticipants = tournament.getSignedUpNumber();
 
         if (tournament.getStartTime() != null)
             this.startTime = tournament.getStartTime().format(formatter);
@@ -39,7 +42,9 @@ public class TournamentDto implements Serializable {
 
     public TournamentDto(Tournament tournament, Integer userId) {
         this(tournament);
+        this.hasSignedUp = tournament.hasSignedUpWithId(userId);
         this.isCreator = tournament.getCreator().getId().equals(userId);
+        this.numberOfParticipants = tournament.getSignedUpNumber();
     }
 
     public void setId(int id) { this.id = id; }
@@ -49,6 +54,8 @@ public class TournamentDto implements Serializable {
     public void setIsCreator(Boolean creator) { isCreator = creator; }
 
     public Boolean getIsCreator() { return isCreator; }
+
+    public Boolean hasSignedUp() { return hasSignedUp; }
 
     public void setStartTime(String time) { startTime = time; }
 
@@ -65,4 +72,6 @@ public class TournamentDto implements Serializable {
     public void setTopics(Collection<TopicDto> p) { topics = (p == null? null: new HashSet<>(p)); }
 
     public Set<TopicDto> getTopics() { return topics; }
+
+    public Integer getNumberOfParticipants() { return numberOfParticipants; }
 }
