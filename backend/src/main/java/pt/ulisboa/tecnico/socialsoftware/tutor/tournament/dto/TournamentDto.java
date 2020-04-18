@@ -6,7 +6,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
 import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TournamentDto implements Serializable {
@@ -15,7 +17,7 @@ public class TournamentDto implements Serializable {
     private String startTime = null;
     private String finishTime = null;
     private Integer numberOfQuestions;
-    private List<TopicDto> topics;
+    private Set<TopicDto> topics;
 
     @Transient
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -31,7 +33,7 @@ public class TournamentDto implements Serializable {
         if (tournament.getFinishTime() != null)
             this.finishTime= tournament.getFinishTime().format(formatter);
 
-        this.topics = tournament.getTopics().stream().map(TopicDto::new).collect(Collectors.toList());
+        this.topics = tournament.getTopics().stream().map(TopicDto::new).collect(Collectors.toSet());
     }
 
     public void setId(int id) { this.id = id; }
@@ -50,7 +52,7 @@ public class TournamentDto implements Serializable {
 
     public int getNumberOfQuestions() { return numberOfQuestions; }
 
-    public void setTopics(List<TopicDto> p) { topics = p; }
+    public void setTopics(Collection<TopicDto> p) { topics = (p == null? null: new HashSet<>(p)); }
 
-    public List<TopicDto> getTopics() { return topics; }
+    public Set<TopicDto> getTopics() { return topics; }
 }

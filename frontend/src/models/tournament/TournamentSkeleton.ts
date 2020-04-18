@@ -2,38 +2,39 @@ import Topic from '../management/Topic';
 import RemoteServices from '@/services/RemoteServices';
 import moment from 'moment';
 export default class TournamentSkeleton {
-    topics: Topic[]
-    startTime: string;
-    finishTime: string;
-    numberOfQuestions: number;
+  topics: Topic[];
+  startTime: string;
+  finishTime: string;
+  numberOfQuestions: number;
 
-    private static FORMAT: string = 'YYYY-MM-DD HH:mm';
+  private static FORMAT: string = 'YYYY-MM-DD HH:mm';
 
-    private static _tournament: TournamentSkeleton = new TournamentSkeleton();
+  private static _tournament: TournamentSkeleton = new TournamentSkeleton();
 
-    constructor() {
-        this.topics = [];
-        this.startTime = "";
-        this.finishTime = "";
-        this.numberOfQuestions = 5;
-    }
+  constructor() {
+    this.topics = [];
+    this.startTime = '';
+    this.finishTime = '';
+    this.numberOfQuestions = 5;
+  }
 
-    async createTournament() {
-        let params = {
-            topics: this.topics,
-            startTime: moment(this.startTime).format(TournamentSkeleton.FORMAT),
-            finishTime: moment(this.finishTime).format(TournamentSkeleton.FORMAT),
-            numberOfQuestions: this.numberOfQuestions
-        }
-        
-        await RemoteServices.createTournament(params);
-    }
+  async createTournament() {
+    let params = {
+      topics: this.topics,
+      startTime: moment(this.startTime).format(TournamentSkeleton.FORMAT),
+      finishTime: moment(this.finishTime).format(TournamentSkeleton.FORMAT),
+      numberOfQuestions: this.numberOfQuestions
+    };
 
-    reset() {
-        this.topics = [];
-        this.startTime = ""
-        this.finishTime = "";
-        this.numberOfQuestions = 5;
-    }
+    console.log(this.topics);
 
+    await RemoteServices.createTournament(params);
+  }
+
+  reset() {
+    this.topics = [];
+    this.startTime = '';
+    this.finishTime = '';
+    this.numberOfQuestions = 5;
+  }
 }
