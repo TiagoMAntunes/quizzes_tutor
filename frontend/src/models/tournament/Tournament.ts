@@ -24,6 +24,7 @@ export default class Tournament {
       this.topics = jsonObj.topics.map((topic: Topic) => new Topic(topic));
 
       console.log(jsonObj);
+      console.log(jsonObj.hasSignedUp);
     }
   }
 }

@@ -55,7 +55,9 @@ public class TournamentDto implements Serializable {
 
     public Boolean getIsCreator() { return isCreator; }
 
-    public Boolean hasSignedUp() { return hasSignedUp; }
+    public void setHasSignedUp(Boolean signedUp) { hasSignedUp = signedUp; }
+
+    public Boolean getHasSignedUp() { return hasSignedUp; }
 
     public void setStartTime(String time) { startTime = time; }
 
@@ -72,6 +74,8 @@ public class TournamentDto implements Serializable {
     public void setTopics(Collection<TopicDto> p) { topics = (p == null? null: new HashSet<>(p)); }
 
     public Set<TopicDto> getTopics() { return topics; }
+
+    public void setNumberOfParticipants(int p) { numberOfParticipants = p; }
 
     public Integer getNumberOfParticipants() { return numberOfParticipants; }
 }
