@@ -260,8 +260,8 @@ END TRANSACTION;</stringProp>
             <hashTree/>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert open tournament topics" enabled="true">
               <stringProp name="JSON_PATH">$[0].topics</stringProp>
-              <stringProp name="EXPECTED_VALUE"></stringProp>
-              <boolProp name="JSONVALIDATION">false</boolProp>
+              <stringProp name="EXPECTED_VALUE">[{&quot;id&quot;:82,&quot;name&quot;:&quot;Software Architecture&quot;,&quot;numberOfQuestions&quot;:52}]</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
               <boolProp name="ISREGEX">false</boolProp>

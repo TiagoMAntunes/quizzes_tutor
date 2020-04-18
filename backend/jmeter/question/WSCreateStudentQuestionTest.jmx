@@ -235,7 +235,7 @@ END TRANSACTION;</stringProp>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert status" enabled="true">
               <stringProp name="JSON_PATH">$.status</stringProp>
               <stringProp name="EXPECTED_VALUE">AVAILABLE</stringProp>
-              <boolProp name="JSONVALIDATION">false</boolProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
               <boolProp name="ISREGEX">false</boolProp>
