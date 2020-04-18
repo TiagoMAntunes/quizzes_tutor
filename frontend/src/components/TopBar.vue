@@ -58,7 +58,7 @@
                 <v-icon>fas fa-user-graduate</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Student Questions</v-list-item-title>
+                <v-list-item-title data-cy="availableStudentQuestions">Student Questions</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/management/questions">
@@ -282,7 +282,7 @@
               <v-icon>fas fa-user-graduate</v-icon>
             </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-title data-cy="availableStudentQuestions">Student Questions</v-list-item-title>
+              <v-list-item-title>Student Questions</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
           <v-list-item to="/management/questions">

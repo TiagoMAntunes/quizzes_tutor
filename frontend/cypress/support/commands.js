@@ -36,6 +36,11 @@ Cypress.Commands.add('demoStudentLogin', () => {
     cy.get('[data-cy="studentButton"]').click()
 })
 
+Cypress.Commands.add('demoTeacherLogin', () => {
+    cy.visit('/')
+    cy.get('[data-cy="teacherButton"]').click()
+})
+
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
     cy.get('[data-cy="createButton"]').click()
     cy.get('[data-cy="Name"]').type(name)
@@ -77,6 +82,11 @@ Cypress.Commands.add('createFromCourseExecution', (name, acronym, academicTerm) 
 Cypress.Commands.add('openAvailableQuestions', () => {
     cy.contains('Questions').click()
     cy.get('[data-cy="availableQuestions"]').click()
+})
+
+Cypress.Commands.add('openTeacherStudentQuestions', () => {
+    cy.contains('Management').click()
+    cy.get('[data-cy="availableStudentQuestions"]').click()
 })
 
 Cypress.Commands.add('showStudentQuestion', (explanation) => {
@@ -139,4 +149,28 @@ Cypress.Commands.add('createTournament', (topics, startDay, finishDay, numberOfQ
 Cypress.Commands.add('openCreateTournament', () => {
     cy.contains('Tournaments').click()
     cy.get('[data-cy="createTournament"]').click()
+})
+
+Cypress.Commands.add('rejectQuestion', (explanation) => {
+    cy.contains(explanation)
+        .parent()
+        .should('have.length', 1)
+        .children()
+        .should('have.length', 8)
+        .find('[data-cy="questionStatusCy"]')
+        .parent()
+        .click({force: true})
+        cy.contains('REJECT').click()
+})
+
+Cypress.Commands.add('addExplanation', (explanation1, explanation2) => {
+    cy.contains(explanation1)
+        .parent()
+        .should('have.length', 1)
+        .children()
+        .should('have.length', 8)
+        .find('[data-cy="Explanation"]')
+        .click({force: true})
+        .clear()
+        .type(explanation2)
 })
