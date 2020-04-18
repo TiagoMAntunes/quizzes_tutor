@@ -175,7 +175,7 @@
         </v-menu>
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn to="/student/questions" v-on="on" text dark>
+            <v-btn v-on="on" text dark>
               Questions
               <v-icon>question_answer</v-icon>
             </v-btn>
