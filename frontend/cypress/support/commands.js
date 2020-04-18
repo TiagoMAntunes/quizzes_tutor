@@ -31,6 +31,11 @@ Cypress.Commands.add('demoAdminLogin', () => {
     cy.contains('Manage Courses').click()
 })
 
+Cypress.Commands.add('demoStudentLogin', () => {
+    cy.visit('/')
+    cy.get('[data-cy="studentButton"]').click()
+})
+
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
     cy.get('[data-cy="createButton"]').click()
     cy.get('[data-cy="Name"]').type(name)
@@ -67,5 +72,31 @@ Cypress.Commands.add('createFromCourseExecution', (name, acronym, academicTerm) 
     cy.get('[data-cy="Acronym"]').type(acronym)
     cy.get('[data-cy="AcademicTerm"]').type(academicTerm)
     cy.get('[data-cy="saveButton"]').click()
+})
+
+Cypress.Commands.add('openAvailableQuestions', () => {
+    cy.contains('Questions').click()
+    cy.get('[data-cy="availableQuestions"]').click()
+})
+
+Cypress.Commands.add('showStudentQuestion', (explanation) => {
+    cy.contains(explanation)
+        .parent()
+        .should('have.length', 1)
+        .children()
+        .should('have.length', 8)
+        .find('[data-cy="showQuestionCy"]')
+        .click()
+})
+
+Cypress.Commands.add('addTopicStudentQuestion', (explanation, topic) => {
+    cy.contains(explanation)
+        .parent()
+        .should('have.length', 1)
+        .children()
+        .should('have.length', 8)
+        .find('[data-cy="topicsCy"]')
+        .click()
+    //missing selecting the topic
 })
 
