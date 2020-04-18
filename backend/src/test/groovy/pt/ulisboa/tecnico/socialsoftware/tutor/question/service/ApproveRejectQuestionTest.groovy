@@ -46,7 +46,6 @@ class ApproveRejectQuestionTest extends Specification {
     StudentQuestionRepository studentQuestionRepository
 
     def course;
-    def teacher;
     def student;
     def questionDto;
     def result
@@ -58,9 +57,6 @@ class ApproveRejectQuestionTest extends Specification {
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
 
-        teacher = new User("User1", "teacher", 1, User.Role.TEACHER)
-        userRepository.save(teacher)
-        teacher.addCourse(courseExecution)
         student = new User("User2", "student", 2, User.Role.STUDENT)
         userRepository.save(student)
         student.addCourse(courseExecution)
@@ -85,7 +81,7 @@ class ApproveRejectQuestionTest extends Specification {
         result = studentQuestionRepository.findAll().get(0)
 
         when:
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, null, teacher.getId(), courseExecution.getId())
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED)
 
         then: "the question status will be: approved"
         studentQuestionRepository.count() == 1L
@@ -100,7 +96,7 @@ class ApproveRejectQuestionTest extends Specification {
         result = studentQuestionRepository.findAll().get(0)
 
         when:
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher.getId(), courseExecution.getId())
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED)
 
         then: "the question status will be: rejected"
         studentQuestionRepository.count() == 1L
@@ -112,56 +108,16 @@ class ApproveRejectQuestionTest extends Specification {
     def "an explanation is added for a rejected question"() {
         given: "a rejected question"
         result = studentQuestionRepository.findAll().get(0)
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED, null, teacher.getId(), courseExecution.getId())
+        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED)
 
         when:
-        result.setRejectionExplanation(EXPLANATION)
+        studentQuestionService.setStudentQuestionExplanation(result.getId(), EXPLANATION)
 
         then: "the explanation will have been added"
         studentQuestionRepository.count() == 1L
         result.getId() != null
         result.getQuestionStatus() == StudentQuestion.QuestionStatus.REJECTED
         result.getRejectionExplanation() == EXPLANATION
-    }
-
-    def "an explanation is added for an approved question"() {
-        given: "a question"
-        result = studentQuestionRepository.findAll().get(0)
-
-        when:
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, EXPLANATION, teacher.getId(), courseExecution.getId())
-
-        then: "an exception is thrown"
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.CANT_ADD_EXPLANATION
-        result.getQuestionStatus() == StudentQuestion.QuestionStatus.PENDING
-        result.getRejectionExplanation() == null
-    }
-
-    def "an explanation is added for a question that has not been aproved or rejected"() {
-        given: "a pending question"
-        result = studentQuestionRepository.findAll().get(0)
-
-        when:
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.PENDING, EXPLANATION, teacher.getId(), courseExecution.getId())
-
-        then: "an exception is thrown"
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.CANT_ADD_EXPLANATION
-        result.getRejectionExplanation() == null
-    }
-
-    def "a student tries to approve a question"() {
-        given: "a pending question"
-        result = studentQuestionRepository.findAll().get(0)
-
-        when:
-        studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED, null, student.getId(), courseExecution.getId())
-
-        then: "an exception is thrown"
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
-        result.getQuestionStatus() == StudentQuestion.QuestionStatus.PENDING
     }
 
     @TestConfiguration

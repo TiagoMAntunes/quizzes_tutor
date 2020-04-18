@@ -12,6 +12,7 @@ import TopicsView from './views/teacher/TopicsView.vue';
 import QuizzesView from './views/teacher/quizzes/QuizzesView.vue';
 import StudentsView from './views/teacher/students/StudentsView.vue';
 import StudentView from '@/views/student/StudentView.vue';
+import StudentQuestionsManageView from '@/views/teacher/questions/StudentQuestionManageView.vue';
 import StudentQuestionsView from '@/views/student/questions/StudentQuestionsView.vue';
 import AvailableQuizzesView from './views/student/AvailableQuizzesView.vue';
 import SolvedQuizzesView from './views/student/SolvedQuizzesView.vue';
@@ -21,6 +22,7 @@ import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
 import TournamentView from '@/views/student/tournament/TournamentView.vue';
 import CreateTournamentView from '@/views/student/tournament/CreateTournamentView.vue';
+import CreateStudentQuestionView from '@/views/student/questions/CreateStudentQuestionView.vue';
 import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
 
 import AdminManagementView from './views/admin/AdminManagementView.vue';
@@ -65,6 +67,15 @@ let router = new Router({
       name: 'management',
       component: ManagementView,
       children: [
+        {
+          path: 'student_questions',
+          name: 'student-questions',
+          component: StudentQuestionsManageView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - StudentQuestionsManage',
+            requiredAuth: 'Teacher'
+          }
+        },
         {
           path: 'questions',
           name: 'questions-management',
@@ -133,6 +144,15 @@ let router = new Router({
           component: StudentQuestionsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Status of Questions',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'createQuestion',
+          name: 'createQuestion',
+          component: CreateStudentQuestionView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Create a Question',
             requiredAuth: 'Student'
           }
         },
