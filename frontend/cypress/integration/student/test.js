@@ -1,3 +1,5 @@
+let OPTIONS = ['Option1', 'Option2', 'Option3', 'Option4']
+
 describe('Questions walkthrough', () => {
     beforeEach(() => {
         cy.demoStudentLogin()
@@ -8,12 +10,14 @@ describe('Questions walkthrough', () => {
     })
 
     it ('Get student questions and show a question', () => {
+        //cy.createStudentQuestion('test30', 'What question?', OPTIONS)
         cy.openAvailableQuestions();
-        cy.showStudentQuestion('wtv');
+        cy.showStudentQuestion('question');
     });
 
     it ('Get student questions and add a topic to a question', () => {
+        //cy.createStudentQuestion('test50', 'Whats a question?', OPTIONS)
         cy.openAvailableQuestions();
-        cy.addTopicStudentQuestion('wtv','Adventure Builder');
+        cy.addTopicStudentQuestion('question','Adventure Builder');
     });
 });

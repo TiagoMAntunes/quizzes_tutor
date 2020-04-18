@@ -96,7 +96,47 @@ Cypress.Commands.add('addTopicStudentQuestion', (explanation, topic) => {
         .children()
         .should('have.length', 8)
         .find('[data-cy="topicsCy"]')
-        .click()
+        cy.contains('Adventure Builder').click()
     //missing selecting the topic
 })
 
+Cypress.Commands.add('createStudentQuestion', (title, question, options) => {
+    cy.contains('Questions').click()
+    cy.contains('Create').click()
+    if(title != '')
+        cy.get('[data-cy="Title"]').type(title)
+    if(question != '')
+        cy.get('[data-cy="Question"]').type(question)
+    cy.get('[data-cy="Correct1"]').click({force:true})
+    for(let option of options)
+        cy.get('[data-cy="' + option + '"]').type(option + 'Test')
+    cy.contains('Save').click()
+})
+
+Cypress.Commands.add('createTournament', (topics, startDay, finishDay, numberOfQuestions) => {
+    cy.contains('Select the tournament topics').parent().click()
+    for (let topic of topics)
+        cy.contains(topic).click() //selects the given topics from the list
+    
+    cy.contains("Start time").click({force : true})
+
+    cy.get(".v-dialog--active").find('.mdi-chevron-right').click().wait(1000) //needs to wait for element to load
+    cy.get(".v-dialog--active").contains(startDay).click()
+    cy.get(".v-dialog--active").contains("OK").click()
+
+
+    cy.contains("Finish time").click({force: true})
+
+    cy.get(".v-dialog--active").find('.mdi-chevron-right').click().wait(1000) //needs to wait for element to load
+    cy.get(".v-dialog--active").contains(finishDay).click()
+    cy.get(".v-dialog--active").contains("OK").click()
+
+    cy.get('[data-cy="select' + numberOfQuestions + 'Questions"]').click()
+
+    cy.get("button").contains("Create Tournament").click({force: true})
+})
+
+Cypress.Commands.add('openCreateTournament', () => {
+    cy.contains('Tournaments').click()
+    cy.get('[data-cy="createTournament"]').click()
+})
