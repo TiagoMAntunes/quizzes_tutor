@@ -55,9 +55,7 @@ public class TournamentService {
         if (tournamentDto.getTopics() == null)
             throw new TutorException(ErrorMessage.NO_TOPICS_SELECTED);
 
-        Set<Topic> topicsSet = tournamentDto.getTopics().stream().map(topicDto -> topicRepository.findById(topicDto.getId()).orElseThrow(() -> new TutorException(ErrorMessage.TOPIC_NOT_FOUND, topicDto.getId()))).collect(Collectors.toSet());
-
-        List<Topic> topics = new ArrayList<>(topicsSet);
+        Set<Topic> topics = tournamentDto.getTopics().stream().map(topicDto -> topicRepository.findById(topicDto.getId()).orElseThrow(() -> new TutorException(ErrorMessage.TOPIC_NOT_FOUND, topicDto.getId()))).collect(Collectors.toSet());
 
         if (topics.isEmpty())
             throw new TutorException(ErrorMessage.NO_TOPICS_SELECTED);

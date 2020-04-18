@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,20 +41,20 @@ public class Tournament {
     private CourseExecution courseExecution;
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.EAGER)
-    private List<Topic> topics = new ArrayList<>();
+    private Set<Topic> topics = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "signedUpTournaments", fetch=FetchType.EAGER)
     private Set<User> signedUp = new HashSet<>();
 
     public Tournament(){}
 
-    public Tournament(TournamentDto tournamentDto, List<Topic> topic, User creator) {
+    public Tournament(TournamentDto tournamentDto, Set<Topic> topic, User creator) {
         this.id = tournamentDto.getId();
         this.startTime = LocalDateTime.parse(tournamentDto.getStartTime(), formatter);
         this.finishTime = LocalDateTime.parse(tournamentDto.getFinishTime(), formatter);
         this.creator = creator;
         this.numberOfQuestions = tournamentDto.getNumberOfQuestions();
-        this.topics = topic;
+        this.topics = new HashSet<>(topic);
     }
 
     public int getId() {
@@ -79,11 +79,11 @@ public class Tournament {
 
     public void setCreator(User user) { creator = user; }
 
-    public List<Topic> getTopics() {
+    public Set<Topic> getTopics() {
         return topics;
     }
 
-    public void setTopics(List<Topic> l) { topics = l; }
+    public void setTopics(Collection<Topic> l) { topics = new HashSet<>(l); }
 
     public int getNumberOfQuestions() {
         return numberOfQuestions;

@@ -57,7 +57,7 @@ public class TournamentController {
     }
   
     @GetMapping("/executions/{executionId}/tournaments")
-    @PreAuthorize("hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public List<TournamentDto> getOpenTournaments(@PathVariable int executionId) {
         return this.tournamentService.getOpenTournaments(executionId);
     }
