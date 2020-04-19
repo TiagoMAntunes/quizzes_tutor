@@ -163,9 +163,6 @@ export default class StudentQuestionsView extends Vue {
     else return 'green';
   }
 
-  isDisabled(question: StudentQuestion) {
-  }
-
   showStudentQuestionDialog(studentQuestion: StudentQuestion) {
     this.currentQuestion = studentQuestion;
     this.questionDialog = true;

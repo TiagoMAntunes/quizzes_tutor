@@ -189,8 +189,8 @@
               Questions
               <v-icon>question_answer</v-icon>
             </v-btn>
-           </template>
-           <v-list dense>
+          </template>
+          <v-list dense>
             <v-list-item to="/student/createQuestion">
               <v-list-item-action>
                 <v-icon>create</v-icon>
