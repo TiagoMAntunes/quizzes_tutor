@@ -138,7 +138,6 @@ let router = new Router({
       component: StudentView,
       children: [
         {
-
           path: 'questions',
           name: 'questions-status',
           component: StudentQuestionsView,

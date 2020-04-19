@@ -40,7 +40,11 @@
       </v-row>
       <v-container>
         <p>Number of Questions</p>
-        <v-btn-toggle mandatory class="button-group" v-model="tournamentManager.numberOfQuestions">
+        <v-btn-toggle
+          mandatory
+          class="button-group"
+          v-model="tournamentManager.numberOfQuestions"
+        >
           <v-btn text data-cy="select5Questions" value="5">5</v-btn>
           <v-btn text data-cy="select10Questions" value="10">10</v-btn>
           <v-btn text data-cy="select20Questions" value="20">20</v-btn>
@@ -82,7 +86,7 @@ export default class CreateTournamentView extends Vue {
     this.tournamentManager
       .createTournament()
       .then(() => {
-        this.$router.push({ name: 'home' }); //TODO change to list tournaments when finished
+        this.$router.push({ name: 'available-tournament' });
       })
       .catch(err => {
         this.$store.dispatch('error', err);

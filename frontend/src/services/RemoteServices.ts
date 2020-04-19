@@ -107,7 +107,6 @@ export default class RemoteServices {
       });
   }
 
-
   static async getStudentQuestions(): Promise<StudentQuestion[]> {
     return httpClient
       .get(
@@ -135,7 +134,7 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
-      
+
   static async exportCourseQuestions(): Promise<Blob> {
     return httpClient
       .get(
@@ -146,14 +145,13 @@ export default class RemoteServices {
       )
       .then(response => {
         return new Blob([response.data], {
-          type: 'application/zip, application/octet-stream'  
+          type: 'application/zip, application/octet-stream'
         });
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
   }
-
 
   static async getAvailableQuestions(): Promise<Question[]> {
     return httpClient
@@ -687,6 +685,14 @@ export default class RemoteServices {
           return new Tournament(tournament);
         });
       })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async cancelTournament(tournamentId: number) {
+    return httpClient
+      .delete(`/tournaments/${tournamentId}`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });

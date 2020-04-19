@@ -127,7 +127,7 @@ Cypress.Commands.add('createTournament', (topics, startDay, finishDay, numberOfQ
     cy.contains('Select the tournament topics').parent().click()
     for (let topic of topics)
         cy.contains(topic).click() //selects the given topics from the list
-    
+
     cy.contains("Start time").click({force : true})
 
     cy.get(".v-dialog--active").find('.mdi-chevron-right').click().wait(1000) //needs to wait for element to load
@@ -173,4 +173,13 @@ Cypress.Commands.add('addExplanation', (title, explanation) => {
         .click({force: true})
         .clear()
         .type(explanation)
+})
+
+Cypress.Commands.add('openAvailableTournaments', () => {
+    cy.contains('Tournaments').click()
+    cy.get('[data-cy="availableTournaments"]').click()
+})
+
+Cypress.Commands.add('cancelTournament', () => {
+    cy.get(':nth-child(2) > .last-col > .v-icon').click();
 })

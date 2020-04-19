@@ -103,7 +103,7 @@ class GetOpenTournamentsServicePerformanceTest extends Specification {
 
         when:
         int count = 0
-        1.upto(N_USERS, {count += tournamentService.getOpenTournaments(courseExecution).size()})
+        1.upto(N_USERS, {count += tournamentService.getOpenTournaments(courseExecution, user_id).size()})
 
         then:
         count == N_USERS * N_TOURNAMENTS
