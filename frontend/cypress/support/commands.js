@@ -89,8 +89,8 @@ Cypress.Commands.add('openTeacherStudentQuestions', () => {
     cy.get('[data-cy="availableStudentQuestions"]').click()
 })
 
-Cypress.Commands.add('showStudentQuestion', (explanation) => {
-    cy.contains(explanation)
+Cypress.Commands.add('showStudentQuestion', (title) => {
+    cy.contains(title)
         .parent()
         .should('have.length', 1)
         .children()
@@ -99,17 +99,15 @@ Cypress.Commands.add('showStudentQuestion', (explanation) => {
         .click({force: true})
 })
 
-Cypress.Commands.add('addTopicStudentQuestion', (explanation, topic) => {
-    cy.contains(explanation)
+Cypress.Commands.add('addTopicStudentQuestion', (title, topic) => {
+    cy.contains(title)
         .parent()
         .should('have.length', 1)
         .children()
         .should('have.length', 8)
         .find('[data-cy="topicsCy"]')
-        .parent()
         .click({force: true})
-        cy.contains('Adventure Builder').click()
-    //missing selecting the topic
+        cy.contains(topic).click()
 })
 
 Cypress.Commands.add('createStudentQuestion', (title, question, options) => {
@@ -153,8 +151,8 @@ Cypress.Commands.add('openCreateTournament', () => {
     cy.get('[data-cy="createTournament"]').click()
 })
 
-Cypress.Commands.add('rejectQuestion', (explanation) => {
-    cy.contains(explanation)
+Cypress.Commands.add('rejectQuestion', (title) => {
+    cy.contains(title)
         .parent()
         .should('have.length', 1)
         .children()
@@ -165,8 +163,8 @@ Cypress.Commands.add('rejectQuestion', (explanation) => {
         cy.contains('REJECT').click()
 })
 
-Cypress.Commands.add('addExplanation', (explanation1, explanation2) => {
-    cy.contains(explanation1)
+Cypress.Commands.add('addExplanation', (title, explanation) => {
+    cy.contains(title)
         .parent()
         .should('have.length', 1)
         .children()
@@ -174,5 +172,5 @@ Cypress.Commands.add('addExplanation', (explanation1, explanation2) => {
         .find('[data-cy="Explanation"]')
         .click({force: true})
         .clear()
-        .type(explanation2)
+        .type(explanation)
 })
