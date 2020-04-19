@@ -47,7 +47,11 @@
 
       <template v-slot:item.topics="{ item }">
         <v-card-title :disabled="isDisabled(item)">
-          <show-student-question-topics :question="item" :topics="topics" data-cy="topicsCy"/>
+          <show-student-question-topics
+            :question="item"
+            :topics="topics"
+            data-cy="topicsCy"
+          />
         </v-card-title>
       </template>
 

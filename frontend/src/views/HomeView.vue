@@ -18,7 +18,13 @@
       >
         <i class="fa fa-graduation-cap" />Demo as student
       </v-btn>
-      <v-btn depressed small color="primary" @click="demoTeacher" data-cy="teacherButton">
+      <v-btn
+        depressed
+        small
+        color="primary"
+        @click="demoTeacher"
+        data-cy="teacherButton"
+      >
         <i class="fa fa-graduation-cap" />Demo as teacher
       </v-btn>
       <v-btn

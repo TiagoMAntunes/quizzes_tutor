@@ -58,7 +58,9 @@
                 <v-icon>fas fa-user-graduate</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title data-cy="availableStudentQuestions">Student Questions</v-list-item-title>
+                <v-list-item-title data-cy="availableStudentQuestions"
+                  >Student Questions</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/management/questions">
@@ -206,7 +208,9 @@
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title data-cy="availableQuestions">Available</v-list-item-title>
+                <v-list-item-title data-cy="availableQuestions"
+                  >Available</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
           </v-list>
