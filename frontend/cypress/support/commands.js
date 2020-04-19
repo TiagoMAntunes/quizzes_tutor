@@ -105,7 +105,7 @@ Cypress.Commands.add('addTopicStudentQuestion', (title, topic) => {
         .should('have.length', 1)
         .children()
         .should('have.length', 8)
-        .find('[data-cy="topicsCy"]')
+        .find('[data-cy="topicsCy"] > .v-input > .v-input__control > .v-input__slot > .v-select__slot')
         .click({force: true})
         cy.contains(topic).click()
 })
