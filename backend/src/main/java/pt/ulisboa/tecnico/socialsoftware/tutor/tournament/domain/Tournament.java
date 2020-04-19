@@ -117,6 +117,10 @@ public class Tournament {
         return signedUp.contains(user);
     }
 
+    public boolean hasSignedUpWithId(Integer id){
+        return signedUp.stream().anyMatch(user -> user.getId().equals(id));
+    }
+
     public void signUp(User user){
         signedUp.add(user);
     }

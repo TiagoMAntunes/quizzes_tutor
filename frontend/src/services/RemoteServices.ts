@@ -641,4 +641,17 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
+
+  static async joinTournament(tournamentId: number): Promise<Tournament> {
+    return httpClient
+      .put(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/${tournamentId}`
+      )
+      .then(response => {
+        return new Tournament(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
 }

@@ -31,6 +31,11 @@ describe('Student using tournaments walkthrough', () => {
         cy.closeErrorMessage();
     })
 
+    it('Join created tournament', () => {
+        cy.openAvailableTournaments();
+        cy.joinTournament();
+    })
+
     it('Cancel created tournament', () => {
         cy.openAvailableTournaments();
         cy.cancelTournament();
