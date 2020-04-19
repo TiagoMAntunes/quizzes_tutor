@@ -10,7 +10,7 @@ describe('Student Questions walkthrough', () => {
     cy.contains('Logout').click()
   });
 
-  /*it('Creates a Question without title', () => {
+  it('Creates a Question without title', () => {
     cy.demoStudentLogin()
     cy.createStudentQuestion( '', QUESTION, OPTIONS)
     cy.contains('Missing information for quiz')
@@ -33,7 +33,7 @@ describe('Student Questions walkthrough', () => {
     cy.contains('Missing information for quiz')
     cy.closeErrorMessage()
     cy.contains('Logout').click()
-  });*/
+  });
 
   it('Get the questions and show a question', () => {
     cy.demoStudentLogin()
