@@ -644,9 +644,7 @@ export default class RemoteServices {
 
   static async joinTournament(tournamentId: number): Promise<Tournament> {
     return httpClient
-      .put(
-        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/${tournamentId}`
-      )
+      .put(`/tournaments/${tournamentId}`)
       .then(response => {
         return new Tournament(response.data);
       })
