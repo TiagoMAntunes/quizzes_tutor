@@ -2,22 +2,18 @@ let TITLE = 'Test Title'
 let QUESTION = 'Test Question'
 let OPTIONS =['Option1','Option2','Option3', 'Option4']
 
-describe('Administration walkthrough', () => {
-  beforeEach(() => {
-    cy.demoStudentLogin()
-  })
-
+describe('Student Questions walkthrough', () => {
   afterEach(() => {
-    cy.contains('Logout').click()
+    cy.contains('Logout').click();
   })
 
   it('Creates a good Question', () => {
+    cy.demoStudentLogin()
     cy.createStudentQuestion(TITLE, QUESTION, OPTIONS)
-
   });
 
-
   it('Creates a Question without title', () => {
+    cy.demoStudentLogin()
     cy.createStudentQuestion( '', QUESTION, OPTIONS)
     cy.contains('Missing information for quiz')
     cy.closeErrorMessage()
@@ -25,15 +21,36 @@ describe('Administration walkthrough', () => {
 
 
   it('Creates a Question without name', () => {
+    cy.demoStudentLogin()
     cy.createStudentQuestion(TITLE, '', OPTIONS)
     cy.contains('Missing information for quiz')
     cy.closeErrorMessage()
   });
 
   it('Creates a Question without options', () => {
+    cy.demoStudentLogin()
     cy.createStudentQuestion(TITLE, QUESTION, [])
     cy.contains('Missing information for quiz')
     cy.closeErrorMessage()
+  });
+
+  it('Get the questions and show a question', () => {
+    cy.demoStudentLogin()
+    cy.openAvailableQuestions();
+    cy.showStudentQuestion(TITLE);
+  });
+
+  it ('Add a topic to the question', () => {
+    cy.demoStudentLogin()
+    cy.openAvailableQuestions();
+    cy.addTopicStudentQuestion(TITLE,'Adventure Builder');
+  });
+
+  it ('Reject a student question and add an explanation', () => {
+    cy.demoTeacherLogin()
+    cy.openTeacherStudentQuestions();
+    cy.rejectQuestion(TITLE);
+    cy.addExplanation(TITLE, 'not good');
   });
 
 });
