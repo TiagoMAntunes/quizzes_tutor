@@ -26,8 +26,6 @@ export default class TournamentSkeleton {
       numberOfQuestions: this.numberOfQuestions
     };
 
-    console.log(this.topics);
-
     await RemoteServices.createTournament(params);
   }
 

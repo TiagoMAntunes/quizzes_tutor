@@ -128,10 +128,10 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<TournamentDto> getOpenTournaments(Integer courseExecutionId){
+    public List<TournamentDto> getOpenTournaments(Integer courseExecutionId, Integer userId) {
         return tournamentRepository.findAll().stream()
                 .filter(tournament -> tournamentIsOpen(tournament.getId(), courseExecutionId))
-                .map(TournamentDto::new)
+                .map( tournament -> new TournamentDto(tournament, userId) )
                 .collect(Collectors.toList());
     }
 
@@ -139,7 +139,7 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public boolean tournamentIsOpen(Integer tournamentId, Integer courseExecutionId){
+    public boolean tournamentIsOpen(Integer tournamentId, Integer courseExecutionId) {
         LocalDateTime now = LocalDateTime.now();
         Tournament tournament = getTournament(tournamentId);
         return (tournament.getCourseExecution().getId().equals(courseExecutionId)) &&
