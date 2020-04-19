@@ -54,7 +54,7 @@ export default class AvailableTournamentsView extends Vue {
       this.tournaments = this.tournaments.filter(
         tournament => tournament.id !== tournamentId
       );
-      this.tournaments.push(this.updatedTournament);
+      this.tournaments.unshift(this.updatedTournament);
     } catch (error) {
       await this.$store.dispatch('error', error);
     }

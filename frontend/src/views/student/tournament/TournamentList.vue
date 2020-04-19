@@ -48,7 +48,7 @@
                 v-on="on"
                 @click="$emit('joinTournament', tournament.id)"
                 color="dark grey"
-                >fas fa-chevron-circle-right</v-icon
+                >fas fa-user-plus</v-icon
               >
             </template>
             <span>Sign Up for Tournament</span>

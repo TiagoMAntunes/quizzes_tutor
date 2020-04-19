@@ -108,6 +108,10 @@ Cypress.Commands.add('openAvailableTournaments', () => {
     cy.get('[data-cy="availableTournaments"]').click()
 })
 
+Cypress.Commands.add('joinTournament', () => {
+    cy.get(':nth-child(2) > .last-col > .fas').click();
+})
+
 Cypress.Commands.add('cancelTournament', () => {
     cy.get(':nth-child(2) > .last-col > .v-icon').click();
 })
