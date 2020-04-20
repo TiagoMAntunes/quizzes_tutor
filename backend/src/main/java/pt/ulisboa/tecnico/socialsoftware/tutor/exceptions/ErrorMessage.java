@@ -71,6 +71,7 @@ public enum ErrorMessage {
     TOURNAMENT_ALREADY_JOINED("User has already joined this tournament"),
     TOURNAMENT_NOT_OPEN("Tournament is not open"),
     TOURNAMENT_JOIN_WRONG_ROLE("Only students can join tournaments"),
+    TOURNAMENT_DIFF_COURSE_EXEC("Student is not enrolled in this tournament's course execution"),
 
     CANT_ADD_EXPLANATION("Question is not in the rejected state"),
     ACCESS_DENIED("You do not have permission to view this resource"),

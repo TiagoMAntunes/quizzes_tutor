@@ -463,4 +463,8 @@ public class User implements UserDetails, DomainEntity {
 
     public Set<Tournament> getCreatedTournaments() { return createdTournaments; }
 
+    public boolean hasCourseExecution(Integer id) {
+        return courseExecutions.stream().anyMatch(execution -> execution.getId().equals(id));
+    }
+
 }
