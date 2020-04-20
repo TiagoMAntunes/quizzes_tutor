@@ -95,6 +95,7 @@ public class StudentQuestionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void setStudentQuestionExplanation(int questionId, String explanation) {
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+        checkStatusToAddExplanation(explanation, questionId);
         question.setRejectionExplanation(explanation);
     }
 
@@ -144,6 +145,13 @@ public class StudentQuestionService {
     private void checkRoleStudent(User student) {
         if(student.getRole() != User.Role.STUDENT){
             throw new TutorException(ACCESS_DENIED);
+        }
+    }
+
+    private void checkStatusToAddExplanation(String explanation, int questionId) {
+        StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+        if(question.getQuestionStatus() != StudentQuestion.QuestionStatus.REJECTED) {
+            throw new TutorException(CANT_ADD_EXPLANATION);
         }
     }
 }
