@@ -195,22 +195,22 @@
             </v-btn>
           </template>
           <v-list dense>
-            <v-list-item to="/student/createQuestion">
-              <v-list-item-action>
-                <v-icon>create</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Create</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
             <v-list-item to="/student/questions">
               <v-list-item-action>
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title data-cy="availableQuestions"
-                  >Available</v-list-item-title
+                >Available</v-list-item-title
                 >
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item to="/student/createQuestion">
+              <v-list-item-action>
+                <v-icon>create</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Create</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -362,13 +362,23 @@
           </v-list-item>
 
           <v-list-item
+            to="/student/createQuestion"
+            v-if="isStudent && currentCourse"
+          >
+            <v-list-item-action>
+              <v-icon>question_answer</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Create question</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item
             to="/student/questions"
             v-if="isStudent && currentCourse"
           >
             <v-list-item-action>
               <v-icon>question_answer</v-icon>
             </v-list-item-action>
-            <v-list-item-content>Questions</v-list-item-content>
+            <v-list-item-content>Available questions</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/create">
