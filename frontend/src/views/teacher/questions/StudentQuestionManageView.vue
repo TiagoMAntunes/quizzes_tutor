@@ -28,6 +28,7 @@
           v-model="item.rejectionExplanation"
           name="rejectionExplanation"
           type="string"
+          data-cy="Explanation"
           @change="setExplanation(item.id, item.rejectionExplanation)"
         ></v-text-field>
       </template>
@@ -57,6 +58,7 @@
 
       <template v-slot:item.questionStatus="{ item }">
         <v-select
+          data-cy="questionStatusCy"
           v-model="item.questionStatus"
           :items="statusList"
           dense

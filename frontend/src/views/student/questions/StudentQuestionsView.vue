@@ -47,7 +47,11 @@
 
       <template v-slot:item.topics="{ item }">
         <v-card-title :disabled="isDisabled(item)">
-          <show-student-question-topics :question="item" :topics="topics" />
+          <show-student-question-topics
+            :question="item"
+            :topics="topics"
+            data-cy="topicsCy"
+          />
         </v-card-title>
       </template>
 
@@ -56,6 +60,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               small
+              data-cy="showQuestionCy"
               class="mr-2"
               v-on="on"
               @click="showStudentQuestionDialog(item)"
@@ -164,6 +169,7 @@ export default class StudentQuestionsView extends Vue {
   }
 
   isDisabled(question: StudentQuestion) {
+    return question.questionStatus == 'APPROVED';
   }
 
   showStudentQuestionDialog(studentQuestion: StudentQuestion) {

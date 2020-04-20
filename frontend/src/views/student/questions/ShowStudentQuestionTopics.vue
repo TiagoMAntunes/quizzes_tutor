@@ -21,7 +21,7 @@
           {{ data.item.name }}
         </v-chip>
       </template>
-      <template v-slot:item="data">
+      <template v-slot:item="data" data-cy="question-topics-cy">
         <v-list-item-content>
           <v-list-item-title v-html="data.item.name" />
         </v-list-item-content>
