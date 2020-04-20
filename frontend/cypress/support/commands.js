@@ -160,7 +160,7 @@ Cypress.Commands.add('rejectQuestion', (title) => {
         .find('[data-cy="questionStatusCy"]')
         .parent()
         .click({force: true})
-        cy.contains('REJECT').click()
+        cy.contains('REJECT').click({force: true})
 })
 
 Cypress.Commands.add('addExplanation', (title, explanation) => {
