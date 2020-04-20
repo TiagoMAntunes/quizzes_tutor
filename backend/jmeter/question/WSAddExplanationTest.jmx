@@ -209,9 +209,7 @@ END TRANSACTION;</stringProp>
               <collectionProp name="Arguments.arguments">
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">{&#xd;
-	&quot;explanation&quot; : &quot;batata&quot;,&#xd;
-}</stringProp>
+                  <stringProp name="Argument.value">explanation</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
@@ -240,7 +238,7 @@ END TRANSACTION;</stringProp>
           <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
             <stringProp name="dataSource">test_student_question</stringProp>
             <stringProp name="queryType">Select Statement</stringProp>
-            <stringProp name="query">SELECT explanation from student_questions where id =&apos;1339&apos;;
+            <stringProp name="query">SELECT * from student_questions where id =&apos;1339&apos;;
 </stringProp>
             <stringProp name="queryArguments"></stringProp>
             <stringProp name="queryArgumentsTypes"></stringProp>
@@ -248,15 +246,15 @@ END TRANSACTION;</stringProp>
             <stringProp name="resultVariable">result</stringProp>
             <stringProp name="queryTimeout"></stringProp>
             <stringProp name="resultSetMaxRows"></stringProp>
-            <stringProp name="resultSetHandler">Store as String</stringProp>
+            <stringProp name="resultSetHandler">Store as Object</stringProp>
           </JDBCSampler>
           <hashTree>
             <BeanShellAssertion guiclass="BeanShellAssertionGui" testclass="BeanShellAssertion" testname="BeanShell Assertion" enabled="true">
-              <stringProp name="BeanShellAssertion.query">String result = vars.getObject(&quot;result&quot;).get(0).toString();
+              <stringProp name="BeanShellAssertion.query">Object output = vars.getObject(&quot;result&quot;).get(0).get(&quot;explanation&quot;);
 
-if (!result.equals(&quot;batata&quot;)) {
-	Failure = true;
-	FailureMessage = &quot;Invalid arguments. Values: &quot; + result;
+if (!output.toString().equals(&quot;explanation&quot;)) {
+    Failure = true;
+    FailureMessage = &quot;Value is: &quot; + output + &quot; should be &quot; + &quot;explanation&quot;;
 }</stringProp>
               <stringProp name="BeanShellAssertion.filename"></stringProp>
               <stringProp name="BeanShellAssertion.parameters"></stringProp>
