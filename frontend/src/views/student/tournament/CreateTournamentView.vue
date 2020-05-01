@@ -45,6 +45,7 @@
           class="button-group"
           v-model="tournamentManager.numberOfQuestions"
         >
+          <!-- I should be able to choose the number i want -->
           <v-btn text data-cy="select5Questions" value="5">5</v-btn>
           <v-btn text data-cy="select10Questions" value="10">10</v-btn>
           <v-btn text data-cy="select20Questions" value="20">20</v-btn>

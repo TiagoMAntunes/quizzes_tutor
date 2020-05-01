@@ -49,10 +49,6 @@ import Question from '@/models/management/Question';
 export default class CreateStudentQuestionView extends Vue {
   questionManager: Question = new Question();
 
-  async created() {
-
-  }
-
   async createQuestion() {
       try {
         await RemoteServices.createStudentQuestion(this.questionManager)
@@ -60,6 +56,7 @@ export default class CreateStudentQuestionView extends Vue {
             this.$router.push({ name: 'questions-status' });
          });
       } catch (error) {
+        // returns error "Missing information for quiz". probably a copy-paste.
         await this.$store.dispatch('error', error);
       }
   }

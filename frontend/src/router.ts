@@ -147,7 +147,7 @@ let router = new Router({
           }
         },
         {
-          path: 'createQuestion',
+          path: 'createQuestion', //create-question (conventions - should not be camelCase)
           name: 'createQuestion',
           component: CreateStudentQuestionView,
           meta: {

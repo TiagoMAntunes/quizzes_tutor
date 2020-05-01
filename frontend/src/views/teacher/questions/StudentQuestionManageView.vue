@@ -22,6 +22,7 @@
         </v-card-title>
       </template>
 
+      <!-- This action should be in a dialog  -->
       <template v-slot:item.rejectionExplanation="{ item }">
         <v-text-field
           :disabled="isDisabled(item.id, item)"
@@ -48,6 +49,7 @@
         >
       </template>
 
+      <!-- The teacher shouldn't be able to change the submitted question -->
       <template v-slot:item.topics="{ item }">
         <edit-student-question-topics
           :question="item"

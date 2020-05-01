@@ -112,7 +112,7 @@ export default class StudentQuestionsView extends Vue {
       align: 'center',
       sortable: false
     },
-    { text: 'Difficulty', value: 'difficulty', align: 'center' },
+    { text: 'Difficulty', value: 'difficulty', align: 'center' }, //why?
     { text: 'Status', value: 'questionStatus', align: 'center' },
     { text: 'Explanation', value: 'rejectionExplanation', align: 'center' },
     {

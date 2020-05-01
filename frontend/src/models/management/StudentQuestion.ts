@@ -7,7 +7,7 @@ export default class StudentQuestion {
   title: string = '';
   questionStatus: string = 'PENDING';
   numberOfCorrect!: number;
-  difficulty!: number | null;
+  difficulty!: number | null; //why?
   content: string = '';
   rejectionExplanation: string = '';
   creationDate!: string | null;

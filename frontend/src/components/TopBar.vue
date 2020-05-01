@@ -378,6 +378,7 @@
             <v-list-item-action>
               <v-icon>question_answer</v-icon>
             </v-list-item-action>
+            <!-- Available questions? Or submitted questions? -->
             <v-list-item-content>Available questions</v-list-item-content>
           </v-list-item>
 
