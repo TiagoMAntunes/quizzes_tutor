@@ -34,10 +34,12 @@ describe('Student using tournaments walkthrough', () => {
     it('Join created tournament', () => {
         cy.openAvailableTournaments();
         cy.joinTournament();
+        // could had a validation
     })
 
     it('Cancel created tournament', () => {
         cy.openAvailableTournaments();
         cy.cancelTournament();
+        // could had a validation
     })
 })
