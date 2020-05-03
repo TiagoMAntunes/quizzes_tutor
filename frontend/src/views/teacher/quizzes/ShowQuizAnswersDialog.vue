@@ -12,7 +12,6 @@
       disable-pagination
       :hide-default-footer="true"
       :mobile-breakpoint="0"
-      multi-sort
     >
       <template v-slot:top>
         <v-card-title>
@@ -24,7 +23,7 @@
           />
 
           <v-spacer />
-          <span v-if="secondsToSubmission > 0">{{ getTimeAsHHMMSS }}</span>
+          <span v-if="timeToSubmission > 0">{{ getTimeAsHHMMSS }}</span>
         </v-card-title>
       </template>
 
@@ -76,16 +75,16 @@ export default class ShowStudentAnswersDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ required: true }) readonly quizAnswers!: QuizAnswer[];
   @Prop({ required: true }) readonly correctSequence!: number[];
-  @Prop({ required: true }) readonly secondsToSubmission!: number;
+  @Prop({ required: true }) readonly timeToSubmission!: number;
 
   secondsLeft: number = 0;
   search: string = '';
   timeout: number | null = null;
 
-  @Watch('secondsToSubmission')
+  @Watch('timeToSubmission')
   updateTimer() {
-    if (this.secondsToSubmission > 0) {
-      this.secondsLeft = this.secondsToSubmission;
+    if (this.timeToSubmission > 0) {
+      this.secondsLeft = this.timeToSubmission;
       if (this.timeout) {
         clearTimeout(this.timeout);
       }

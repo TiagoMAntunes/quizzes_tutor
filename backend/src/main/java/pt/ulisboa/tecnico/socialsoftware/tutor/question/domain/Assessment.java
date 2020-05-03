@@ -1,6 +1,9 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.AssessmentDto;
 
 import javax.persistence.*;
@@ -8,10 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_TITLE_FOR_ASSESSMENT;
+
 @Entity
 @Table(name = "assessments")
-public class Assessment {
-    @SuppressWarnings("unused")
+public class Assessment implements DomainEntity {
     public enum Status {
         DISABLED, AVAILABLE, REMOVED
     }
@@ -20,7 +24,9 @@ public class Assessment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String title;
+
     private Integer sequence = 0;
 
     @Enumerated(EnumType.STRING)
@@ -41,19 +47,17 @@ public class Assessment {
         setStatus(Assessment.Status.valueOf(assessmentDto.getStatus()));
         setSequence(assessmentDto.getSequence());
         setCourseExecution(courseExecution);
-
-        courseExecution.addAssessment(this);
-
-        this.topicConjunctions = topicConjunctions;
-        topicConjunctions.forEach(topicConjunction -> topicConjunction.setAssessment(this));
+        setTopicConjunctions(topicConjunctions);
     }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visitAssessment(this);
+    }
+
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -61,6 +65,9 @@ public class Assessment {
     }
 
     public void setTitle(String title) {
+        if (title == null || title.isBlank())
+            throw new TutorException(INVALID_TITLE_FOR_ASSESSMENT);
+
         this.title = title;
     }
 
@@ -86,10 +93,20 @@ public class Assessment {
 
     public void setCourseExecution(CourseExecution courseExecution) {
         this.courseExecution = courseExecution;
+        courseExecution.addAssessment(this);
     }
 
     public List<TopicConjunction> getTopicConjunctions() {
         return topicConjunctions;
+    }
+
+    public void setTopicConjunctions(List<TopicConjunction> topicConjunctions) {
+        this.topicConjunctions = topicConjunctions;
+        topicConjunctions.forEach(topicConjunction -> topicConjunction.setAssessment(this));
+    }
+
+    public void addTopicConjunction(TopicConjunction topicConjunction) {
+        this.topicConjunctions.add(topicConjunction);
     }
 
     @Override
@@ -103,19 +120,14 @@ public class Assessment {
                 '}';
     }
 
-    public void addTopicConjunction(TopicConjunction topicConjunction) {
-        this.topicConjunctions.add(topicConjunction);
-    }
-
-    public void remove() {
-        new ArrayList<>(getTopicConjunctions()).forEach(TopicConjunction::remove);
-        getTopicConjunctions().clear();
-    }
-
     public List<Question> getQuestions() {
         return this.topicConjunctions.stream()
                 .flatMap(topicConjunction -> topicConjunction.getQuestions().stream())
                 .collect(Collectors.toList());
     }
 
+    public void remove() {
+        new ArrayList<>(getTopicConjunctions()).forEach(TopicConjunction::remove);
+        getTopicConjunctions().clear();
+    }
 }

@@ -25,7 +25,7 @@
       <template v-slot:item.action="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="editTopic(item)"
+            <v-icon large class="mr-2" v-on="on" @click="editTopic(item)"
               >edit</v-icon
             >
           </template>
@@ -34,7 +34,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="deleteTopic(item)"
@@ -45,7 +45,16 @@
           <span>Delete Topic</span>
         </v-tooltip>
       </template>
+      <template v-slot:item.name="{ item }">
+        <p @contextmenu="editTopic(item, $event)" style="cursor: pointer">
+          {{ item.name }}
+        </p>
+      </template>
     </v-data-table>
+    <footer>
+      <v-icon class="mr-2">mouse</v-icon>Right-click on topic's name to edit it.
+    </footer>
+
     <v-dialog v-model="topicDialog" max-width="75%">
       <v-card>
         <v-card-title>
@@ -53,13 +62,7 @@
         </v-card-title>
 
         <v-card-text v-if="editedTopic">
-          <v-container grid-list-md fluid>
-            <v-layout column wrap>
-              <v-flex xs24 sm12 md8>
-                <v-text-field v-model="editedTopic.name" label="Topic" />
-              </v-flex>
-            </v-layout>
-          </v-container>
+          <v-text-field v-model="editedTopic.name" label="Topic" />
         </v-card-text>
 
         <v-card-actions>
@@ -84,19 +87,19 @@ export default class TopicsView extends Vue {
   topicDialog: boolean = false;
   search: string = '';
   headers: object = [
-    { text: 'Topic', value: 'name', align: 'left' },
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      width: '15%',
+      sortable: false
+    },
+    { text: 'Name', value: 'name', align: 'left' },
     {
       text: 'Questions',
       value: 'numberOfQuestions',
       align: 'center',
       width: '115px'
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      width: '7%',
-      sortable: false
     }
   ];
 
@@ -132,7 +135,8 @@ export default class TopicsView extends Vue {
     this.topicDialog = false;
   }
 
-  editTopic(topic: Topic) {
+  editTopic(topic: Topic, e?: Event) {
+    if (e) e.preventDefault();
     this.editedTopic = { ...topic };
     this.topicDialog = true;
   }

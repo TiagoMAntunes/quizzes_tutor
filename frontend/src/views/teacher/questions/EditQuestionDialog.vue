@@ -18,40 +18,26 @@
       </v-card-title>
 
       <v-card-text class="text-left" v-if="editQuestion">
-        <v-container grid-list-md fluid>
-          <v-layout column wrap>
-            <v-flex xs24 sm12 md8>
-              <v-text-field v-model="editQuestion.title" label="Title" />
-            </v-flex>
-            <v-flex xs24 sm12 md12>
-              <v-textarea
-                outline
-                rows="10"
-                v-model="editQuestion.content"
-                label="Question"
-              ></v-textarea>
-            </v-flex>
-            <v-flex
-              xs24
-              sm12
-              md12
-              v-for="index in editQuestion.options.length"
-              :key="index"
-            >
-              <v-switch
-                v-model="editQuestion.options[index - 1].correct"
-                class="ma-4"
-                label="Correct"
-              />
-              <v-textarea
-                outline
-                rows="10"
-                v-model="editQuestion.options[index - 1].content"
-                :label="`Option ${index}`"
-              ></v-textarea>
-            </v-flex>
-          </v-layout>
-        </v-container>
+        <v-text-field v-model="editQuestion.title" label="Title" />
+        <v-textarea
+          outline
+          rows="10"
+          v-model="editQuestion.content"
+          label="Question"
+        ></v-textarea>
+        <div v-for="index in editQuestion.options.length" :key="index">
+          <v-switch
+            v-model="editQuestion.options[index - 1].correct"
+            class="ma-4"
+            label="Correct"
+          />
+          <v-textarea
+            outline
+            rows="10"
+            v-model="editQuestion.options[index - 1].content"
+            :label="`Option ${index}`"
+          ></v-textarea>
+        </div>
       </v-card-text>
 
       <v-card-actions>
@@ -66,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Model, Prop, Vue } from 'vue-property-decorator';
+import { Component, Model, Prop, Vue, Watch } from 'vue-property-decorator';
 import Question from '@/models/management/Question';
 import RemoteServices from '@/services/RemoteServices';
 
@@ -78,6 +64,11 @@ export default class EditQuestionDialog extends Vue {
   editQuestion!: Question;
 
   created() {
+    this.updateQuestion();
+  }
+
+  @Watch('question', { immediate: true, deep: true })
+  updateQuestion() {
     this.editQuestion = new Question(this.question);
   }
 
@@ -102,20 +93,15 @@ export default class EditQuestionDialog extends Vue {
       return;
     }
 
-    if (this.editQuestion && this.editQuestion.id != null) {
-      try {
-        const result = await RemoteServices.updateQuestion(this.editQuestion);
-        this.$emit('save-question', result);
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
-    } else if (this.editQuestion) {
-      try {
-        const result = await RemoteServices.createQuestion(this.editQuestion);
-        this.$emit('save-question', result);
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
+    try {
+      const result =
+        this.editQuestion.id != null
+          ? await RemoteServices.updateQuestion(this.editQuestion)
+          : await RemoteServices.createQuestion(this.editQuestion);
+
+      this.$emit('save-question', result);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
     }
   }
 }

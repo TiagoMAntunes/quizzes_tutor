@@ -4,7 +4,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Image;
 
 import java.io.Serializable;
 
-
 public class ImageDto implements Serializable {
     private Integer id;
     private String url;
@@ -21,10 +20,6 @@ public class ImageDto implements Serializable {
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getUrl() {

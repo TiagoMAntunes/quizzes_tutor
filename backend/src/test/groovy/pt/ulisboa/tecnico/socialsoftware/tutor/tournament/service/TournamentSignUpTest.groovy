@@ -225,9 +225,8 @@ class TournamentSignUpTest extends Specification {
 
     def "no user with the given id"(){
         given:"an unused user id"
-        def userId = 1
-        def user = new User()
-        user.setId(userId)
+        
+        int userId = userRepository.getMaxUserNumber() + 1
 
         when:
         tournamentService.joinTournament(openTournamentId, userId)
@@ -237,7 +236,7 @@ class TournamentSignUpTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
 
         def tournament = tournamentRepository.findAll().get(0)
-        !tournament.hasSignedUp(user)
+        !tournament.hasSignedUpWithId(userId);
     }
 
     def "no tournament with the given id"(){

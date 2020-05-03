@@ -1,11 +1,9 @@
-import QrcodeVue from "*.vue";
 <template>
   <div class="container">
     <qrcode-stream v-if="!quizId" @decode="onDecode"></qrcode-stream>
     <v-card v-else>
-      <v-card-title>
-        Hold on and wait for {{ secondsToRequest + 1 }} seconds to start the
-        quiz!
+      <v-card-title class="justify-center">
+        Hold on and wait {{ timer() }} to start the quiz!
       </v-card-title>
     </v-card>
   </div>
@@ -17,6 +15,7 @@ import RemoteServices from '@/services/RemoteServices';
 import { QrcodeStream } from 'vue-qrcode-reader';
 import StatementQuiz from '@/models/statement/StatementQuiz';
 import StatementManager from '@/models/statement/StatementManager';
+import { milisecondsToHHMMSS } from '@/services/ConvertDateService';
 
 @Component({
   components: {
@@ -25,37 +24,22 @@ import StatementManager from '@/models/statement/StatementManager';
 })
 export default class ScanView extends Vue {
   quizId: number | null = null;
-  secondsToRequest: number = 0;
+  quiz: StatementQuiz | null = null;
 
   async onDecode(decodedString: String) {
     this.quizId = Number(decodedString);
     this.getQuizByQRCode();
   }
 
-  countDownTimer() {
-    if (this.secondsToRequest >= 0) {
-      if (this.$router.currentRoute.name === 'scan') {
-        this.secondsToRequest -= 1;
-        setTimeout(() => {
-          this.countDownTimer();
-        }, 1000);
-      }
-    } else {
-      this.getQuizByQRCode();
-    }
-  }
-
   async getQuizByQRCode() {
-    if (this.quizId) {
+    if (this.quizId && this.$router.currentRoute.name === 'scan') {
       try {
-        let quiz: StatementQuiz = await RemoteServices.getQuizByQRCode(
-          this.quizId
-        );
-        if (quiz.secondsToAvailability) {
-          this.secondsToRequest = quiz.secondsToAvailability;
-          this.countDownTimer();
-        } else {
-          this.goToSolveQuiz(quiz);
+        this.quiz = await RemoteServices.getQuizByQRCode(this.quizId);
+
+        if (this.quiz.timeToAvailability === 0) {
+          let statementManager: StatementManager = StatementManager.getInstance;
+          statementManager.statementQuiz = this.quiz;
+          await this.$router.push({ name: 'solve-quiz' });
         }
       } catch (error) {
         await this.$store.dispatch('error', error);
@@ -64,10 +48,12 @@ export default class ScanView extends Vue {
     }
   }
 
-  async goToSolveQuiz(quiz: StatementQuiz) {
-    let statementManager: StatementManager = StatementManager.getInstance;
-    statementManager.statementQuiz = quiz;
-    await this.$router.push({ name: 'solve-quiz' });
+  timer() {
+    if (this.quiz?.timeToAvailability === 0) {
+      this.getQuizByQRCode();
+    }
+
+    return milisecondsToHHMMSS(this.quiz?.timeToAvailability);
   }
 }
 </script>
