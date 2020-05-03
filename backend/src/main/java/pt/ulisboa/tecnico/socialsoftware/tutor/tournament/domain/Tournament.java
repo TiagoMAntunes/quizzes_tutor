@@ -140,4 +140,8 @@ Tournament {
     public void setQuiz(Quiz quiz) {
         this.quiz = quiz;
     }
+
+    public void setNumberOfQuestions(int size) {
+        this.numberOfQuestions = size;
+    }
 }

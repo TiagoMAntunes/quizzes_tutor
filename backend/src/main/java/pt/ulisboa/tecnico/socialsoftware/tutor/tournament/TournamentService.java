@@ -35,6 +35,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -207,9 +208,11 @@ public class TournamentService {
                 .stream().filter(question -> tournament.getTopics().stream()
                         .anyMatch(topic -> question.getTopics().contains(topic))).collect(Collectors.toList());
 
+        Collections.shuffle(availableQuestions); //Random selection of questions
+
         // Validate enough questions
         if (availableQuestions.size() < tournament.getNumberOfQuestions())
-            throw new TutorException(ErrorMessage.NOT_ENOUGH_QUESTIONS);
+            tournament.setNumberOfQuestions(availableQuestions.size());
 
         ArrayList<QuestionDto> quizQuestions = new ArrayList<>();
         int i = 0;

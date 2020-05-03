@@ -4,22 +4,28 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import spock.lang.Specification
 
 import java.util.function.Predicate; 
@@ -29,7 +35,7 @@ import java.time.format.DateTimeFormatter
 
 @DataJpaTest
 class TournamentSignUpTest extends Specification {
-    public static final int NUMBER_QUESTIONS = 5
+    public static final int NUMBER_QUESTIONS = 1
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_ABREV = "Software Architecture"
     public static final String ACADEMIC_TERM = "1"
@@ -53,6 +59,9 @@ class TournamentSignUpTest extends Specification {
     @Autowired
     CourseExecutionRepository courseExecutionRepository
 
+    @Autowired
+    QuestionRepository questionRepository
+
     def formatter
     def NOW_TIME
     def FIVE_DAYS_EARLIER
@@ -75,6 +84,7 @@ class TournamentSignUpTest extends Specification {
     def diffExecOpenTournament
     def diffExecOpenTournamentId
     def courseExec
+    def QUESTION_TITLE = "Question"
 
 
     def setup() {
@@ -115,6 +125,15 @@ class TournamentSignUpTest extends Specification {
         //Creates an open tournament
         courseExec = courseExecutionRepository.findAll().get(0)
         COURSE_EXEC_ID = courseExec.getId()
+
+        //Creates an available question with the given topic
+        def question = new Question()
+        question.setCourse(courseExec.getCourse())
+        question.addTopic(topic)
+        question.setTitle(QUESTION_TITLE)
+        question.setStatus(Question.Status.AVAILABLE)
+        questionRepository.save(question)
+
 
         //Creates an open tournament
         def diffCourseExec = courseExecutionRepository.findAll().get(1)
@@ -298,14 +317,15 @@ class TournamentSignUpTest extends Specification {
         then: "tournament should have the tournament quiz generated"
         def tournament = tournamentRepository.findAll().get(0)
         def quiz = tournament.getQuiz()
-        quiz.getType() == Quiz.TOURNAMENT
-        quiz.getAvailableDate() == tournament.getAvailableDate()
-        quiz.getConclusionDate() == tournament.getConclusionDate()
+        quiz.getType() == Quiz.QuizType.TOURNAMENT
+        quiz.getAvailableDate() == tournament.getStartTime()
+        quiz.getConclusionDate() == tournament.getFinishTime()
         quiz.getResultsDate() == quiz.getConclusionDate() // results must be available after the end
         quiz.getQuizQuestions().size() == tournament.getNumberOfQuestions()
         quiz.getQuizQuestions().stream() // Check if all the questions are of at least one of the given topics
                             .allMatch({question -> question.getQuestion().getTopics().stream()
-                                                        .anyMatch({topic -> tournament.getTopics().contains(topic)} as Predicate<Topic>)} as Predicate<Question>);
+                                                        .anyMatch({topic -> tournament.getTopics().contains(topic)} as Predicate<Topic>)} as Predicate<Question>)
+
     }
 
     def "tournament generates quiz when creator and another student join the tournament"() {
@@ -389,6 +409,35 @@ class TournamentSignUpTest extends Specification {
         tournamentRepository.findAll().get(0).getQuiz() == null
     }
 
+    def "the quiz does not have enough questions and resizes its number of questions"() {
+        given: "a tournament with 2 questions and only 1 question in the course"
+        openTournament.setNumberOfQuestions(2)
+        tournamentRepository.save(openTournament)
+
+
+        and: "two students"
+        def student1 = new User()
+        student1.setKey(userRepository.getMaxUserNumber() + 1)
+        student1.setRole(User.Role.STUDENT)
+        student1.addCourse(courseExec)
+
+        def student2 = new User()
+        student2.setKey(userRepository.getMaxUserNumber() + 2)
+        student2.setRole(User.Role.STUDENT)
+        student2.addCourse(courseExec)
+
+        userRepository.save(student1)
+        userRepository.save(student2)
+
+        when: "both of them register to the tournament"
+        tournamentService.joinTournament(openTournamentId, student1.getId())
+        tournamentService.joinTournament(openTournamentId, student2.getId())
+
+        then:
+        def tournament = tournamentRepository.findById(openTournamentId).get()
+        tournament.getQuiz().getQuizQuestions().size() == 1
+        tournament.getNumberOfQuestions() == 1
+    }
 
 
     @TestConfiguration
@@ -397,6 +446,26 @@ class TournamentSignUpTest extends Specification {
         @Bean
         TournamentService tournamentService() {
             return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        AnswersXmlImport answersXmlImport() {
+            return new AnswersXmlImport()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
         }
     }
 }
