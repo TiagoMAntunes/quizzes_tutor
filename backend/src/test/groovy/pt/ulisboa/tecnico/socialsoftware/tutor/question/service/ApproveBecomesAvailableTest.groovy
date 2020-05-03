@@ -4,7 +4,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import spock.lang.Specification
 
 @DataJpaTest
-class ApproveToAvailableTest extends Specification{
+class ApproveBecomesAvailableTest extends Specification{
 
     def "a question is approved and then it is made available"(){
         //the question becomes part of the available questions
@@ -21,3 +21,4 @@ class ApproveToAvailableTest extends Specification{
         expect: false
     }
 }
+
