@@ -130,20 +130,33 @@ Cypress.Commands.add('createTournament', (topics, startDay, finishDay, numberOfQ
     for (let topic of topics)
         cy.contains(topic).click() //selects the given topics from the list
 
-    cy.contains("Start time").click({force : true})
+    cy.get('[data-cy="startTimePicker"').click({force : true}).parent().parent() // Open menu
+                .find('.datepicker-next').click() // go to next month
+                .wait(1000) // needs to wait for load 
+    
+    
+    cy.get('[data-cy="startTimePicker"').parent().parent()
+                .find('.month-container') // select dates
+                .contains(startDay).click()
+    
+    cy.get('[data-cy="startTimePicker"').parent().parent()
+                .find('.validate').click();
 
-    cy.get(".v-dialog--active").find('.mdi-chevron-right').click().wait(1000) //needs to wait for element to load
-    cy.get(".v-dialog--active").contains(startDay).click()
-    cy.get(".v-dialog--active").contains("OK").click()
+    
+    cy.get('[data-cy="finishTimePicker"').click({force : true}).parent().parent() // Open menu
+                .find('.datepicker-next').click() // go to next month
+                .wait(1000) // needs to wait for load 
+    
+    
+    cy.get('[data-cy="finishTimePicker"').parent().parent()
+                .find('.month-container') // select dates
+                .contains(finishDay).click()
+    
+    cy.get('[data-cy="finishTimePicker"').parent().parent()
+                .find('.validate').click();
 
 
-    cy.contains("Finish time").click({force: true})
-
-    cy.get(".v-dialog--active").find('.mdi-chevron-right').click().wait(1000) //needs to wait for element to load
-    cy.get(".v-dialog--active").contains(finishDay).click()
-    cy.get(".v-dialog--active").contains("OK").click()
-
-    cy.get('[data-cy="select' + numberOfQuestions + 'Questions"]').click()
+    cy.get('[data-cy="select' + numberOfQuestions + 'Questions"]').click({force: true})
 
     cy.get("button").contains("Create Tournament").click({force: true})
 })
