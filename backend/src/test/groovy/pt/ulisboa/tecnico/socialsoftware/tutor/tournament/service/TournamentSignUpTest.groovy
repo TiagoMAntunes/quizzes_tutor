@@ -270,6 +270,28 @@ class TournamentSignUpTest extends Specification {
         !user.hasTournament(tournament)
     }
 
+    def "tournament generates quiz when has 2 sign ups"() {
+        false
+    }
+
+    def "tournament generates quiz when creator and another student join the tournament"() {
+        false
+    }
+
+    def "tournament has not generated quiz with 1 student"() {
+        false
+    }
+
+    def "tournament has quiz with more than 2 students signedup "() {
+        false
+    }
+
+    def "tournament has not generated quiz with only the creator signed up"() {
+        false
+    }
+
+
+
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {
 
