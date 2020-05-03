@@ -147,7 +147,7 @@ public class StudentQuestionService {
 
     private void checkStatusToAddExplanation(String explanation, int questionId) {
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
-        if(question.getQuestionStatus() != StudentQuestion.QuestionStatus.REJECTED) {
+        if(question.getQuestionStatus() != StudentQuestion.QuestionStatus.REJECTED && !explanation.equals("No explanation")){
             throw new TutorException(CANT_ADD_EXPLANATION);
         }
     }
