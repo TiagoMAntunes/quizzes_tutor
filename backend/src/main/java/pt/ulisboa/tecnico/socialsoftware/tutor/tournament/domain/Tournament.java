@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
@@ -15,7 +16,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tournaments")
-public class Tournament {
+public class
+Tournament {
 
     @Transient
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -44,6 +46,9 @@ public class Tournament {
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "signedUpTournaments", fetch=FetchType.EAGER)
     private Set<User> signedUp = new HashSet<>();
+
+    @OneToOne
+    private Quiz quiz;
 
     public Tournament(){}
 
@@ -127,4 +132,12 @@ public class Tournament {
     public Set<User> getSignedUp() { return signedUp; }
 
     public int getSignedUpNumber(){ return signedUp.size();}
+
+    public Quiz getQuiz() {
+        return this.quiz;
+    }
+
+    public void setQuiz(Quiz quiz) {
+        this.quiz = quiz;
+    }
 }
