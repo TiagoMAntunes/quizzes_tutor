@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -26,8 +27,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.statement.dto.StatementAnswerDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
-
-import java.time.LocalDateTime
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUIZ_NOT_FOUND
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUIZ_NOT_YET_AVAILABLE
@@ -90,25 +89,30 @@ class ConcludeQuizTest extends Specification {
 
         quiz = new Quiz()
         quiz.setKey(1)
-        quiz.setType(Quiz.QuizType.GENERATED)
+        quiz.setType(Quiz.QuizType.GENERATED.toString())
         quiz.setCourseExecution(courseExecution)
+        quiz.setAvailableDate(DateHandler.now())
         courseExecution.addQuiz(quiz)
 
 
         def question = new Question()
         question.setKey(1)
+        question.setTitle("Question Title")
         question.setCourse(course)
-        course.addQuestion(question)
 
         quizQuestion = new QuizQuestion(quiz, question, 0)
         optionKO = new Option()
+        optionKO.setContent("Option Content")
         optionKO.setCorrect(false)
-        question.addOption(optionKO)
+        optionKO.setSequence(0)
+        optionKO.setQuestion(question)
         optionOk = new Option()
+        optionOk.setContent("Option Content")
         optionOk.setCorrect(true)
-        question.addOption(optionOk)
+        optionOk.setSequence(1)
+        optionOk.setQuestion(question)
 
-        date = LocalDateTime.now()
+        date = DateHandler.now()
 
         quizAnswer = new QuizAnswer(user, quiz)
         userRepository.save(user)
@@ -143,8 +147,8 @@ class ConcludeQuizTest extends Specification {
 
     def 'conclude quiz IN_CLASS without answering, before conclusionDate'() {
         given: 'an IN_CLASS quiz with future conclusionDate'
-        quiz.setConclusionDate(LocalDateTime.now().plusDays(2));
-        quiz.setType(Quiz.QuizType.IN_CLASS);
+        quiz.setConclusionDate(DateHandler.now().plusDays(2))
+        quiz.setType(Quiz.QuizType.IN_CLASS.toString())
 
         when:
         def correctAnswers = answerService.concludeQuiz(user, quiz.getId())
@@ -165,13 +169,13 @@ class ConcludeQuizTest extends Specification {
 
     def 'conclude quiz with answer, before conclusionDate'() {
         given: 'a quiz with future conclusionDate'
-        quiz.setConclusionDate(LocalDateTime.now().plusDays(2))
+        quiz.setConclusionDate(DateHandler.now().plusDays(2))
         and: 'an answer'
-        def statementAnswerDto = new StatementAnswerDto();
+        def statementAnswerDto = new StatementAnswerDto()
         statementAnswerDto.setOptionId(optionOk.getId())
         statementAnswerDto.setSequence(0)
         statementAnswerDto.setTimeTaken(100)
-        answerService.submitAnswer(user, quiz.getId(), statementAnswerDto);
+        answerService.submitAnswer(user, quiz.getId(), statementAnswerDto)
 
         when:
         def correctAnswers = answerService.concludeQuiz(user, quiz.getId())
@@ -195,7 +199,7 @@ class ConcludeQuizTest extends Specification {
 
     def 'conclude quiz without answering, before availableDate'() {
         given: 'a quiz with future availableDate'
-        quiz.setAvailableDate(LocalDateTime.now().plusDays(2))
+        quiz.setAvailableDate(DateHandler.now().plusDays(2))
 
         when:
         answerService.concludeQuiz(user, quiz.getId())

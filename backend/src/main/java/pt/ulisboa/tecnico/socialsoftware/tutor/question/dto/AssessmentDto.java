@@ -30,10 +30,6 @@ public class AssessmentDto implements Serializable {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public Integer getSequence() {
         return sequence;
     }
@@ -74,6 +70,10 @@ public class AssessmentDto implements Serializable {
         this.topicConjunctions = topicConjunctions;
     }
 
+    public void addTopicConjunction(TopicConjunctionDto topicConjunctionDto) {
+        this.topicConjunctions.add(topicConjunctionDto);
+    }
+
     @Override
     public String toString() {
         return "AssessmentDto{" +
@@ -84,9 +84,5 @@ public class AssessmentDto implements Serializable {
                 ", status='" + status + '\'' +
                 ", topicConjunctions=" + topicConjunctions +
                 '}';
-    }
-
-    public void addTopicConjunction(TopicConjunctionDto topicConjunctionDto) {
-        this.topicConjunctions.add(topicConjunctionDto);
     }
 }
