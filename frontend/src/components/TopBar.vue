@@ -205,7 +205,7 @@
                 >
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="/student/createQuestion">
+            <v-list-item to="/student/create-question">
               <v-list-item-action>
                 <v-icon>create</v-icon>
               </v-list-item-action>
@@ -378,7 +378,7 @@
             <v-list-item-action>
               <v-icon>question_answer</v-icon>
             </v-list-item-action>
-            <v-list-item-content>Available questions</v-list-item-content>
+            <v-list-item-content>Submitted questions</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/create">

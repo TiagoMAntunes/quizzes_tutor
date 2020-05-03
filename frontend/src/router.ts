@@ -147,8 +147,8 @@ let router = new Router({
           }
         },
         {
-          path: 'createQuestion',
-          name: 'createQuestion',
+          path: 'create-question',
+          name: 'create-question',
           component: CreateStudentQuestionView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Create a Question',
