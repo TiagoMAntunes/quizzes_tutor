@@ -78,6 +78,7 @@ class ApproveBecomesAvailableTest extends Specification{
     def "a question is approved and then it is made available"(){
         given: "an approved student question"
         result = studentQuestionRepository.findAll().get(0)
+        result.setStatus(Question.Status.DISABLED)
         studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.APPROVED)
 
         when:
@@ -93,6 +94,7 @@ class ApproveBecomesAvailableTest extends Specification{
     def "a question is rejected and then it is made available"(){
         given: "a rejected student question"
         result = studentQuestionRepository.findAll().get(0)
+        result.setStatus(Question.Status.DISABLED)
         studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.REJECTED)
 
         when:
@@ -101,11 +103,14 @@ class ApproveBecomesAvailableTest extends Specification{
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.CANT_MAKE_QUESTION_AVAILABLE
+        studentQuestionRepository.count() == 1L
+        result.getStatus() != Question.Status.AVAILABLE
     }
 
     def "a question is in the pending status and then it is made available"(){
         given: "a pending student question"
         result = studentQuestionRepository.findAll().get(0)
+        result.setStatus(Question.Status.DISABLED)
         studentQuestionService.studentQuestionApproveReject(result.getId(), StudentQuestion.QuestionStatus.PENDING)
 
         when:
@@ -114,6 +119,8 @@ class ApproveBecomesAvailableTest extends Specification{
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.CANT_MAKE_QUESTION_AVAILABLE
+        studentQuestionRepository.count() == 1L
+        result.getStatus() != Question.Status.AVAILABLE
     }
 
     @TestConfiguration
