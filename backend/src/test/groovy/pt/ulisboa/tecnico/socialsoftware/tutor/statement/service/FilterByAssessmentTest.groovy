@@ -113,9 +113,9 @@ class FilterByAssessmentTest extends Specification {
         def topicConjunction1 = new TopicConjunction()
         topicConjunction1.addTopic(topic1)
         assessmentTopic1.addTopicConjunction(topicConjunction1)
-        assessmentRepository.save(assessmentTopic1);
+        assessmentRepository.save(assessmentTopic1)
         def statementCreationDto = new StatementCreationDto()
-        statementCreationDto.assessment = assessmentTopic1.id.toString()
+        statementCreationDto.assessment = assessmentTopic1.id
 
         when:
         def result = statementService.filterByAssessment(questionList, statementCreationDto)
@@ -136,7 +136,7 @@ class FilterByAssessmentTest extends Specification {
         assessmentTopic1_and_2.addTopicConjunction(topicConjunction1_and_2)
         assessmentRepository.save(assessmentTopic1_and_2)
         def statementCreationDto = new StatementCreationDto()
-        statementCreationDto.assessment = assessmentTopic1_and_2.id.toString()
+        statementCreationDto.assessment = assessmentTopic1_and_2.id
 
         when:
         def result = statementService.filterByAssessment(questionList, statementCreationDto)
@@ -158,7 +158,7 @@ class FilterByAssessmentTest extends Specification {
         assessmentTopic1_or_2.addTopicConjunction(topicConjunction2)
         assessmentRepository.save(assessmentTopic1_or_2)
         def statementCreationDto = new StatementCreationDto()
-        statementCreationDto.assessment = assessmentTopic1_or_2.id.toString()
+        statementCreationDto.assessment = assessmentTopic1_or_2.id
 
         when:
         def result = statementService.filterByAssessment(questionList, statementCreationDto)
@@ -169,7 +169,6 @@ class FilterByAssessmentTest extends Specification {
         result.contains(questionTopic2)
         result.contains(questionTopic1Again)
     }
-
 
     @TestConfiguration
     static class StatementServiceImplTestContextConfiguration {
@@ -198,5 +197,4 @@ class FilterByAssessmentTest extends Specification {
             return new QuestionService()
         }
     }
-
 }

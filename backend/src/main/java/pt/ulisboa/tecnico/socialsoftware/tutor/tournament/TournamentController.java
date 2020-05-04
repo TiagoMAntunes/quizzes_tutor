@@ -35,10 +35,19 @@ public class TournamentController {
         return this.tournamentService.createTournament(tournament, executionId, user.getId());
     }
 
-    @PutMapping("/executions/{executionId}/tournaments/{tournamentId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
-    public void joinTournament(@PathVariable int executionId, @PathVariable int tournamentId, @RequestParam int userId, Principal principal) {
-        this.tournamentService.joinTournament(tournamentId, executionId, userId);
+    @PutMapping("/tournaments/{tournamentId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.ACCESS')")
+    public TournamentDto joinTournament(@PathVariable int tournamentId, @RequestParam(required = false) Integer userId, Principal principal) {
+        if(userId == null){
+            User user = (User) ((Authentication) principal).getPrincipal();
+
+            if (user == null) {
+                throw new TutorException(AUTHENTICATION_ERROR);
+            }
+
+            userId = user.getId();
+        }
+        return this.tournamentService.joinTournament(tournamentId, userId);
     }
 
 

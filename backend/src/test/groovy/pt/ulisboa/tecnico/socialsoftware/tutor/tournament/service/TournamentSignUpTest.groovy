@@ -29,8 +29,9 @@ import java.time.format.DateTimeFormatter
 class TournamentSignUpTest extends Specification {
     public static final int NUMBER_QUESTIONS = 5
     public static final String TOPIC_NAME = "Main_Topic"
-    public static final String COURSE_NAME = "Software Architecture"
-    public static final String COURSE_ABREV = "SA"
+    public static final String COURSE_ABREV = "Software Architecture"
+    public static final String ACADEMIC_TERM = "1"
+    public static final String DIFF_ACADEMIC_TERM = "2"
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -60,6 +61,7 @@ class TournamentSignUpTest extends Specification {
     def ONE_DAY_LATER
     def TOPIC_LIST
     def COURSE_EXEC_ID
+    def DIFF_COURSE_EXEC_ID
     def USER
     def USER_ID
     def TEACHER
@@ -67,6 +69,9 @@ class TournamentSignUpTest extends Specification {
     def openTournamentDto
     def openTournament
     def openTournamentId
+    def diffExecOpenTournamentDto
+    def diffExecOpenTournament
+    def diffExecOpenTournamentId
 
 
     def setup() {
@@ -79,28 +84,17 @@ class TournamentSignUpTest extends Specification {
         TWO_DAYS_EARLIER = LocalDateTime.now().minusDays(2).format(formatter)
         ONE_DAY_LATER = LocalDateTime.now().plusDays(1).format(formatter)
 
-        //Creates a user
-        def tmp_user1 = new User()
-        tmp_user1.setKey(1)
-        tmp_user1.setRole(User.Role.STUDENT)
-        userRepository.save(tmp_user1)
-        USER = userRepository.findAll().get(0)
-        USER_ID = USER.getId()
-
-        def tmp_user2 = new User()
-        tmp_user2.setKey(2)
-        tmp_user2.setRole(User.Role.TEACHER)
-        userRepository.save(tmp_user2)
-        TEACHER = userRepository.findAll().get(1)
-        TEACHER_ID = TEACHER.getId()
-
         //Creates a course
-        def course1 = new Course(COURSE_NAME, Course.Type.TECNICO)
+        def course1 = new Course(COURSE_ABREV, Course.Type.TECNICO)
         courseRepository.save(course1)
 
         //Creates a course execution
-        def courseExecution = new CourseExecution(course1, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
+        def courseExecution = new CourseExecution(course1, COURSE_ABREV, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
+
+        //Creates a different course execution
+        def diffCourseExecution = new CourseExecution(course1, COURSE_ABREV, DIFF_ACADEMIC_TERM, Course.Type.TECNICO)
+        courseExecutionRepository.save(diffCourseExecution)
 
         //Creates a topic
         def topic = new Topic()
@@ -116,8 +110,30 @@ class TournamentSignUpTest extends Specification {
         TOPIC_LIST = topicList
 
         //Creates an open tournament
-        def course2 = courseExecutionRepository.findAll().get(0)
-        COURSE_EXEC_ID = course2.getId()
+        def courseExec = courseExecutionRepository.findAll().get(0)
+        COURSE_EXEC_ID = courseExec.getId()
+
+        //Creates an open tournament
+        def diffCourseExec = courseExecutionRepository.findAll().get(1)
+        DIFF_COURSE_EXEC_ID = diffCourseExec.getId()
+
+        //Creates a user
+        def tmp_user1 = new User()
+        tmp_user1.setKey(1)
+        tmp_user1.setRole(User.Role.STUDENT)
+        tmp_user1.addCourse(courseExec)
+        userRepository.save(tmp_user1)
+        USER = userRepository.findAll().get(0)
+        USER_ID = USER.getId()
+
+        //Creates a teacher
+        def tmp_user2 = new User()
+        tmp_user2.setKey(2)
+        tmp_user2.setRole(User.Role.TEACHER)
+        tmp_user2.addCourse(courseExec)
+        userRepository.save(tmp_user2)
+        TEACHER = userRepository.findAll().get(1)
+        TEACHER_ID = TEACHER.getId()
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setStartTime(ONE_DAY_LATER)
@@ -129,6 +145,11 @@ class TournamentSignUpTest extends Specification {
         tournamentService.createTournament(openTournamentDto, COURSE_EXEC_ID, USER_ID)
         openTournament = tournamentRepository.findAll().get(0)
         openTournamentId = openTournament.getId()
+
+        diffExecOpenTournamentDto = tournamentDto
+        tournamentService.createTournament(diffExecOpenTournamentDto, DIFF_COURSE_EXEC_ID, USER_ID)
+        diffExecOpenTournament = tournamentRepository.findAll().get(1)
+        diffExecOpenTournamentId = diffExecOpenTournament.getId()
     }
 
     def "tournament has ended"(){
@@ -136,7 +157,7 @@ class TournamentSignUpTest extends Specification {
         openTournament.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
 
         when:
-        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(openTournamentId, USER_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -153,7 +174,7 @@ class TournamentSignUpTest extends Specification {
         openTournament.setStartTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
 
         when:
-        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(openTournamentId, USER_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -167,7 +188,7 @@ class TournamentSignUpTest extends Specification {
 
     def "tournament is open and student hasnt signed up for it yet"(){
         when:
-        tournamentService.joinTournament(openTournament.getId(), COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(openTournament.getId(), USER_ID)
 
         then:
         def tournament = tournamentRepository.findAll().get(0)
@@ -178,10 +199,10 @@ class TournamentSignUpTest extends Specification {
 
     def "tournament is open and student has already signed up for it"(){
         given:"an open tournament that the student has already joined"
-        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(openTournamentId, USER_ID)
 
         when:
-        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(openTournamentId, USER_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -190,7 +211,7 @@ class TournamentSignUpTest extends Specification {
 
     def "tournament is open but user isnt a student"(){
         when:
-        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, TEACHER_ID)
+        tournamentService.joinTournament(openTournamentId, TEACHER_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -204,19 +225,18 @@ class TournamentSignUpTest extends Specification {
 
     def "no user with the given id"(){
         given:"an unused user id"
-        def userId = 1
-        def user = new User()
-        user.setId(userId)
+        
+        int userId = userRepository.getMaxUserNumber() + 1
 
         when:
-        tournamentService.joinTournament(openTournamentId, COURSE_EXEC_ID, userId)
+        tournamentService.joinTournament(openTournamentId, userId)
 
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
 
         def tournament = tournamentRepository.findAll().get(0)
-        !tournament.hasSignedUp(user)
+        !tournament.hasSignedUpWithId(userId);
     }
 
     def "no tournament with the given id"(){
@@ -226,13 +246,27 @@ class TournamentSignUpTest extends Specification {
         tournament.setId(tournamentId)
 
         when:
-        tournamentService.joinTournament(tournamentId, COURSE_EXEC_ID, USER_ID)
+        tournamentService.joinTournament(tournamentId, USER_ID)
 
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
 
         def user = userRepository.findAll().get(0)
+        !user.hasTournament(tournament)
+    }
+
+    def "tournament is open but belongs to a different course execution"(){
+        when:
+        tournamentService.joinTournament(diffExecOpenTournamentId, USER_ID)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_DIFF_COURSE_EXEC
+
+        def tournament = tournamentRepository.findAll().get(1)
+        def user = userRepository.findAll().get(0)
+        !tournament.hasSignedUp(user)
         !user.hasTournament(tournament)
     }
 

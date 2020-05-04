@@ -57,19 +57,13 @@ class CancelTournamentTest extends Specification {
     def courseExecutionId
     def userId
     def tournamentId
+    def courseExecution
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         TWO_DAYS_AGO_DATETIME = LocalDateTime.now().minusDays(2)
         IN_TWO_DAYS_TIME = LocalDateTime.now().plusDays(2).format(formatter)
         IN_FOUR_DAYS_TIME = LocalDateTime.now().plusDays(4).format(formatter)
-
-        //Creates a user
-        def user = new User()
-        user.setKey(1)
-        user.setRole(User.Role.STUDENT)
-        userRepository.save(user)
-        userId = userRepository.findAll().get(0).getId()
 
         //Creates a course
         def course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -78,7 +72,16 @@ class CancelTournamentTest extends Specification {
         //Creates a course execution
         def newCourseExecution = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
         courseExecutionRepository.save(newCourseExecution)
-        courseExecutionId = courseExecutionRepository.findAll().get(0).getId()
+        courseExecution = courseExecutionRepository.findAll().get(0)
+        courseExecutionId = courseExecution.getId()
+
+        //Creates a user
+        def user = new User()
+        user.setKey(1)
+        user.setRole(User.Role.STUDENT)
+        user.addCourse(courseExecution)
+        userRepository.save(user)
+        userId = userRepository.findAll().get(0).getId()
 
         //Creates a topic
         def topic = new Topic()
@@ -163,7 +166,7 @@ class CancelTournamentTest extends Specification {
 
     def "cancel a tournament with 1 student signed up"() {
         given: "a cancelable tournament with 1 student signed up"
-        tournamentService.joinTournament(tournamentId, courseExecutionId, userId)
+        tournamentService.joinTournament(tournamentId, userId)
 
         when: "cancel tournament"
         tournamentService.cancelTournament(tournamentId, userId)

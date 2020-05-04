@@ -209,12 +209,10 @@ class CreateStudentQuestionTest extends Specification {
 
         where:
         Title             | Content            | Option             || errorMessage
-        BLANK             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        EMPTY             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | BLANK              | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | QUESTION_CONTENT   | BLANK              || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | QUESTION_CONTENT   | EMPTY              || QUESTION_MISSING_DATA
+        EMPTY             | QUESTION_CONTENT   | OPTION_CONTENT     || INVALID_TITLE_FOR_QUESTION
+        BLANK             | QUESTION_CONTENT   | OPTION_CONTENT     || INVALID_TITLE_FOR_QUESTION
+        QUESTION_TITLE    | BLANK              | OPTION_CONTENT     || INVALID_CONTENT_FOR_QUESTION
+        QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || INVALID_CONTENT_FOR_QUESTION
     }
 
 

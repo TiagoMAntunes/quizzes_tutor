@@ -1,5 +1,6 @@
 <template>
   <tournament-list
+    @joinTournament="joinTournament"
     @cancelTournament="cancelTournament"
     :tournaments="tournaments"
   />
@@ -20,6 +21,7 @@ import TournamentList from '@/views/student/tournament/TournamentList.vue';
 })
 export default class AvailableTournamentsView extends Vue {
   tournaments: Tournament[] = [];
+  updatedTournament: Tournament | undefined;
 
   async created() {
     await this.$store.dispatch('loading');
@@ -41,6 +43,20 @@ export default class AvailableTournamentsView extends Vue {
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
+    }
+  }
+
+  async joinTournament(tournamentId: number) {
+    try {
+      this.updatedTournament = await RemoteServices.joinTournament(
+        tournamentId
+      );
+      this.tournaments = this.tournaments.filter(
+        tournament => tournament.id !== tournamentId
+      );
+      this.tournaments.unshift(this.updatedTournament);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
     }
   }
 }

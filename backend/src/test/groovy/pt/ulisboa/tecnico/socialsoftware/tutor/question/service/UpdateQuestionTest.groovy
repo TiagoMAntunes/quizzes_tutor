@@ -17,11 +17,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.ImageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.OptionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import spock.lang.Specification
-
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUESTION_MISSING_DATA
 
 @DataJpaTest
 class UpdateQuestionTest extends Specification {
@@ -49,6 +49,9 @@ class UpdateQuestionTest extends Specification {
     QuizQuestionRepository quizQuestionRepository
 
     @Autowired
+    QuizRepository quizRepository
+
+    @Autowired
     QuestionAnswerRepository questionAnswerRepository
 
     def question
@@ -59,7 +62,7 @@ class UpdateQuestionTest extends Specification {
         given: "create a question"
         question = new Question()
         question.setKey(1)
-        question.setContent(QUESTION_TITLE)
+        question.setTitle(QUESTION_TITLE)
         question.setContent(QUESTION_CONTENT)
         question.setStatus(Question.Status.AVAILABLE)
         question.setNumberOfAnswers(2)
@@ -74,37 +77,30 @@ class UpdateQuestionTest extends Specification {
         optionOK = new Option()
         optionOK.setContent(OPTION_CONTENT)
         optionOK.setCorrect(true)
+        optionOK.setSequence(0)
         optionOK.setQuestion(question)
         optionRepository.save(optionOK)
         optionKO = new Option()
         optionKO.setContent(OPTION_CONTENT)
         optionKO.setCorrect(false)
+        optionKO.setSequence(1)
         optionKO.setQuestion(question)
         optionRepository.save(optionKO)
-        question.addOption(optionKO)
-        question.addOption(optionOK)
         questionRepository.save(question)
     }
 
     def "update a question"() {
-        given: "create a question"
-        def questionDto = new QuestionDto()
-        questionDto.setId(question.getId())
+        given: "a changed question"
+        def questionDto = new QuestionDto(question)
         questionDto.setTitle(NEW_QUESTION_TITLE)
         questionDto.setContent(NEW_QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-        questionDto.setNumberOfAnswers(4)
-        questionDto.setNumberOfCorrect(2)
-        and: 'a optionId'
-        def optionDto = new OptionDto()
-        optionDto.setId(optionOK.getId())
+        and: '2 changed options'
+        def options = new ArrayList<OptionDto>()
+        def optionDto = new OptionDto(optionOK)
         optionDto.setContent(NEW_OPTION_CONTENT)
         optionDto.setCorrect(false)
-        def options = new ArrayList<OptionDto>()
         options.add(optionDto)
-        optionDto = new OptionDto()
-        optionDto.setId(optionKO.getId())
-        optionDto.setContent(OPTION_CONTENT)
+        optionDto = new OptionDto(optionKO)
         optionDto.setCorrect(true)
         options.add(optionDto)
         questionDto.setOptions(options)
@@ -136,51 +132,27 @@ class UpdateQuestionTest extends Specification {
 
     def "update question with missing data"() {
         given: 'a question'
-        def questionDto = new QuestionDto()
-        questionDto.setId(question.getId())
+        def questionDto = new QuestionDto(question)
         questionDto.setTitle('     ')
-        questionDto.setContent(NEW_QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.DISABLED.name())
-        questionDto.setNumberOfAnswers(4)
-        questionDto.setNumberOfCorrect(2)
-        def optionDto = new OptionDto()
-        optionDto.setId(optionOK.getId())
-        optionDto.setContent(NEW_OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        optionDto = new OptionDto()
-        optionDto.setId(optionKO.getId())
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        options.add(optionDto)
-        questionDto.setOptions(options)
 
         when:
         questionService.updateQuestion(question.getId(), questionDto)
 
         then: "the question an exception is thrown"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == QUESTION_MISSING_DATA
+        exception.getErrorMessage() == ErrorMessage.INVALID_TITLE_FOR_QUESTION
     }
 
     def "update question with two options true"() {
         given: 'a question'
-        def questionDto = new QuestionDto()
-        questionDto.setId(question.getId())
-        questionDto.setTitle(NEW_QUESTION_TITLE)
-        questionDto.setContent(NEW_QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.DISABLED.name())
-        questionDto.setNumberOfAnswers(4)
-        questionDto.setNumberOfCorrect(2)
-        def optionDto = new OptionDto()
-        optionDto.setId(optionOK.getId())
+        def questionDto = new QuestionDto(question)
+
+        def optionDto = new OptionDto(optionOK)
         optionDto.setContent(NEW_OPTION_CONTENT)
         optionDto.setCorrect(true)
         def options = new ArrayList<OptionDto>()
         options.add(optionDto)
-        optionDto = new OptionDto()
-        optionDto.setId(optionKO.getId())
+        optionDto = new OptionDto(optionKO)
         optionDto.setContent(OPTION_CONTENT)
         optionDto.setCorrect(true)
         options.add(optionDto)
@@ -191,13 +163,19 @@ class UpdateQuestionTest extends Specification {
 
         then: "the question an exception is thrown"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.QUESTION_MULTIPLE_CORRECT_OPTIONS
+        exception.getErrorMessage() == ErrorMessage.ONE_CORRECT_OPTION_NEEDED
     }
 
     def "update correct option in a question with answers"() {
         given: "a question with answers"
+        def quiz = new Quiz()
+        quiz.setKey(1)
+        quiz.setType(Quiz.QuizType.GENERATED.toString())
+        quizRepository.save(quiz)
         def quizQuestion = new QuizQuestion()
         quizQuestionRepository.save(quizQuestion)
+        quiz.addQuizQuestion(quizQuestion)
+        quizQuestion.setQuiz(quiz)
         question.addQuizQuestion(quizQuestion)
         def questionAnswer = new QuestionAnswer()
         questionAnswer.setOption(optionOK)
@@ -208,22 +186,19 @@ class UpdateQuestionTest extends Specification {
         questionAnswerRepository.save(questionAnswer)
         quizQuestion.addQuestionAnswer(questionAnswer)
         and: "createQuestion a question dto"
-        def questionDto = new QuestionDto()
-        questionDto.setId(question.getId())
+        def questionDto = new QuestionDto(question)
         questionDto.setTitle(NEW_QUESTION_TITLE)
         questionDto.setContent(NEW_QUESTION_CONTENT)
         questionDto.setStatus(Question.Status.DISABLED.name())
         questionDto.setNumberOfAnswers(4)
         questionDto.setNumberOfCorrect(2)
         and: 'a optionId'
-        def optionDto = new OptionDto()
-        optionDto.setId(optionOK.getId())
+        def optionDto = new OptionDto(optionOK)
         optionDto.setContent(NEW_OPTION_CONTENT)
         optionDto.setCorrect(false)
         def options = new ArrayList<OptionDto>()
         options.add(optionDto)
-        optionDto = new OptionDto()
-        optionDto.setId(optionKO.getId())
+        optionDto = new OptionDto(optionKO)
         optionDto.setContent(OPTION_CONTENT)
         optionDto.setCorrect(true)
         options.add(optionDto)
@@ -234,7 +209,8 @@ class UpdateQuestionTest extends Specification {
 
         then: "the question an exception is thrown"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.QUESTION_CHANGE_CORRECT_OPTION_HAS_ANSWERS
+        exception.getErrorMessage() == ErrorMessage.CANNOT_CHANGE_ANSWERED_QUESTION
+
     }
 
     @TestConfiguration
@@ -245,5 +221,4 @@ class UpdateQuestionTest extends Specification {
             return new QuestionService()
         }
     }
-
 }

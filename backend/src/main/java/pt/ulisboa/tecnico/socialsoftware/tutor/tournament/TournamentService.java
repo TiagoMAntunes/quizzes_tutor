@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -24,10 +25,11 @@ import java.sql.SQLException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.TOURNAMENT_NOT_FOUND;
 
 @Service
 public class TournamentService {
@@ -130,7 +132,8 @@ public class TournamentService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<TournamentDto> getOpenTournaments(Integer courseExecutionId, Integer userId) {
         return tournamentRepository.findAll().stream()
-                .filter(tournament -> tournamentIsOpen(tournament.getId(), courseExecutionId))
+                .filter(tournament -> tournament.getCourseExecution().getId().equals(courseExecutionId)
+                && tournamentIsOpen(tournament.getId()))
                 .map( tournament -> new TournamentDto(tournament, userId) )
                 .collect(Collectors.toList());
     }
@@ -139,32 +142,42 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public boolean tournamentIsOpen(Integer tournamentId, Integer courseExecutionId) {
+    public boolean tournamentIsOpen(Integer tournamentId) {
         LocalDateTime now = LocalDateTime.now();
         Tournament tournament = getTournament(tournamentId);
-        return (tournament.getCourseExecution().getId().equals(courseExecutionId)) &&
-                tournament.getFinishTime().isAfter(now) &&
-                tournament.getStartTime().isAfter(now);
+        return (tournament.getFinishTime().isAfter(now) &&
+                tournament.getStartTime().isAfter(now));
     }
 
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void joinTournament(Integer tournamentId, Integer courseExecutionId, Integer userId){
+    public TournamentDto joinTournament(Integer tournamentId, Integer userId){
         Tournament tournament = getTournament(tournamentId);
         User user = getUser(userId);
 
         checkIsStudentRole(user);
-        checkTournamentIsOpen(tournamentId, courseExecutionId);
+        checkSameCourseExecution(user, tournament);
+        checkTournamentIsOpen(tournamentId);
         checkNotSignedUpYet(tournament, user);
 
         tournament.signUp(user);
         user.addTournament(tournament);
+
+        return new TournamentDto(tournament, userId);
     }
 
     public int getTournamentSignedUpNumber(Integer tournamentId){
         return getTournament(tournamentId).getSignedUpNumber();
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public CourseDto findTournamentCourseExecution(int id) {
+        return this.tournamentRepository.findById(id)
+                .map(Tournament::getCourseExecution)
+                .map(CourseDto::new)
+                .orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, id));
     }
 
     private void checkNotSignedUpYet(Tournament tournament, User user) {
@@ -172,14 +185,19 @@ public class TournamentService {
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_JOINED);
     }
 
-    private void checkTournamentIsOpen(Integer tournamentId, Integer courseExecutionId) {
-        if(!tournamentIsOpen(tournamentId, courseExecutionId))
+    private void checkTournamentIsOpen(Integer tournamentId) {
+        if(!tournamentIsOpen(tournamentId))
             throw new TutorException(ErrorMessage.TOURNAMENT_NOT_OPEN);
     }
 
     private void checkIsStudentRole(User user) {
         if (user.getRole() != User.Role.STUDENT)
             throw new TutorException(ErrorMessage.TOURNAMENT_JOIN_WRONG_ROLE);
+    }
+
+    private void checkSameCourseExecution(User user, Tournament tournament){
+        if(!user.hasCourseExecution(tournament.getCourseExecution().getId()))
+            throw new TutorException(ErrorMessage.TOURNAMENT_DIFF_COURSE_EXEC);
     }
 
     private User getUser(Integer userId) {

@@ -15,7 +15,7 @@ describe('Student Questions walkthrough', () => {
   it('Creates a Question without title', () => {
     cy.demoStudentLogin()
     cy.createStudentQuestion( '', QUESTION, OPTIONS)
-    cy.contains('Missing information for quiz')
+    cy.contains('Invalid title for question')
     cy.closeErrorMessage()
   });
 
@@ -23,14 +23,7 @@ describe('Student Questions walkthrough', () => {
   it('Creates a Question without name', () => {
     cy.demoStudentLogin()
     cy.createStudentQuestion(TITLE, '', OPTIONS)
-    cy.contains('Missing information for quiz')
-    cy.closeErrorMessage()
-  });
-
-  it('Creates a Question without options', () => {
-    cy.demoStudentLogin()
-    cy.createStudentQuestion(TITLE, QUESTION, [])
-    cy.contains('Missing information for quiz')
+    cy.contains('Invalid content for question')
     cy.closeErrorMessage()
   });
 

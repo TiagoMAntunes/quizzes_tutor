@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -115,6 +114,10 @@ public class Tournament {
 
     public boolean hasSignedUp(User user){
         return signedUp.contains(user);
+    }
+
+    public boolean hasSignedUpWithId(Integer id){
+        return signedUp.stream().anyMatch(user -> user.getId().equals(id));
     }
 
     public void signUp(User user){

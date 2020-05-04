@@ -15,49 +15,76 @@
     </v-card-title>
     <v-card-text>
       <v-text-field v-model="quiz.title" label="*Title" />
-      <v-row>
-        <v-col cols="12" sm="6">
-          <v-datetime-picker
-            label="*Available Date"
-            format="yyyy-MM-dd HH:mm"
-            v-model="quiz.availableDate"
-            date-format="yyyy-MM-dd"
-            time-format="HH:mm"
-          >
-          </v-datetime-picker>
-        </v-col>
-        <v-spacer></v-spacer>
-        <v-col cols="12" sm="6">
-          <v-datetime-picker
-            :label="
-              quiz.type === 'IN_CLASS' ? '*Conclusion Date' : 'Conclusion Date'
-            "
-            v-model="quiz.conclusionDate"
-            date-format="yyyy-MM-dd"
-            time-format="HH:mm"
-          >
-          </v-datetime-picker>
-        </v-col>
-      </v-row>
-      <v-row wrap justify="center">
-        <v-col style="display: flex; justify-content: center">
-          <v-switch v-model="quiz.scramble" label="Scramble" />
-        </v-col>
-        <v-col style="display: flex; justify-content: center">
-          <v-switch v-model="quiz.qrCodeOnly" label="QRCode Only" />
-        </v-col>
-        <v-col style="display: flex; justify-content: center">
-          <v-switch v-model="quiz.oneWay" label="One Way Quiz" />
-        </v-col>
-        <v-col cols="12" sm="6">
-          <v-select
-            v-model="quiz.type"
-            :items="['PROPOSED', 'IN_CLASS']"
-            label="*Type"
-          ></v-select>
-          {{ quiz.type }}
-        </v-col>
-      </v-row>
+      <v-container fluid>
+        <v-row>
+          <v-col>
+            <VueCtkDateTimePicker
+              label="*Available Date"
+              id="availableDateInput"
+              v-model="quiz.availableDate"
+              format="YYYY-MM-DDTHH:mm:ssZ"
+            ></VueCtkDateTimePicker>
+          </v-col>
+          <v-col v-if="quiz.timed">
+            <VueCtkDateTimePicker
+              label="*Conclusion Date"
+              id="conclusionDateInput"
+              v-model="quiz.conclusionDate"
+              format="YYYY-MM-DDTHH:mm:ssZ"
+            ></VueCtkDateTimePicker>
+          </v-col>
+          <v-col v-if="quiz.timed">
+            <VueCtkDateTimePicker
+              label="Results Date"
+              id="resultsDateInput"
+              v-model="quiz.resultsDate"
+              format="YYYY-MM-DDTHH:mm:ssZ"
+            ></VueCtkDateTimePicker>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-switch v-on="on" v-model="quiz.scramble" label="Scramble" />
+              </template>
+              <span>Question order is scrambled</span>
+            </v-tooltip>
+          </v-col>
+          <v-col>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-switch
+                  v-on="on"
+                  v-model="quiz.qrCodeOnly"
+                  label="QRCode Only"
+                />
+              </template>
+              <span>Students can only start quiz with the qrcode</span>
+            </v-tooltip>
+          </v-col>
+          <v-col>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-switch
+                  v-on="on"
+                  v-model="quiz.oneWay"
+                  label="One Way Quiz"
+                />
+              </template>
+              <span>Students cannot go to previous question</span>
+            </v-tooltip>
+          </v-col>
+          <v-col>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-switch v-on="on" v-model="quiz.timed" label="Timer" />
+              </template>
+              <span>Displays a timer to conclusion and to show results</span>
+            </v-tooltip>
+          </v-col> </v-row
+        >\
+      </v-container>
 
       <v-data-table
         :headers="headers"
@@ -73,27 +100,32 @@
         :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
       >
         <template v-slot:top>
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-text-field v-model="search" label="Search" class="mx-4" />
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-btn
-                v-if="quizQuestions.length !== 0"
-                color="primary"
-                dark
-                @click="openShowQuiz"
-                >Show Quiz</v-btn
-              >
-            </v-col>
-          </v-row>
+          <v-container fluid>
+            <v-row>
+              <v-col>
+                <v-text-field v-model="search" label="Search" class="mx-4" />
+              </v-col>
+              <v-col>
+                <v-btn
+                  v-if="quizQuestions.length !== 0"
+                  color="primary"
+                  dark
+                  @click="openShowQuiz"
+                  >Show Quiz</v-btn
+                >
+              </v-col>
+            </v-row>
+          </v-container>
         </template>
-        <template v-slot:item.content="{ item }">
-          <div
-            class="text-left"
-            v-html="convertMarkDownNoFigure(item.content, item.image)"
-            @click="openShowQuestionDialog(item)"
-          ></div>
+
+        <template v-slot:item.title="{ item }">
+          <p
+            @click="showQuestionDialog(item)"
+            @contextmenu="rightClickEditQuestion($event, item)"
+            style="cursor: pointer"
+          >
+            {{ item.title }}
+          </p>
         </template>
 
         <template v-slot:item.topics="{ item }">
@@ -106,10 +138,10 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                small
+                large
                 class="mr-2"
                 v-on="on"
-                @click="openShowQuestionDialog(item)"
+                @click="showQuestionDialog(item)"
               >
                 visibility</v-icon
               >
@@ -118,7 +150,7 @@
           </v-tooltip>
           <v-tooltip bottom v-if="!item.sequence">
             <template v-slot:activator="{ on }">
-              <v-icon small class="mr-2" v-on="on" @click="addToQuiz(item)">
+              <v-icon large class="mr-2" v-on="on" @click="addToQuiz(item)">
                 add</v-icon
               >
             </template>
@@ -128,7 +160,7 @@
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
                 <v-icon
-                  small
+                  large
                   class="mr-2"
                   v-on="on"
                   @click="removeFromQuiz(item)"
@@ -141,7 +173,7 @@
             <v-tooltip bottom v-if="item.sequence !== 1">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  small
+                  large
                   class="mr-2"
                   v-on="on"
                   @click="changeQuestionPosition(item, 0)"
@@ -154,7 +186,7 @@
             <v-tooltip bottom v-if="item.sequence !== 1">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  small
+                  large
                   class="mr-2"
                   v-on="on"
                   @click="
@@ -172,7 +204,7 @@
             <v-tooltip bottom v-if="quizQuestions.length > 1">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  small
+                  large
                   class="mr-2"
                   v-on="on"
                   @click="openSetPosition(item)"
@@ -185,7 +217,7 @@
             <v-tooltip bottom v-if="item.sequence !== quizQuestions.length">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  small
+                  large
                   class="mr-2"
                   v-on="on"
                   @click="
@@ -203,7 +235,7 @@
             <v-tooltip bottom v-if="item.sequence !== quizQuestions.length">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  small
+                  large
                   class="mr-2"
                   v-on="on"
                   @click="
@@ -218,6 +250,12 @@
           </div>
         </template>
       </v-data-table>
+
+      <footer>
+        <v-icon class="mr-2">mouse</v-icon> Left-click on title to view
+        question. <v-icon class="mr-2">mouse</v-icon>Right -click on title to
+        edit question.
+      </footer>
     </v-card-text>
 
     <show-quiz-dialog
@@ -229,14 +267,8 @@
     <v-dialog v-model="positionDialog" persistent max-width="200px">
       <v-card>
         <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field v-model="position" label="position" required>
-                </v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
+          <v-text-field v-model="position" label="position" required>
+          </v-text-field>
         </v-card-text>
         <v-card-actions>
           <div class="flex-grow-1"></div>
@@ -257,12 +289,14 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
-import { convertMarkDownNoFigure } from '@/services/ConvertMarkdownService';
 import { Quiz } from '@/models/management/Quiz';
 import Question from '@/models/management/Question';
-import Image from '@/models/management/Image';
 import ShowQuestionDialog from '@/views/teacher/questions/ShowQuestionDialog.vue';
 import ShowQuizDialog from '@/views/teacher/quizzes/ShowQuizDialog.vue';
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
+
+Vue.component('VueCtkDateTimePicker', VueCtkDateTimePicker);
 
 @Component({
   components: {
@@ -285,16 +319,23 @@ export default class QuizForm extends Vue {
 
   headers: object = [
     {
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      width: '1%',
+      sortable: false
+    },
+    {
       text: 'Sequence',
       value: 'sequence',
-      align: 'left',
+      align: 'center',
       width: '1%'
     },
     {
-      text: 'Question',
-      value: 'content',
+      text: 'Title',
+      value: 'title',
       align: 'left',
-      width: '70%',
+      width: '20%',
       sortable: false
     },
     {
@@ -303,22 +344,7 @@ export default class QuizForm extends Vue {
       align: 'left',
       width: '20%'
     },
-    { text: 'Difficulty', value: 'difficulty', align: 'center', width: '1%' },
-    { text: 'Answers', value: 'numberOfAnswers', align: 'center', width: '1%' },
-    {
-      text: 'Title',
-      value: 'title',
-      align: 'left',
-      width: '5%',
-      sortable: false
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      width: '1%',
-      sortable: false
-    }
+    { text: 'Answers', value: 'numberOfAnswers', align: 'center', width: '1%' }
   ];
 
   async created() {
@@ -360,10 +386,8 @@ export default class QuizForm extends Vue {
     return (
       !!this.quiz.title &&
       !!this.quiz.availableDate &&
-      !!this.quiz.type &&
-      ((this.quiz.type == 'IN_CLASS' &&
-        this.quiz.conclusionDate !== undefined) ||
-        this.quiz.type !== 'IN_CLASS')
+      ((this.quiz.timed && this.quiz.conclusionDate !== undefined) ||
+        !this.quiz.timed)
     );
   }
 
@@ -424,7 +448,7 @@ export default class QuizForm extends Vue {
     }
   }
 
-  openShowQuestionDialog(question: Question) {
+  showQuestionDialog(question: Question) {
     this.currentQuestion = question;
     this.questionDialog = true;
   }
@@ -432,10 +456,6 @@ export default class QuizForm extends Vue {
   onCloseShowQuestionDialog() {
     this.currentQuestion = null;
     this.questionDialog = false;
-  }
-
-  convertMarkDownNoFigure(text: string, image: Image | null = null): string {
-    return convertMarkDownNoFigure(text, image);
   }
 
   addToQuiz(question: Question) {
