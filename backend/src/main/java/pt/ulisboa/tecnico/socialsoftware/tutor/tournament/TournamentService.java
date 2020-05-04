@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
@@ -22,6 +24,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto.QuizDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.statement.dto.StatementQuizDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
@@ -68,6 +71,9 @@ public class TournamentService {
 
     @Autowired
     private QuizRepository quizRepository;
+
+    @Autowired
+    private QuizAnswerRepository quizAnswerRepository;
 
     @Retryable(
         value = {SQLException.class },
@@ -144,6 +150,44 @@ public class TournamentService {
 
         tournament.cancel();
         entityManager.remove(tournament);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public StatementQuizDto getTournamentQuiz(Integer tournamentId, Integer userId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
+
+        User user = getUser(userId);
+
+        if (!tournament.hasSignedUp(user)) throw new TutorException(ErrorMessage.TOURNAMENT_QUIZ_NOT_JOINED, tournamentId);
+
+        checkTournamentQuizTime(tournament);
+
+        Quiz quiz = tournament.getQuiz();
+        if ( quiz == null ) throw new TutorException(ErrorMessage.TOURNAMENT_QUIZ_NOT_GENERATED, tournamentId);
+
+        QuizAnswer quizAnswer = getUserQuizAnswer(user, quiz);
+
+        return new StatementQuizDto(quizAnswer);
+    }
+
+    private QuizAnswer getUserQuizAnswer(User user, Quiz quiz) {
+        QuizAnswer quizAnswer = quizAnswerRepository.findQuizAnswer(quiz.getId(), user.getId()).orElseGet(() -> {
+            QuizAnswer qa = new QuizAnswer(user, quiz);
+            quizAnswerRepository.save(qa);
+            return qa;
+        });
+
+        if (quizAnswer.isCompleted()) throw new TutorException(ErrorMessage.TOURNAMENT_QUIZ_ALREADY_COMPLETED);
+        return quizAnswer;
+    }
+
+    private void checkTournamentQuizTime(Tournament tournament) {
+        LocalDateTime now = LocalDateTime.now();
+        if (tournament.getStartTime().isAfter(now)) throw new TutorException(ErrorMessage.TOURNAMENT_QUIZ_NOT_YET_AVAILABLE);
+        if (tournament.getFinishTime().isBefore(now)) throw new TutorException(ErrorMessage.TOURNAMENT_QUIZ_NO_LONGER_AVAILABLE);
     }
 
     @Retryable(
