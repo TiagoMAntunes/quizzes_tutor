@@ -227,3 +227,7 @@ Cypress.Commands.add('joinTournament', () => {
 Cypress.Commands.add('cancelTournament', () => {
   cy.get(':nth-child(2) > .last-col > .v-icon').click();
 });
+
+Cypress.Commands.add('joinTournamentWithFinishDate', (date) => {
+  cy.contains(date).parent().find('.last-col > .v-icon').click()
+})
