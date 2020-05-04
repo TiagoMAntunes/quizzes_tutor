@@ -72,4 +72,15 @@ public class StudentQuestionController{
         question.setStatus(Question.Status.AVAILABLE.name());
         return this.studentQuestionService.createStudentQuestion(courseId, question, user.getId());
     }
+
+    @GetMapping("/student/dashboard")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public int findStudentQuestionsSubmitted(Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if(user == null){
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+        return this.studentQuestionService.findStudentQuestionsSubmitted(user.getId());
+    }
 }
