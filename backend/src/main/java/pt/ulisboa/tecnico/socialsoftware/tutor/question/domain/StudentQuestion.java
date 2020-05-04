@@ -1,10 +1,14 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
+
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_CHANGE_ANSWERED_QUESTION;
 
 
 @Entity
@@ -50,6 +54,15 @@ public class StudentQuestion extends Question {
     public User getUser() { return this.user; }
 
     public void setUser(User userDto) { this.user = userDto; }
+
+    public void updateQuestion(StudentQuestionDto questionDto) {
+        if (questionDto.getQuestionStatus().equals("APPROVED")) {
+            throw new TutorException(CANNOT_CHANGE_ANSWERED_QUESTION);
+        }
+        setTitle(questionDto.getTitle());
+        setContent(questionDto.getContent());
+        setOptions(questionDto.getOptions());
+    }
 
 }
 
