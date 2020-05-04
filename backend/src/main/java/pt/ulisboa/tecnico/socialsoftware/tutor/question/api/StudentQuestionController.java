@@ -53,9 +53,9 @@ public class StudentQuestionController{
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/student_questions/available/{questionId}")
+    @PutMapping("/student_questions/available/{questionId}")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
-    public ResponseEntity studentQuestionApproveRejectStatus(@PathVariable Integer questionId) {
+    public ResponseEntity studentQuestionApproveToAvailable(@PathVariable Integer questionId) {
         studentQuestionService.studentQuestionApproveToAvailable(questionId);
         return ResponseEntity.ok().build();
     }
