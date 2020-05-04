@@ -48,10 +48,10 @@ describe('Student using tournaments walkthrough', () => {
 
         startTime.setHours(startTime.getHours() + 1) // Summer time zone problem fix!
 
-        cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"INSERT INTO tournaments(id, finish_time, number_of_questions, start_time, course_execution_id, creator_id, quiz_id) VALUES(42069, '2099-12-31 23:59:59', 5, '" + startTime.toISOString() + "', 11, 677, null); INSERT INTO topics_tournaments(topics_id, tournaments_id) VALUES(88, 42069);\"")
+        cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"INSERT INTO tournaments(id, finish_time, number_of_questions, start_time, course_execution_id, creator_id, quiz_id) VALUES(42069, '2099-12-31 23:59:59', 5, '" + startTime.toISOString() + "', 11, 647, null); INSERT INTO topics_tournaments(topics_id, tournaments_id) VALUES(88, 42069);\"")
         
         //Insert user
-        cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"INSERT INTO users_signed_up_tournaments VALUES(677, 42069);\"")
+        cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"INSERT INTO users_signed_up_tournaments VALUES(647, 42069);\"")
         
         //Join tournament with one participant
         cy.openAvailableTournaments();

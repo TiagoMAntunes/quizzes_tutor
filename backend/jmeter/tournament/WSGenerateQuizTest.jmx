@@ -78,10 +78,10 @@ END TRANSACTION;</stringProp>
         </JDBCSampler>
         <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Sign up a user" enabled="true">
-          <stringProp name="TestPlan.comments">677 is the id of the demo teacher. we can use it here for testing, but he wouldn&apos;t be able to access the tournament</stringProp>
+          <stringProp name="TestPlan.comments">647 is a random student</stringProp>
           <stringProp name="dataSource">Populate</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
-          <stringProp name="query">INSERT INTO users_signed_up_tournaments(signed_up_id, signed_up_tournaments_id) VALUES(677, ${tournamentId});</stringProp>
+          <stringProp name="query">INSERT INTO users_signed_up_tournaments(signed_up_id, signed_up_tournaments_id) VALUES(647, ${tournamentId});</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
           <stringProp name="variableNames"></stringProp>
@@ -358,8 +358,7 @@ if (quizId == null) {
           <stringProp name="dataSource">Populate</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
-DELETE FROM users_signed_up_tournaments WHERE signed_up_id = 677;
-DELETE FROM users_signed_up_tournaments WHERE signed_up_id = 676;
+DELETE FROM users_signed_up_tournaments WHERE signed_up_tournaments_id = ${tournamentId};
 DELETE FROM topics_tournaments WHERE tournaments_id = ${tournamentId};
 DELETE FROM tournaments WHERE id = ${tournamentId};
 DELETE FROM quiz_questions WHERE quiz_id = ${quizId_g1};
