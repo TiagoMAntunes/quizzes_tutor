@@ -48,7 +48,7 @@ Tournament {
     private Set<User> signedUp = new HashSet<>();
 
     @OneToOne
-    private Quiz quiz;
+    private Quiz quiz = null;
 
     public Tournament(){}
 

@@ -88,6 +88,12 @@ public enum ErrorMessage {
     TOURNAMENT_JOIN_WRONG_ROLE("Only students can join tournaments"),
     TOURNAMENT_DIFF_COURSE_EXEC("Student is not enrolled in this tournament's course execution"),
 
+    TOURNAMENT_QUIZ_NOT_YET_AVAILABLE("Tournament quiz is not yet available"),
+    TOURNAMENT_QUIZ_NO_LONGER_AVAILABLE("Tournament quiz is no longer available"),
+    TOURNAMENT_QUIZ_NOT_GENERATED("Tournament %d has no associated quiz"),
+    TOURNAMENT_QUIZ_NOT_JOINED("User has not joined tournament %d"),
+    TOURNAMENT_QUIZ_ALREADY_COMPLETED("User already completed tournament quiz"),
+
     CANT_ADD_EXPLANATION("Question is not in the rejected state"),
     ACCESS_DENIED("You do not have permission to view this resource"),
     NO_QUESTION_SUBMITTED("The user hasn't submitted any questions yet"),
