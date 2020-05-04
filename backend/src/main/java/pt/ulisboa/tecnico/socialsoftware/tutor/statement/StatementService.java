@@ -165,6 +165,7 @@ public class StatementService {
         quizRepository.findQuizzes(executionId).stream()
                 .filter(quiz -> !quiz.isQrCodeOnly())
                 .filter(quiz -> !quiz.getType().equals(Quiz.QuizType.GENERATED))
+                .filter(quiz -> !quiz.getType().equals(Quiz.QuizType.TOURNAMENT))
                 .filter(quiz -> quiz.getAvailableDate() == null || quiz.getAvailableDate().isBefore(now))
                 .filter(quiz -> !studentQuizIds.contains(quiz.getId()))
                 .forEach(quiz ->  {
