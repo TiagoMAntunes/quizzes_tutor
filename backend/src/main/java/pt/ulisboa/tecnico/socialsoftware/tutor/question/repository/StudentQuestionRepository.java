@@ -13,6 +13,9 @@ import java.util.List;
 @Repository
 @Transactional
 public interface StudentQuestionRepository extends JpaRepository<StudentQuestion, Integer> {
-    @Query(value = "SELECT * FROM studentQuestions c WHERE c.course_id = :courseId", nativeQuery = true)
+    @Query( value = "SELECT * FROM studentQuestions c WHERE c.course_id = :courseId", nativeQuery = true)
     List<Question> findStudentQuestions(int courseId);
+
+    @Query( value = "SELECT count(user_id) FROM stundentQuestions c WHERE c.user_id = :userId", nativeQuery = true)
+    int findStudentQuestionsSubmitted(int userId);
 }

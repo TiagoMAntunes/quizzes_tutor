@@ -134,6 +134,16 @@ public class StudentQuestionService {
                 anyMatch(course -> course.getCourse().getId() == id && id == currentCourseId);
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public int  findStudentQuestionsSubmitted(int studentId) {
+        User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
+        checkRoleStudent(user);
+        return studentQuestionRepository.findStudentQuestionsSubmitted(studentId);
+    }
+
     private void checkEnrolledCourseExecution(User student, Course course) {
         List<CourseExecution> list = student.getCourseExecutions().stream().filter(
                 courseExecution -> courseExecution.getCourse() == course).collect(Collectors.toList());
