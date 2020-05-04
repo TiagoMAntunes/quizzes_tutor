@@ -145,6 +145,17 @@ public class StudentQuestionService {
         return count;
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public int  findStudentQuestionsApproved(int studentId) {
+        User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
+        checkRoleStudent(user);
+        Integer count = studentQuestionRepository.findStudentQuestionsApproved(user.getId());
+        return count;
+    }
+
     private void checkEnrolledCourseExecution(User student, Course course) {
         List<CourseExecution> list = student.getCourseExecutions().stream().filter(
                 courseExecution -> courseExecution.getCourse() == course).collect(Collectors.toList());
