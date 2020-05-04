@@ -6,13 +6,22 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto.QuizDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
@@ -25,6 +34,8 @@ import java.sql.SQLException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,6 +59,15 @@ public class TournamentService {
 
     @PersistenceContext
     EntityManager entityManager;
+
+    @Autowired
+    private QuizService quizService;
+
+    @Autowired
+    private QuestionRepository questionRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
 
     @Retryable(
         value = {SQLException.class },
@@ -165,10 +185,52 @@ public class TournamentService {
         tournament.signUp(user);
         user.addTournament(tournament);
 
+        if(tournament.getSignedUpNumber() >= 2)
+            this.generateTournamentQuiz(tournament);
+
         return new TournamentDto(tournament, userId);
     }
 
-    public int getTournamentSignedUpNumber(Integer tournamentId){
+    private void generateTournamentQuiz(Tournament tournament) {
+        //Generate quiz
+        QuizDto quiz = new QuizDto();
+        quiz.setType(Quiz.QuizType.TOURNAMENT.toString());
+        quiz.setAvailableDate(DateHandler.toISOString(tournament.getStartTime()));
+        quiz.setConclusionDate(DateHandler.toISOString(tournament.getFinishTime()));
+        quiz.setScramble(true);
+        quiz.setTitle("Tournament" + tournament.getId());
+        quiz.setKey(quizService.getMaxQuizKey() + 1);
+
+        CourseExecution courseExecution = tournament.getCourseExecution();
+
+        // Get all available questions with one of the given topics at least
+        List<Question> availableQuestions = questionRepository.findAvailableQuestions(courseExecution.getCourse().getId())
+                .stream().filter(question -> tournament.getTopics().stream()
+                        .anyMatch(topic -> question.getTopics().contains(topic))).collect(Collectors.toList());
+
+        Collections.shuffle(availableQuestions); //Random selection of questions
+
+        // Validate enough questions
+        if (availableQuestions.size() < tournament.getNumberOfQuestions())
+            tournament.setNumberOfQuestions(availableQuestions.size());
+
+        ArrayList<QuestionDto> quizQuestions = new ArrayList<>();
+        int i = 0;
+        for (Question q : availableQuestions) {
+            if (i++ == tournament.getNumberOfQuestions())
+                break;
+            QuestionDto question = new QuestionDto(q);
+            question.setSequence(i); // if we don't add this, it will crash because it doesn't come from frontend
+            quizQuestions.add(question);
+
+        }
+        quiz.setQuestions(quizQuestions);
+
+        quizService.createQuiz(courseExecution.getId(), quiz);
+        tournament.setQuiz(quizRepository.findByKey(quiz.getKey()).get()); // No need to throw as we just created it
+    }
+
+    public int getTournamentSignedUpNumber(Integer tournamentId) {
         return getTournament(tournamentId).getSignedUpNumber();
     }
 
