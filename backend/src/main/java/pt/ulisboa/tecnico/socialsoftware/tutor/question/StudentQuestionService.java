@@ -141,7 +141,8 @@ public class StudentQuestionService {
     public int  findStudentQuestionsSubmitted(int studentId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
-        return studentQuestionRepository.findStudentQuestionsSubmitted(studentId);
+        Integer count = studentQuestionRepository.findStudentQuestionsSubmitted(user.getId());
+        return count;
     }
 
     private void checkEnrolledCourseExecution(User student, Course course) {
