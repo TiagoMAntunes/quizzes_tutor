@@ -115,6 +115,9 @@ Tournament {
 
         courseExecution.getTournaments().remove(this);
         courseExecution = null;
+
+        if (quiz != null) quiz.remove();
+        quiz = null;
     }
 
     public boolean hasSignedUp(User user){
