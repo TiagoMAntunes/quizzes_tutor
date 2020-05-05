@@ -97,11 +97,10 @@ export default class RemoteServices {
   static async getStudentDashboard(): Promise<StudentDashboard> {
     return httpClient
         .get(
-            '/student/${Store.getters.getCurrentCourse.courseExecutionId}/dashboard'
+            `/student/${Store.getters.getCurrentCourse.courseId}/dashboard`
         )
         .then(response => {
           return new StudentDashboard(response.data);
-          console.log(response.data);
         })
         .catch(async error => {
           throw Error(await this.errorMessage(error));

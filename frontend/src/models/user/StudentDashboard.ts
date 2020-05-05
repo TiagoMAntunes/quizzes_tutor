@@ -6,7 +6,7 @@ export default class StudentDashboard {
     constructor(jsonObj?: StudentDashboard) {
         if (jsonObj) {
             this.numberQuestionsSubmitted = jsonObj.numberQuestionsSubmitted;
-         this.numberQuestionsApproved = jsonObj.numberQuestionsApproved;
+            this.numberQuestionsApproved = jsonObj.numberQuestionsApproved;
         }
     }
 }
