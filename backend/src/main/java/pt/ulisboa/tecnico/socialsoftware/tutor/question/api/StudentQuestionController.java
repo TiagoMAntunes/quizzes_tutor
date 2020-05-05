@@ -53,6 +53,13 @@ public class StudentQuestionController{
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/student_questions/available/{questionId}")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public ResponseEntity studentQuestionApproveToAvailable(@PathVariable Integer questionId) {
+        studentQuestionService.studentQuestionApproveToAvailable(questionId);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/student_questions/{questionId}/explanation")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity studentQuestionAddExplanation(@PathVariable Integer questionId, @Valid @RequestBody String explanation) {
