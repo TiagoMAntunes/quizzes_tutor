@@ -108,7 +108,7 @@ class JoinTournamentServicePerformanceTest extends Specification {
         when:
         1.upto(N_USERS, {
             id->
-                tournamentService.joinTournament(tournament_id, courseExecution, id as Integer)
+                tournamentService.joinTournament(tournament_id, id as Integer)
         })
 
         then:

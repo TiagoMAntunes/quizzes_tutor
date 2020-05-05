@@ -6,7 +6,6 @@
       :search="search"
       :sort-by="['sequence']"
       :mobile-breakpoint="0"
-      multi-sort
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
     >
@@ -20,7 +19,7 @@
           />
 
           <v-spacer />
-          <v-btn color="primary" dark @click="newAssessment"
+          <v-btn color="primary" dark @click="$emit('newAssessment')"
             >New Assessment</v-btn
           >
         </v-card-title>
@@ -43,7 +42,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="editAssessment(item.id)"
@@ -55,7 +54,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="deleteAssessment(item.id)"
@@ -66,7 +65,19 @@
           <span>Delete Assessment</span>
         </v-tooltip>
       </template>
+      <template v-slot:item.title="{ item }">
+        <p
+          @contextmenu="editAssessment(item.id, $event)"
+          style="cursor: pointer"
+        >
+          {{ item.title }}
+        </p>
+      </template>
     </v-data-table>
+    <footer>
+      <v-icon class="mr-2">mouse</v-icon>Right-click on assessment's title to
+      edit it.
+    </footer>
 
     <v-dialog
       v-model="dialog"
@@ -85,32 +96,26 @@
         </v-toolbar>
 
         <v-card-text>
-          <v-container grid-list-md fluid>
-            <v-layout column wrap>
-              <ol>
-                <li
-                  v-for="question in assessment.questions"
-                  :key="question.sequence"
-                  class="text-left"
-                >
+          <ol>
+            <li
+              v-for="question in assessment.questions"
+              :key="question.sequence"
+              class="text-left"
+            >
+              <span
+                v-html="convertMarkDown(question.content, question.image)"
+              />
+              <ul>
+                <li v-for="option in question.options" :key="option.number">
                   <span
-                    v-html="convertMarkDown(question.content, question.image)"
+                    v-html="convertMarkDown(option.content)"
+                    v-bind:class="[option.correct ? 'font-weight-bold' : '']"
                   />
-                  <ul>
-                    <li v-for="option in question.options" :key="option.number">
-                      <span
-                        v-html="convertMarkDown(option.content, null)"
-                        v-bind:class="[
-                          option.correct ? 'font-weight-bold' : ''
-                        ]"
-                      />
-                    </li>
-                  </ul>
-                  <br />
                 </li>
-              </ol>
-            </v-layout>
-          </v-container>
+              </ul>
+              <br />
+            </li>
+          </ol>
         </v-card-text>
 
         <v-card-actions>
@@ -137,6 +142,13 @@ export default class AssessmentList extends Vue {
   statusList = ['DISABLED', 'AVAILABLE', 'REMOVED'];
   dialog: boolean = false;
   headers: object = [
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      sortable: false,
+      width: '15%'
+    },
     { text: 'Order', value: 'sequence', align: 'center', width: '95px' },
     { text: 'Title', value: 'title', align: 'left' },
     {
@@ -145,14 +157,7 @@ export default class AssessmentList extends Vue {
       align: 'center',
       width: '7%'
     },
-    { text: 'Status', value: 'status', align: 'center', width: '7%' },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false,
-      width: '7%'
-    }
+    { text: 'Status', value: 'status', align: 'center', width: '7%' }
   ];
 
   closeAssessment() {
@@ -174,11 +179,8 @@ export default class AssessmentList extends Vue {
     }
   }
 
-  newAssessment() {
-    this.$emit('newAssessment');
-  }
-
-  editAssessment(assessmentId: number) {
+  editAssessment(assessmentId: number, e?: Event) {
+    if (e) e.preventDefault();
     this.$emit('editAssessment', assessmentId);
   }
 

@@ -20,22 +20,20 @@
       </v-row>
       <v-row justify="center">
         <v-col>
-          <v-datetime-picker
+          <VueCtkDateTimePicker
             label="Start time"
-            format="yyyy-MM-dd HH:mm"
-            date-format="yyyy-MM-dd"
-            time-format="HH:mm"
+            format="YYYY-MM-DDTHH:mm:ssZ"
             v-model="tournamentManager.startTime"
-          ></v-datetime-picker>
+            data-cy="startTimePicker"
+          ></VueCtkDateTimePicker>
         </v-col>
         <v-col>
-          <v-datetime-picker
+          <VueCtkDateTimePicker
             label="Finish time"
-            format="yyyy-MM-dd HH:mm"
-            date-format="yyyy-MM-dd"
-            time-format="HH:mm"
+            format="YYYY-MM-DDTHH:mm:ssZ"
             v-model="tournamentManager.finishTime"
-          ></v-datetime-picker>
+            data-cy="finishTimePicker"
+          ></VueCtkDateTimePicker>
         </v-col>
       </v-row>
       <v-container>

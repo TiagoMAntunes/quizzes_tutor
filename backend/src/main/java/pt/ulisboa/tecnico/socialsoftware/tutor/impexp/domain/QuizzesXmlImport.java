@@ -7,13 +7,14 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService;
-import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto.QuizDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto.QuizQuestionDto;
@@ -28,13 +29,15 @@ public class QuizzesXmlImport {
 	private QuizService quizService;
 	private QuestionRepository questionRepository;
 	private QuizQuestionRepository quizQuestionRepository;
-    private CourseExecutionRepository courseExecutionRepository;
+    private CourseRepository courseRepository;
 
-	public void importQuizzes(InputStream inputStream, QuizService quizService, QuestionRepository questionRepository, QuizQuestionRepository quizQuestionRepository, CourseExecutionRepository courseExecutionRepository) {
+	public void importQuizzes(InputStream inputStream, QuizService quizService, QuestionRepository questionRepository,
+							  QuizQuestionRepository quizQuestionRepository, CourseExecutionRepository courseExecutionRepository,
+							  CourseRepository courseRepository) {
 		this.quizService = quizService;
 		this.questionRepository = questionRepository;
 		this.quizQuestionRepository = quizQuestionRepository;
-		this.courseExecutionRepository = courseExecutionRepository;
+        this.courseRepository = courseRepository;
 
 		SAXBuilder builder = new SAXBuilder();
 		builder.setIgnoringElementContentWhitespace(true);
@@ -58,13 +61,15 @@ public class QuizzesXmlImport {
 		importQuizzes(doc);
 	}
 
-	public void importQuizzes(String quizzesXml, QuizService quizService, QuestionRepository questionRepository, QuizQuestionRepository quizQuestionRepository, CourseExecutionRepository courseExecutionRepository) {
+	public void importQuizzes(String quizzesXml, QuizService quizService, QuestionRepository questionRepository,
+							  QuizQuestionRepository quizQuestionRepository, CourseExecutionRepository courseExecutionRepository,
+							  CourseRepository courseRepository) {
 		SAXBuilder builder = new SAXBuilder();
 		builder.setIgnoringElementContentWhitespace(true);
 
 		InputStream stream = new ByteArrayInputStream(quizzesXml.getBytes());
 
-		importQuizzes(stream, quizService, questionRepository, quizQuestionRepository, courseExecutionRepository);
+		importQuizzes(stream, quizService, questionRepository, quizQuestionRepository, courseExecutionRepository, courseRepository);
 	}
 
 	private void importQuizzes(Document doc) {
@@ -76,6 +81,9 @@ public class QuizzesXmlImport {
 	}
 
 	private void importQuiz(Element quizElement) {
+		String courseName = quizElement.getAttributeValue("courseName");
+		String courseType = quizElement.getAttributeValue("courseType");
+
 		String courseExecutionType = quizElement.getAttributeValue("courseExecutionType");
         String acronym = quizElement.getAttributeValue("acronym");
         String academicTerm = quizElement.getAttributeValue("academicTerm");
@@ -125,12 +133,16 @@ public class QuizzesXmlImport {
 		quizDto.setCreationDate(creationDate);
         quizDto.setAvailableDate(availableDate);
         quizDto.setConclusionDate(conclusionDate);
-		quizDto.setType(Quiz.QuizType.valueOf(type));
+		quizDto.setType(type);
 		quizDto.setSeries(series);
 		quizDto.setVersion(version);
 
-		CourseExecution courseExecution =
-				this.courseExecutionRepository.findByAcronymAcademicTermType(acronym, academicTerm, courseExecutionType).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, acronym));
+		Course course = courseRepository.findByNameType(courseName, courseType)
+			.orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseName + ":" + courseType));
+
+		CourseExecution courseExecution = course.getCourseExecution(acronym, academicTerm, Course.Type.valueOf(courseExecutionType))
+				.orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, acronym));
+
 		QuizDto quizDto2 = quizService.createQuiz(courseExecution.getId(), quizDto);
 		importQuizQuestions(quizElement.getChild("quizQuestions"), quizDto2);
 	}

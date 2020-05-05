@@ -11,10 +11,12 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuizAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuizAnswersDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.Demo;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.CSVQuizExportVisitor;
@@ -38,8 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,6 +50,9 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Service
 public class QuizService {
+    @Autowired
+    private CourseRepository courseRepository;
+
     @Autowired
     private CourseExecutionRepository courseExecutionRepository;
 
@@ -113,11 +116,15 @@ public class QuizService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public QuizDto createQuiz(int executionId, QuizDto quizDto) {
         CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+        Quiz quiz = new Quiz(quizDto);
 
         if (quizDto.getKey() == null) {
             quizDto.setKey(getMaxQuizKey() + 1);
         }
-        Quiz quiz = new Quiz(quizDto);
+
+        if (quizDto.getCreationDate() == null) {
+            quiz.setCreationDate(DateHandler.now());
+        }
         quiz.setCourseExecution(courseExecution);
 
         if (quizDto.getQuestions() != null) {
@@ -127,12 +134,7 @@ public class QuizService {
                 new QuizQuestion(quiz, question, quiz.getQuizQuestions().size());
             }
         }
-        if (quizDto.getCreationDate() == null) {
-            quiz.setCreationDate(LocalDateTime.now());
-        } else {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            quiz.setCreationDate(LocalDateTime.parse(quizDto.getCreationDate(), formatter));
-        }
+
         quizRepository.save(quiz);
 
         return new QuizDto(quiz, true);
@@ -149,12 +151,22 @@ public class QuizService {
         quiz.checkCanChange();
 
         quiz.setTitle(quizDto.getTitle());
-        quiz.setAvailableDate(quizDto.getAvailableDateDate());
-        quiz.setConclusionDate(quizDto.getConclusionDateDate());
+        if (DateHandler.isValidDateFormat(quizDto.getAvailableDate()))
+            quiz.setAvailableDate(DateHandler.toLocalDateTime(quizDto.getAvailableDate()));
+        if (DateHandler.isValidDateFormat(quizDto.getConclusionDate()))
+            quiz.setConclusionDate(DateHandler.toLocalDateTime(quizDto.getConclusionDate()));
+        if (DateHandler.isValidDateFormat(quizDto.getResultsDate()))
+            quiz.setResultsDate(DateHandler.toLocalDateTime(quizDto.getResultsDate()));
         quiz.setScramble(quizDto.isScramble());
         quiz.setQrCodeOnly(quizDto.isQrCodeOnly());
         quiz.setOneWay(quizDto.isOneWay());
-        quiz.setType(quizDto.getType());
+
+        if (quizDto.getType() != null)
+            quiz.setType(quizDto.getType());
+        else if (quizDto.isTimed())
+            quiz.setType(Quiz.QuizType.IN_CLASS.toString());
+        else
+            quiz.setType(Quiz.QuizType.PROPOSED.toString());
 
         Set<QuizQuestion> quizQuestions = new HashSet<>(quiz.getQuizQuestions());
 
@@ -226,8 +238,8 @@ public class QuizService {
         ).collect(Collectors.toList()));
 
         quizAnswersDto.setQuizAnswers(quiz.getQuizAnswers().stream().map(QuizAnswerDto::new).collect(Collectors.toList()));
-        if (quiz.getConclusionDate() != null && quiz.getConclusionDate().isAfter(LocalDateTime.now())) {
-            quizAnswersDto.setSecondsToSubmission(ChronoUnit.SECONDS.between(LocalDateTime.now(), quiz.getConclusionDate()));
+        if (quiz.getConclusionDate() != null && quiz.getConclusionDate().isAfter(DateHandler.now())) {
+            quizAnswersDto.setTimeToSubmission(ChronoUnit.MILLIS.between(DateHandler.now(), quiz.getConclusionDate()));
         }
 
         return quizAnswersDto;
@@ -251,7 +263,7 @@ public class QuizService {
     public void importQuizzesFromXml(String quizzesXml) {
         QuizzesXmlImport xmlImport = new QuizzesXmlImport();
 
-        xmlImport.importQuizzes(quizzesXml, this, questionRepository, quizQuestionRepository, courseExecutionRepository);
+        xmlImport.importQuizzes(quizzesXml, this, questionRepository, quizQuestionRepository, courseExecutionRepository, courseRepository);
     }
 
     @Retryable(
@@ -330,7 +342,7 @@ public class QuizService {
             this.quizRepository.delete(quiz);
         });
 
-        // remove questions that werent in any quiz
+        // remove questions that weren't in any quiz
         for (Question question: questionRepository.findQuestions(Demo.COURSE_ID).stream().filter(question -> question.getQuizQuestions().isEmpty()).collect(Collectors.toList())) {
             questionService.deleteQuestion(question);
         }

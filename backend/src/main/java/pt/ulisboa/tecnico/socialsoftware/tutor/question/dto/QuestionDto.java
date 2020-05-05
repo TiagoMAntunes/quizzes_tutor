@@ -1,12 +1,12 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.dto;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -22,7 +22,7 @@ public class QuestionDto implements Serializable {
     private int numberOfGeneratedQuizzes = 0;
     private int numberOfNonGeneratedQuizzes = 0;
     private int numberOfCorrect;
-    private String creationDate = null;
+    private String creationDate;
     private String status;
     private List<OptionDto> options = new ArrayList<>();
     private ImageDto image;
@@ -38,30 +38,26 @@ public class QuestionDto implements Serializable {
         this.content = question.getContent();
         this.difficulty = question.getDifficulty();
         this.numberOfAnswers = question.getNumberOfAnswers();
+        this.numberOfNonGeneratedQuizzes = question.getQuizQuestions().size() - this.numberOfGeneratedQuizzes;
+        this.numberOfCorrect = question.getNumberOfCorrect();
+        this.status = question.getStatus().name();
+        this.options = question.getOptions().stream().map(OptionDto::new).collect(Collectors.toList());
+        this.topics = question.getTopics().stream().sorted(Comparator.comparing(Topic::getName)).map(TopicDto::new).collect(Collectors.toList());
+        this.creationDate = DateHandler.toISOString(question.getCreationDate());
+
         if (!question.getQuizQuestions().isEmpty()) {
             this.numberOfGeneratedQuizzes = (int) question.getQuizQuestions().stream()
                     .map(QuizQuestion::getQuiz)
                     .filter(quiz -> quiz.getType().equals(Quiz.QuizType.GENERATED))
                     .count();
         }
-        this.numberOfNonGeneratedQuizzes = question.getQuizQuestions().size() - this.numberOfGeneratedQuizzes;
-        this.numberOfCorrect = question.getNumberOfCorrect();
-        this.status = question.getStatus().name();
-        this.options = question.getOptions().stream().map(OptionDto::new).collect(Collectors.toList());
-        this.topics = question.getTopics().stream().sorted(Comparator.comparing(Topic::getName)).map(TopicDto::new).collect(Collectors.toList());
 
         if (question.getImage() != null)
             this.image = new ImageDto(question.getImage());
-        if (question.getCreationDate() != null)
-            this.creationDate = question.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Integer getKey() {

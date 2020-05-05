@@ -1,16 +1,16 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Store from './store';
+import Store from '@/store';
 
-import HomeView from './views/HomeView.vue';
-import LoginView from './views/LoginView.vue';
-import CourseSelectionView from './views/CourseSelectionView.vue';
+import LoginView from '@/views/LoginView.vue';
+import CourseSelectionView from '@/views/CourseSelectionView.vue';
 
+import HomeView from '@/views/HomeView.vue';
 import ManagementView from '@/views/teacher/ManagementView.vue';
-import QuestionsView from './views/teacher/questions/QuestionsView.vue';
-import TopicsView from './views/teacher/TopicsView.vue';
-import QuizzesView from './views/teacher/quizzes/QuizzesView.vue';
-import StudentsView from './views/teacher/students/StudentsView.vue';
+import QuestionsView from '@/views/teacher/questions/QuestionsView.vue';
+import TopicsView from '@/views/teacher/TopicsView.vue';
+import QuizzesView from '@/views/teacher/quizzes/QuizzesView.vue';
+import StudentsView from '@/views/teacher/students/StudentsView.vue';
 import StudentView from '@/views/student/StudentView.vue';
 import StudentQuestionsManageView from '@/views/teacher/questions/StudentQuestionManageView.vue';
 import StudentQuestionsView from '@/views/student/questions/StudentQuestionsView.vue';
@@ -25,8 +25,8 @@ import CreateTournamentView from '@/views/student/tournament/CreateTournamentVie
 import CreateStudentQuestionView from '@/views/student/questions/CreateStudentQuestionView.vue';
 import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
 
-import AdminManagementView from './views/admin/AdminManagementView.vue';
-import NotFoundView from './views/NotFoundView.vue';
+import AdminManagementView from '@/views/admin/AdminManagementView.vue';
+import NotFoundView from '@/views/NotFoundView.vue';
 import ImpExpView from '@/views/teacher/impexp/ImpExpView.vue';
 import AssessmentsView from '@/views/teacher/assessments/AssessmentsView.vue';
 import CreateQuizzesView from '@/views/student/CreateQuizzesView.vue';

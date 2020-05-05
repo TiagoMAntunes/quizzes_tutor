@@ -10,157 +10,177 @@
       <v-btn color="primary" dark @click="saveAssessment">Save</v-btn>
     </v-card-title>
     <v-card-text>
-      <v-row>
-        <v-col cols="12" sm="10">
-          <v-text-field v-model="assessment.title" label="Title"></v-text-field>
-        </v-col>
+      <v-container fluid>
+        <v-row>
+          <v-col>
+            <v-text-field
+              v-model="assessment.title"
+              label="Title"
+            ></v-text-field>
+          </v-col>
 
-        <v-col cols="12" sm="2">
-          <v-text-field
-            min="0"
-            step="1"
-            type="number"
-            label="Order"
-            :value="assessment.sequence"
-            @change="assessment.sequence = Number($event)"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12" sm="6" class="light-green lighten-4">
-          <v-data-table
-            :headers="topicHeaders"
-            :custom-filter="topicFilter"
-            :items="assessment.topicConjunctions"
-            :search="JSON.stringify(currentTopicsSearch)"
-            :mobile-breakpoint="0"
-            :items-per-page="15"
-            :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
-          >
-            <template v-slot:top>
-              <h2>Currently selected</h2>
-              <v-autocomplete
-                v-model="currentTopicsSearch"
-                label="Search"
-                :items="allTopics"
-                :filter="topicSearch"
-                :search-input.sync="currentTopicsSearchText"
-                @change="currentTopicsSearchText = ''"
-                item-text="name"
-                return-object
-                chips
-                small-chips
-                clearable
-                deletable-chips
-                multiple
-                dense
-                class="mx-4"
-              >
-              </v-autocomplete>
-            </template>
-            <template v-slot:item.topics="{ item }">
-              <v-chip v-for="topic in item.topics" :key="topic.id">
-                {{ topic.name }}
-              </v-chip>
-            </template>
-            <template v-slot:item.action="{ item }">
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                  <v-icon
-                    small
-                    class="mr-2"
-                    v-on="on"
-                    @click="removeTopicConjunction(item)"
-                  >
-                    remove</v-icon
-                  >
-                </template>
-                <span>Remove from Assessment</span>
-              </v-tooltip>
+          <v-col>
+            <v-text-field
+              min="0"
+              step="1"
+              type="number"
+              label="Order"
+              :value="assessment.sequence"
+              @change="assessment.sequence = Number($event)"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="light-green lighten-4">
+            <v-data-table
+              :headers="topicHeaders"
+              :custom-filter="topicFilter"
+              :items="assessment.topicConjunctions"
+              :search="JSON.stringify(currentTopicsSearch)"
+              :mobile-breakpoint="0"
+              :items-per-page="15"
+              :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+            >
+              <template v-slot:top>
+                <h2>Currently selected</h2>
+                <v-autocomplete
+                  v-model="currentTopicsSearch"
+                  label="Search"
+                  :items="allTopics"
+                  :filter="topicSearch"
+                  :search-input.sync="currentTopicsSearchText"
+                  @change="currentTopicsSearchText = ''"
+                  item-text="name"
+                  return-object
+                  chips
+                  small-chips
+                  clearable
+                  deletable-chips
+                  multiple
+                  dense
+                  class="mx-4"
+                >
+                </v-autocomplete>
+              </template>
+              <template v-slot:item.topics="{ item }">
+                <div v-if="item.topics.length > 0">
+                  <v-chip v-for="topic in item.topics" :key="topic.id">
+                    {{ topic.name }}
+                  </v-chip>
+                </div>
+                <div v-else>
+                  No Topic
+                </div>
+              </template>
+              <template v-slot:item.action="{ item }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-icon
+                      large
+                      class="mr-2"
+                      v-on="on"
+                      @click="removeTopicConjunction(item)"
+                    >
+                      chevron_right</v-icon
+                    >
+                  </template>
+                  <span>Remove from Assessment</span>
+                </v-tooltip>
 
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                  <v-icon
-                    small
-                    class="mr-2"
-                    v-on="on"
-                    @click="showQuestionsDialog(item)"
-                  >
-                    visibility</v-icon
-                  >
-                </template>
-                <span>Show Questions</span>
-              </v-tooltip>
-            </template>
-          </v-data-table>
-        </v-col>
-        <v-col cols="12" sm="6" class="red lighten-4">
-          <v-data-table
-            :headers="topicHeaders"
-            :custom-filter="topicFilter"
-            :items="topicConjunctions"
-            :search="JSON.stringify(allTopicsSearch)"
-            :mobile-breakpoint="0"
-            :items-per-page="15"
-            :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
-          >
-            <template v-slot:top>
-              <h2>Available topics</h2>
-              <v-autocomplete
-                v-model="allTopicsSearch"
-                label="Search"
-                :items="allTopics"
-                :filter="topicSearch"
-                :search-input.sync="allTopicsSearchText"
-                @change="allTopicsSearchText = ''"
-                item-text="name"
-                return-object
-                chips
-                small-chips
-                clearable
-                deletable-chips
-                multiple
-                dense
-                class="mx-4"
-              >
-              </v-autocomplete>
-            </template>
-            <template v-slot:item.topics="{ item }">
-              <v-chip v-for="topic in item.topics" :key="topic.id">
-                {{ topic.name }}
-              </v-chip>
-            </template>
-            <template v-slot:item.action="{ item }">
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                  <v-icon
-                    small
-                    class="mr-2"
-                    v-on="on"
-                    @click="addTopicConjunction(item)"
-                  >
-                    add</v-icon
-                  >
-                </template>
-                <span>Add to Assessment</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                  <v-icon
-                    small
-                    class="mr-2"
-                    v-on="on"
-                    @click="showQuestionsDialog(item)"
-                  >
-                    visibility</v-icon
-                  >
-                </template>
-                <span>Show Questions</span>
-              </v-tooltip>
-            </template>
-          </v-data-table>
-        </v-col>
-      </v-row>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-icon
+                      large
+                      class="mr-2"
+                      v-on="on"
+                      @click="showQuestionsDialog(item)"
+                    >
+                      visibility</v-icon
+                    >
+                  </template>
+                  <span>Show Questions</span>
+                </v-tooltip>
+              </template>
+            </v-data-table>
+          </v-col>
+          <v-col class="red lighten-4">
+            <v-data-table
+              :headers="topicHeaders"
+              :custom-filter="topicFilter"
+              :items="topicConjunctions"
+              :search="JSON.stringify(allTopicsSearch)"
+              :mobile-breakpoint="0"
+              :items-per-page="15"
+              :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+            >
+              <template v-slot:top>
+                <h2>Available topics</h2>
+                <v-autocomplete
+                  v-model="allTopicsSearch"
+                  label="Search"
+                  :items="allTopics"
+                  :filter="topicSearch"
+                  :search-input.sync="allTopicsSearchText"
+                  @change="allTopicsSearchText = ''"
+                  item-text="name"
+                  return-object
+                  chips
+                  small-chips
+                  clearable
+                  deletable-chips
+                  multiple
+                  dense
+                  class="mx-4"
+                >
+                </v-autocomplete>
+              </template>
+              <template v-slot:item.topics="{ item }">
+                <div v-if="item.topics.length > 0">
+                  <div v-if="item.topics">
+                    <v-chip v-for="topic in item.topics" :key="topic.id">
+                      {{ topic.name }}
+                    </v-chip>
+                  </div>
+                  <div v-else>
+                    No Topic
+                  </div>
+                </div>
+                <div v-else>
+                  No Topic
+                </div>
+              </template>
+              <template v-slot:item.action="{ item }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-icon
+                      large
+                      class="mr-2"
+                      v-on="on"
+                      @click="addTopicConjunction(item)"
+                    >
+                      chevron_left</v-icon
+                    >
+                  </template>
+                  <span>Add to Assessment</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-icon
+                      large
+                      class="mr-2"
+                      v-on="on"
+                      @click="showQuestionsDialog(item)"
+                    >
+                      visibility</v-icon
+                    >
+                  </template>
+                  <span>Show Questions</span>
+                </v-tooltip>
+              </template>
+            </v-data-table>
+          </v-col>
+        </v-row>
+      </v-container>
       <v-btn
         color="primary"
         dark
@@ -177,32 +197,26 @@
     >
       <v-card v-if="questionsToShow">
         <v-card-text>
-          <v-container grid-list-md fluid>
-            <v-layout column wrap>
-              <ol>
-                <li
-                  v-for="question in questionsToShow"
-                  :key="question.id"
-                  class="text-left"
-                >
+          <ol>
+            <li
+              v-for="question in questionsToShow"
+              :key="question.id"
+              class="text-left"
+            >
+              <span
+                v-html="convertMarkDown(question.content, question.image)"
+              ></span>
+              <ul>
+                <li v-for="option in question.options" :key="option.number">
                   <span
-                    v-html="convertMarkDown(question.content, question.image)"
+                    v-html="convertMarkDown(option.content)"
+                    v-bind:class="[option.correct ? 'font-weight-bold' : '']"
                   ></span>
-                  <ul>
-                    <li v-for="option in question.options" :key="option.number">
-                      <span
-                        v-html="convertMarkDown(option.content, null)"
-                        v-bind:class="[
-                          option.correct ? 'font-weight-bold' : ''
-                        ]"
-                      ></span>
-                    </li>
-                  </ul>
-                  <br />
                 </li>
-              </ol>
-            </v-layout>
-          </v-container>
+              </ul>
+              <br />
+            </li>
+          </ol>
         </v-card-text>
 
         <v-card-actions>
@@ -245,16 +259,16 @@ export default class AssessmentForm extends Vue {
 
   topicHeaders: object = [
     {
-      text: 'Topics',
-      value: 'topics',
+      text: 'Actions',
+      value: 'action',
       align: 'left',
+      width: '30%',
       sortable: false
     },
     {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      width: '150px',
+      text: 'Topics',
+      value: 'topics',
+      align: 'left',
       sortable: false
     }
   ];

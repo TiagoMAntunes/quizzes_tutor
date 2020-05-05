@@ -5,7 +5,8 @@
       :custom-filter="customFilter"
       :items="questions"
       :search="search"
-      multi-sort
+      :sort-by="['creationDate']"
+      sort-desc
       :mobile-breakpoint="0"
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
@@ -27,11 +28,15 @@
         </v-card-title>
       </template>
 
-      <template v-slot:item.content="{ item }">
+      <template v-slot:item.title="{ item }">
         <p
-          v-html="convertMarkDownNoFigure(item.content, null)"
           @click="showQuestionDialog(item)"
-      /></template>
+          @contextmenu="editQuestion(item, $event)"
+          style="cursor: pointer"
+        >
+          {{ item.title }}
+        </p>
+      </template>
 
       <template v-slot:item.topics="{ item }">
         <edit-question-topics
@@ -79,7 +84,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="showQuestionDialog(item)"
@@ -88,18 +93,10 @@
           </template>
           <span>Show Question</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
-          <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="editQuestion(item)"
-              >edit</v-icon
-            >
-          </template>
-          <span>Edit Question</span>
-        </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="duplicateQuestion(item)"
@@ -108,10 +105,19 @@
           </template>
           <span>Duplicate Question</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
+          <template v-slot:activator="{ on }">
+            <v-icon large class="mr-2" v-on="on" @click="editQuestion(item)"
+              >edit</v-icon
+            >
+          </template>
+          <span>Edit Question</span>
+        </v-tooltip>
+
+        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="deleteQuestion(item)"
@@ -123,6 +129,11 @@
         </v-tooltip>
       </template>
     </v-data-table>
+    <footer>
+      <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
+      it. <v-icon class="mr-2">mouse</v-icon>Right-click on question's title to
+      edit it.
+    </footer>
     <edit-question-dialog
       v-if="currentQuestion"
       v-model="editQuestionDialog"
@@ -141,7 +152,6 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
-import { convertMarkDownNoFigure } from '@/services/ConvertMarkdownService';
 import Question from '@/models/management/Question';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
@@ -166,11 +176,24 @@ export default class QuestionsView extends Vue {
   statusList = ['DISABLED', 'AVAILABLE', 'REMOVED'];
 
   headers: object = [
-    { text: 'Title', value: 'title', align: 'center' },
-    { text: 'Question', value: 'content', align: 'left' },
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      width: '15%',
+      sortable: false
+    },
+    { text: 'Title', value: 'title', align: 'left' },
+    { text: 'Status', value: 'status', align: 'left', width: '150px' },
     {
       text: 'Topics',
       value: 'topics',
+      align: 'center',
+      sortable: false
+    },
+    {
+      text: 'Image',
+      value: 'image',
       align: 'center',
       sortable: false
     },
@@ -186,23 +209,10 @@ export default class QuestionsView extends Vue {
       value: 'numberOfNonGeneratedQuizzes',
       align: 'center'
     },
-    { text: 'Status', value: 'status', align: 'center' },
     {
       text: 'Creation Date',
       value: 'creationDate',
       align: 'center'
-    },
-    {
-      text: 'Image',
-      value: 'image',
-      align: 'center',
-      sortable: false
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false
     }
   ];
 
@@ -236,10 +246,6 @@ export default class QuestionsView extends Vue {
     );
   }
 
-  convertMarkDownNoFigure(text: string, image: Image | null = null): string {
-    return convertMarkDownNoFigure(text, image);
-  }
-
   onQuestionChangedTopics(questionId: Number, changedTopics: Topic[]) {
     let question = this.questions.find(
       (question: Question) => question.id == questionId
@@ -250,10 +256,10 @@ export default class QuestionsView extends Vue {
   }
 
   getDifficultyColor(difficulty: number) {
-    if (difficulty < 25) return 'green';
-    else if (difficulty < 50) return 'lime';
-    else if (difficulty < 75) return 'orange';
-    else return 'red';
+    if (difficulty < 25) return 'red';
+    else if (difficulty < 50) return 'orange';
+    else if (difficulty < 75) return 'lime';
+    else return 'green';
   }
 
   async setStatus(questionId: number, status: string) {
@@ -295,6 +301,7 @@ export default class QuestionsView extends Vue {
   }
 
   onCloseShowQuestionDialog() {
+    this.currentQuestion = null;
     this.questionDialog = false;
   }
 
@@ -303,7 +310,8 @@ export default class QuestionsView extends Vue {
     this.editQuestionDialog = true;
   }
 
-  editQuestion(question: Question) {
+  editQuestion(question: Question, e?: Event) {
+    if (e) e.preventDefault();
     this.currentQuestion = question;
     this.editQuestionDialog = true;
   }
@@ -311,6 +319,10 @@ export default class QuestionsView extends Vue {
   duplicateQuestion(question: Question) {
     this.currentQuestion = new Question(question);
     this.currentQuestion.id = null;
+    this.currentQuestion.options.forEach(option => {
+      option.id = null;
+    });
+    this.currentQuestion.image = null;
     this.editQuestionDialog = true;
   }
 
