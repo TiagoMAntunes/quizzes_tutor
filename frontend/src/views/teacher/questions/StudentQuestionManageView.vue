@@ -34,8 +34,7 @@
       </template>
 
       <template v-slot:item.content="{ item }">
-        <p
-          @click="showStudentQuestionDialog(item)"
+        <p @click="showStudentQuestionDialog(item)"
       /></template>
 
       <template v-slot:item.difficulty="{ item }">
@@ -77,7 +76,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="showStudentQuestionDialog(item)"
@@ -85,6 +84,14 @@
             >
           </template>
           <span>Show Question</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon large class="mr-2" v-on="on" @click="becomeAvailable(item.id)"
+              >fas fa-check</v-icon
+            >
+          </template>
+          <span>Make Available</span>
         </v-tooltip>
       </template>
     </v-data-table>
@@ -101,7 +108,6 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import StudentQuestion from '@/models/management/StudentQuestion';
-import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/questions/ShowStudentQuestionDialog.vue';
 import EditStudentQuestionTopics from '@/views/teacher/questions/EditStudentQuestionTopics.vue';
@@ -122,6 +128,13 @@ export default class StudentQuestionManageView extends Vue {
   statusList = ['APPROVED', 'REJECTED', 'PENDING'];
 
   headers: object = [
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      width: '15%',
+      sortable: false
+    },
     { text: 'Title', value: 'title', align: 'center' },
     { text: 'Question', value: 'content', align: 'left' },
     {
@@ -137,12 +150,6 @@ export default class StudentQuestionManageView extends Vue {
       text: 'Creation Date',
       value: 'creationDate',
       align: 'center'
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false
     }
   ];
 
@@ -214,6 +221,14 @@ export default class StudentQuestionManageView extends Vue {
   showStudentQuestionDialog(question: StudentQuestion) {
     this.currentQuestion = question;
     this.questionDialog = true;
+  }
+
+  async becomeAvailable(questionId: number) {
+    try {
+      await RemoteServices.makeAvailable(questionId);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 
   isDisabled(questionId: number, question: StudentQuestion) {
