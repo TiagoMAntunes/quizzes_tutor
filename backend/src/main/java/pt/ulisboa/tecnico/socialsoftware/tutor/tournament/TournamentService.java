@@ -173,6 +173,12 @@ public class TournamentService {
                 tournament.getStartTime().isAfter(now));
     }
 
+    private boolean tournamentNotOver(Integer tournamentId) {
+        LocalDateTime now = LocalDateTime.now();
+        Tournament tournament = getTournament(tournamentId);
+        return tournament.getFinishTime().isAfter(now);
+    }
+
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
@@ -289,7 +295,7 @@ public class TournamentService {
     }
 
     private boolean canParticipateInTournament(User user, Tournament tournament) {
-        if(tournamentIsOpen(tournament.getId())){
+        if(tournamentNotOver(tournament.getId())){
             return !hasParticipatedInTournament(user, tournament);
         }
         return false;
