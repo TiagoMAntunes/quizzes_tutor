@@ -13,6 +13,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.DashboardDto;
+
 import java.security.Principal;
 
 import java.util.List;
@@ -73,25 +75,16 @@ public class StudentQuestionController{
         return this.studentQuestionService.createStudentQuestion(courseId, question, user.getId());
     }
 
-    @GetMapping("/student/dashboard/submitted")
+    @GetMapping("/student/dashboard")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public int findStudentQuestionsSubmitted(Principal principal) {
+    public DashboardDto createDashboard(Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
-
         if(user == null){
             throw new TutorException(AUTHENTICATION_ERROR);
         }
-        return this.studentQuestionService.findStudentQuestionsSubmitted(user.getId());
-    }
-
-    @GetMapping("/student/dashboard/approved")
-    @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public int findStudentQuestionsApproved(Principal principal) {
-        User user = (User) ((Authentication) principal).getPrincipal();
-
-        if(user == null){
-            throw new TutorException(AUTHENTICATION_ERROR);
-        }
-        return this.studentQuestionService.findStudentQuestionsApproved(user.getId());
+        DashboardDto dashboard = new DashboardDto();
+        dashboard.setQuestionsSubmitted(this.studentQuestionService.findStudentQuestionsSubmitted(user.getId()));
+        dashboard.setQuestionsApproved(this.studentQuestionService.findStudentQuestionsApproved(user.getId()));
+        return dashboard;
     }
 }
