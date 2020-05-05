@@ -46,6 +46,12 @@
         >
       </template>
 
+      <template v-slot:item.title="{ item }">
+        <p @click="showStudentQuestionDialog(item)" style="cursor: pointer">
+          {{ item.title }}
+        </p>
+      </template>
+
       <template v-slot:item.topics="{ item }">
         <edit-student-question-topics
           :question="item"
@@ -87,7 +93,11 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on" @click="becomeAvailable(item.id)"
+            <v-icon
+              large
+              class="mr-2"
+              v-on="on"
+              @click="becomeAvailable(item.id)"
               >fas fa-check</v-icon
             >
           </template>
@@ -95,6 +105,10 @@
         </v-tooltip>
       </template>
     </v-data-table>
+    <footer>
+      <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
+      it.
+    </footer>
     <show-question-dialog
       v-if="currentQuestion"
       :dialog="questionDialog"
@@ -224,10 +238,12 @@ export default class StudentQuestionManageView extends Vue {
   }
 
   async becomeAvailable(questionId: number) {
-    try {
-      await RemoteServices.makeAvailable(questionId);
-    } catch (error) {
-      await this.$store.dispatch('error', error);
+    if (confirm('Are you sure you want to make the question available?')) {
+      try {
+        await RemoteServices.makeAvailable(questionId);
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
     }
   }
 
