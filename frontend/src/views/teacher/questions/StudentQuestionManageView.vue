@@ -150,7 +150,6 @@ export default class StudentQuestionManageView extends Vue {
       sortable: false
     },
     { text: 'Title', value: 'title', align: 'center' },
-    { text: 'Question', value: 'content', align: 'left' },
     {
       text: 'Topics',
       value: 'topics',
