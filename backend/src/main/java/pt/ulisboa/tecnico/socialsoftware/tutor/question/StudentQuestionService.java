@@ -93,10 +93,10 @@ public class StudentQuestionService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void studentQuestionApproveToAvailable(int questionId) {
-        StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+        StudentQuestion studentQuestion = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
 
-        if(question.getQuestionStatus().equals(StudentQuestion.QuestionStatus.APPROVED)) {
-            question.setStatus(Question.Status.AVAILABLE);
+        if(studentQuestion.getQuestionStatus().equals(StudentQuestion.QuestionStatus.APPROVED)) {
+            studentQuestion.setStatus(Question.Status.AVAILABLE);
         }
         else{
             throw new TutorException(ErrorMessage.CANT_MAKE_QUESTION_AVAILABLE);
