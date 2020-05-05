@@ -1,30 +1,30 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.user.dto;
 
 public class DashboardDto {
-    private int questionsSubmitted;
-    private int questionsApproved;
+    private int numberQuestionsSubmitted;
+    private int numberQuestionsApproved;
 
     public DashboardDto() { }
 
     public DashboardDto( int submitted, int approved ) {
-        questionsSubmitted = submitted;
-        questionsApproved = approved;
+        numberQuestionsSubmitted = submitted;
+        numberQuestionsApproved = approved;
     }
 
     public int getQuestionsSubmitted() {
-        return questionsSubmitted;
+        return numberQuestionsSubmitted;
     }
 
     public int getQuestionsApproved() {
-        return questionsApproved;
+        return numberQuestionsApproved;
     }
 
     public void setQuestionsSubmitted(int questionsSubmitted) {
-        this.questionsSubmitted = questionsSubmitted;
+        this.numberQuestionsSubmitted = questionsSubmitted;
     }
 
     public void setQuestionsApproved(int questionsApproved) {
-        this.questionsApproved = questionsApproved;
+        this.numberQuestionsApproved = questionsApproved;
     }
 
 

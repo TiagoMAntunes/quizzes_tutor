@@ -17,8 +17,8 @@ public interface StudentQuestionRepository extends JpaRepository<StudentQuestion
     List<Question> findStudentQuestions(int courseId);
 
     @Query( value = "SELECT count(*) FROM student_questions sq WHERE sq.user_id = :userId", nativeQuery = true)
-    Integer findStudentQuestionsSubmitted(int userId);
+    Integer findNumberStudentQuestionsSubmitted(int userId);
 
     @Query( value = "SELECT count(*) FROM student_questions sq WHERE sq.user_id = :userId and sq.Question_Status = 'APPROVED'", nativeQuery = true)
-    Integer findStudentQuestionsApproved(int userId);
+    Integer findNumberStudentQuestionsApproved(int userId);
 }

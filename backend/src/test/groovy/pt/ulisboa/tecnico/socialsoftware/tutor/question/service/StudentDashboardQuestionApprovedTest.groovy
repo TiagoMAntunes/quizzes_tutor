@@ -16,7 +16,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -87,7 +86,6 @@ class StudentDashboardQuestionApprovedTest extends Specification {
         questionDto.setTitle(QUESTION_TITLE)
         questionDto.setContent(QUESTION_CONTENT)
         questionDto.setStatus(Question.Status.AVAILABLE.name())
-        questionDto.setCreationDate(LocalDateTime.now().format(Course.formatter))
         and: 'a optionId'
         def optionDto = new OptionDto()
         optionDto.setContent(OPTION_CONTENT)
@@ -102,7 +100,7 @@ class StudentDashboardQuestionApprovedTest extends Specification {
         studentQuestionRepository.save(studentQuestion2)
 
         when:
-        def result = studentQuestionService.findStudentQuestionsApproved(student.getId());
+        def result = studentQuestionService.findNumberStudentQuestionsApproved(student.getId());
 
         then:
         result == 1
@@ -110,7 +108,7 @@ class StudentDashboardQuestionApprovedTest extends Specification {
 
     def "find the number of questions submitted equals zero"() {
         when:
-        def result = studentQuestionService.findStudentQuestionsApproved(student2.getId());
+        def result = studentQuestionService.findNumberStudentQuestionsApproved(student2.getId());
 
         then:
         result == 0
@@ -121,7 +119,7 @@ class StudentDashboardQuestionApprovedTest extends Specification {
         given:
 
         when:
-        studentQuestionService.findStudentQuestionsApproved(teacher.getId());
+        studentQuestionService.findNumberStudentQuestionsApproved(teacher.getId());
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED

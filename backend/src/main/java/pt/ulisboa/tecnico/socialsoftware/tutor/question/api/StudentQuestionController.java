@@ -90,8 +90,8 @@ public class StudentQuestionController{
             throw new TutorException(AUTHENTICATION_ERROR);
         }
         DashboardDto dashboard = new DashboardDto();
-        dashboard.setQuestionsSubmitted(this.studentQuestionService.findStudentQuestionsSubmitted(user.getId()));
-        dashboard.setQuestionsApproved(this.studentQuestionService.findStudentQuestionsApproved(user.getId()));
+        dashboard.setQuestionsSubmitted(this.studentQuestionService.findNumberStudentQuestionsSubmitted(user.getId()));
+        dashboard.setQuestionsApproved(this.studentQuestionService.findNumberStudentQuestionsApproved(user.getId()));
         return dashboard;
     }
 }
