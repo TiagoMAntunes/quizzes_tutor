@@ -34,6 +34,7 @@ class CancelTournamentTest extends Specification {
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_NAME = "Software Architecture"
     public static final String COURSE_ABREV = "ES1"
+    public static final String TOURNAMENT_TITLE = "title"
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -102,6 +103,7 @@ class CancelTournamentTest extends Specification {
 
         //Creates a cancelable tournament
         def tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setStartTime(IN_TWO_DAYS_TIME)
         tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
         tournamentDto.setTopics(TOPIC_LIST)

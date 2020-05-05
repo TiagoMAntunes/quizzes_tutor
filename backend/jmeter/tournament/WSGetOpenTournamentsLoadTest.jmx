@@ -94,8 +94,8 @@ END TRANSACTION;</stringProp>
             <stringProp name="queryType">Update Statement</stringProp>
             <stringProp name="query">START TRANSACTION;
 
-INSERT INTO tournaments(id, start_time, finish_time, number_of_questions, course_execution_id, creator_id)
-VALUES (${tournament_id}, &apos;${start_time}&apos;, &apos;${finish_time}&apos;, ${number_of_questions}, ${course_execution_id}, ${student_id});
+INSERT INTO tournaments(id, start_time, finish_time, title, number_of_questions, course_execution_id, creator_id)
+VALUES (${tournament_id}, &apos;${start_time}&apos;, &apos;${finish_time}&apos;, &apos;title&apos;, ${number_of_questions}, ${course_execution_id}, ${student_id});
 
 INSERT INTO topics_tournaments(topics_id, tournaments_id)
 VALUES (${topic_id}, ${tournament_id});

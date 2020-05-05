@@ -3,6 +3,7 @@
     <h2>Available Tournaments</h2>
     <ul>
       <li class="list-header">
+        <div class="col">Title</div>
         <div class="col">Start Time</div>
         <div class="col">Finish Time</div>
         <div class="col topics">Topics</div>
@@ -15,6 +16,9 @@
         v-for="tournament in sortDate(tournaments)"
         :key="tournament.id + '-tournament'"
       >
+        <div class="col">
+          {{ tournament.title }}
+        </div>
         <div class="col">
           {{ tournament.startTime }}
         </div>
@@ -138,7 +142,7 @@ export default class TournamentList extends Vue {
       font-size: 12px;
       text-align: center;
       margin: auto;
-      min-width: 15%;
+      min-width: 10%;
       padding: 12px 5px;
       overflow: auto;
     }

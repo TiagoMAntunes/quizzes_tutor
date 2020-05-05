@@ -3,6 +3,14 @@
     <h2>Create Tournament</h2>
     <v-container class="create-form">
       <v-row justify="center">
+        <v-text-field
+          class="title"
+          v-model="tournamentManager.title"
+          label="*Title"
+          data-cy="title"
+        />
+      </v-row>
+      <v-row justify="center">
         <v-col>
           <v-select
             chips
@@ -99,5 +107,8 @@ export default class CreateTournamentView extends Vue {
   border-width: 10px;
   border-style: solid;
   border-color: #818181;
+}
+.title {
+  margin: 10px;
 }
 </style>
