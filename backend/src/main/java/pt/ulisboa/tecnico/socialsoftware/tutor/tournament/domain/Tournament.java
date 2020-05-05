@@ -141,6 +141,8 @@ Tournament {
         this.quiz = quiz;
     }
 
+    public boolean hasQuiz() { return this.quiz != null; }
+
     public void setNumberOfQuestions(int size) {
         this.numberOfQuestions = size;
     }
