@@ -15,6 +15,7 @@ import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
 import Tournament from '@/models/tournament/Tournament';
+import StudentDashboard from '@/models/user/StudentDashboard';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -91,6 +92,20 @@ export default class RemoteServices {
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  static async getStudentDashboard(): Promise<StudentDashboard> {
+    return httpClient
+        .get(
+            '/student/${Store.getters.getCurrentCourse.courseExecutionId}/dashboard'
+        )
+        .then(response => {
+          return new StudentDashboard(response.data);
+          console.log(response.data);
+        })
+        .catch(async error => {
+          throw Error(await this.errorMessage(error));
+        });
   }
 
   static async getQuestions(): Promise<Question[]> {
