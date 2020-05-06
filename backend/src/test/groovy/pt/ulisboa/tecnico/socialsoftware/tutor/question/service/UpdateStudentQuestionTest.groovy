@@ -37,7 +37,6 @@ class UpdateStudentQuestionTest extends Specification{
     public static final String NEW_QUESTION_TITLE = 'new question title'
     public static final String NEW_QUESTION_CONTENT = 'new question content'
     public static final String NEW_OPTION_CONTENT = "new optionId content"
-    public static final String URL = 'URL'
 
     @Autowired
     StudentQuestionService studentQuestionService
@@ -62,11 +61,9 @@ class UpdateStudentQuestionTest extends Specification{
 
     def course;
     def student;
-    def question;
     def questionDto;
     def studentQuestion;
     def userDto;
-    def studentQuestionDto;
     def courseExecution;
     def optionOK;
     def optionKO;
@@ -89,6 +86,7 @@ class UpdateStudentQuestionTest extends Specification{
         studentQuestion.setStatus(Question.Status.AVAILABLE)
         studentQuestion.setNumberOfAnswers(2)
         studentQuestion.setNumberOfCorrect(1)
+        studentQuestion.setUser(student)
 
         questionDto = new QuestionDto(studentQuestion)
         questionDto.setTitle(QUESTION_TITLE)
@@ -120,7 +118,6 @@ class UpdateStudentQuestionTest extends Specification{
 
     def "update a question when it is not available"(){
         given: "a student question"
-        studentQuestion.setUser(student)
         studentQuestion.setStatus(Question.Status.DISABLED)
         def studentQuestionDto = new StudentQuestionDto(studentQuestion)
         studentQuestionDto.setTitle(NEW_QUESTION_TITLE)
@@ -162,7 +159,6 @@ class UpdateStudentQuestionTest extends Specification{
 
     def "update a question when it is already available"(){
         given: "a student question"
-        studentQuestion.setUser(student)
         studentQuestion.setStatus(Question.Status.AVAILABLE)
         def studentQuestionDto = new StudentQuestionDto(studentQuestion)
         studentQuestionDto.setTitle(NEW_QUESTION_TITLE)
@@ -189,7 +185,6 @@ class UpdateStudentQuestionTest extends Specification{
 
     def "update a question with missing data"(){
         given: "a question"
-        studentQuestion.setUser(student)
         studentQuestion.setStatus(Question.Status.DISABLED)
         def studentQuestionDto = new StudentQuestionDto(studentQuestion)
         studentQuestionDto.setTitle('     ')
