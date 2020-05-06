@@ -10,6 +10,7 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentScoreboardDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 
@@ -75,6 +76,23 @@ public class TournamentController {
         }
 
         return this.tournamentService.getOpenTournaments(executionId, user.getId());
+    }
+
+    @GetMapping("/tournaments/scoreboard/{tournamentId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.ACCESS')")
+    public TournamentScoreboardDto getTournamentScoreboard(@PathVariable Integer tournamentId, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+
+        TournamentScoreboardDto scoreboard = new TournamentScoreboardDto();
+
+        scoreboard.setScores(tournamentService.getAllTournamentScores(tournamentId));
+        //scoreboard.setAverageScore(tournamentService.getTournamentAverageScore(tournamentId));
+
+        return scoreboard;
     }
 
 }

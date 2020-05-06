@@ -256,9 +256,11 @@ public class TournamentService {
 
         List<Integer> scores = new ArrayList<>();
 
-        quiz.getQuizAnswers().stream()
-                .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId))
-                .forEach(quizAnswer -> scores.add(quizAnswer.getScore()));
+        if(quiz != null) {
+            quiz.getQuizAnswers().stream()
+                    .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId))
+                    .forEach(quizAnswer -> scores.add(quizAnswer.getScore()));
+        }
 
         return scores;
     }
@@ -270,8 +272,10 @@ public class TournamentService {
     public float getTournamentAverageScore(Integer tournamentId){
         List<Integer> scores = getAllTournamentScores(tournamentId);
 
-        float total = scores.stream().reduce(0, Integer::sum);
         float size = scores.size();
+        if(size == 0) return 0;
+
+        float total = scores.stream().reduce(0, Integer::sum);
 
         return total/size;
     }
