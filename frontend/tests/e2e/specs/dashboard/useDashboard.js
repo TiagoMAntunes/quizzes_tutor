@@ -3,7 +3,7 @@ let QUESTION = 'Test Question'
 let OPTIONS =['Option1','Option2','Option3', 'Option4']
 
 describe('Student Questions walkthrough', () => {
-    beforEach( () => {
+    beforeEach( () => {
       cy.demoStudentLogin()
     })
 
@@ -21,7 +21,7 @@ describe('Student Questions walkthrough', () => {
         cy.goToStats()
         cy.logout()
         cy.demoTeacherLogin()
-        cy.approvedQuestion(TITLE)
+        cy.statusQuestion(TITLE, 'APPROVED')
         cy.logout()
         cy.goToStats()
     });
