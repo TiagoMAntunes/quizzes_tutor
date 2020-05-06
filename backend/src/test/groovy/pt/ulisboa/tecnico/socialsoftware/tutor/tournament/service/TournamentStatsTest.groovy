@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.dashboard.DashboardService
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
@@ -37,6 +38,7 @@ class TournamentStatsTest extends Specification {
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_ABREV = "Software Architecture"
     public static final String ACADEMIC_TERM = "1"
+    public static final String TOURNAMENT_TITLE = "title"
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -64,6 +66,9 @@ class TournamentStatsTest extends Specification {
 
     @Autowired
     QuizAnswerRepository quizAnswerRepository
+
+    @Autowired
+    DashboardService dashboardService
 
     def formatter
     def THREE_DAYS_EARLIER
@@ -139,6 +144,7 @@ class TournamentStatsTest extends Specification {
         USER_ID = USER.getId()
 
         def tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setStartTime(ONE_DAY_LATER)
         tournamentDto.setFinishTime(THREE_DAYS_LATER)
         tournamentDto.setTopics(TOPIC_LIST)
@@ -180,13 +186,13 @@ class TournamentStatsTest extends Specification {
         answerService.concludeQuiz(student, quiz.getId())
 
         then:"the student has participated in 1 tournament, and the creator none, both have 0 avg score"
-        tournamentService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 1
-        tournamentService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
-        tournamentService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 0;
+        dashboardService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 1
+        dashboardService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
+        dashboardService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 0;
 
-        tournamentService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
-        tournamentService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 1
-        tournamentService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
+        dashboardService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
+        dashboardService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 1
+        dashboardService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
     }
 
 
@@ -228,13 +234,13 @@ class TournamentStatsTest extends Specification {
         answerService.concludeQuiz(student, quiz.getId())
 
         then:"the student has participated in 2 tournaments and has a 50% average tournament score"
-        tournamentService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 2
-        tournamentService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
-        tournamentService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 50;
+        dashboardService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 2
+        dashboardService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
+        dashboardService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 50;
 
-        tournamentService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
-        tournamentService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 2
-        tournamentService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
+        dashboardService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
+        dashboardService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 2
+        dashboardService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
     }
 
 
@@ -264,6 +270,11 @@ class TournamentStatsTest extends Specification {
         @Bean
         QuestionService questionService() {
             return new QuestionService()
+        }
+
+        @Bean
+        DashboardService dashboardService() {
+            return new DashboardService()
         }
     }
 }
