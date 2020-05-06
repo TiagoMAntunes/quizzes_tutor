@@ -11,19 +11,19 @@ public class DashboardDto {
         numberQuestionsApproved = approved;
     }
 
-    public int getQuestionsSubmitted() {
+    public int getNumberQuestionsSubmitted() {
         return numberQuestionsSubmitted;
     }
 
-    public int getQuestionsApproved() {
+    public int getNumberQuestionsApproved() {
         return numberQuestionsApproved;
     }
 
-    public void setQuestionsSubmitted(int questionsSubmitted) {
+    public void setNumberQuestionsSubmitted(int questionsSubmitted) {
         this.numberQuestionsSubmitted = questionsSubmitted;
     }
 
-    public void setQuestionsApproved(int questionsApproved) {
+    public void setNumberQuestionsApproved(int questionsApproved) {
         this.numberQuestionsApproved = questionsApproved;
     }
 

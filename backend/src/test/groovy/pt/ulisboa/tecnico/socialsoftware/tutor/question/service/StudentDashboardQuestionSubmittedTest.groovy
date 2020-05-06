@@ -77,6 +77,9 @@ class StudentDashboardQuestionSubmittedTest extends Specification {
         courseExecution.addUser(student)
         student.addCourse(courseExecution)
 
+        courseExecution.addUser(student2)
+        student2.addCourse(courseExecution)
+
         teacher = new User(TEACHER_NAME, TEACHER_USERNAME, 3, User.Role.TEACHER)
         userRepository.save(teacher)
     }
@@ -99,7 +102,7 @@ class StudentDashboardQuestionSubmittedTest extends Specification {
         def studentQuestion2 = new StudentQuestion(course, questionDto, student2)
         studentQuestionRepository.save(studentQuestion2)
         when:
-        def result = studentQuestionService.findNumberStudentQuestionsSubmitted(student.getId());
+        def result = studentQuestionService.findNumberStudentQuestionsSubmitted(student.getId(), courseExecution.getId());
 
         then:
         result == 1
@@ -107,7 +110,7 @@ class StudentDashboardQuestionSubmittedTest extends Specification {
 
     def "find the number of questions submitted equals zero"() {
         when:
-        def result = studentQuestionService.findNumberStudentQuestionsSubmitted(student2.getId());
+        def result = studentQuestionService.findNumberStudentQuestionsSubmitted(student2.getId(), courseExecution.getId());
 
         then:
         result == 0
@@ -118,7 +121,7 @@ class StudentDashboardQuestionSubmittedTest extends Specification {
         given:
 
         when:
-        studentQuestionService.findNumberStudentQuestionsSubmitted(teacher.getId());
+        studentQuestionService.findNumberStudentQuestionsSubmitted(teacher.getId(), courseExecution.getId());
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED

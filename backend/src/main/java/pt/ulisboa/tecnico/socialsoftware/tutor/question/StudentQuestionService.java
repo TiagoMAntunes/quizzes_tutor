@@ -152,10 +152,10 @@ public class StudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public int  findNumberStudentQuestionsSubmitted(int studentId) {
+    public int  findNumberStudentQuestionsSubmitted(int studentId, int courseId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
-        Integer count = studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId());
+        Integer count = studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId(), courseId);
         return count;
     }
 
@@ -163,10 +163,10 @@ public class StudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public int  findNumberStudentQuestionsApproved(int studentId) {
+    public int  findNumberStudentQuestionsApproved(int studentId, int courseId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
-        Integer count = studentQuestionRepository.findNumberStudentQuestionsApproved(user.getId());
+        Integer count = studentQuestionRepository.findNumberStudentQuestionsApproved(user.getId(), courseId);
         return count;
     }
 
