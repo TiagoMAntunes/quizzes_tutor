@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -38,6 +39,9 @@ class TournamentScoreboardTest extends Specification {
     public static final String COURSE_ABREV = "Software Architecture"
     public static final String ACADEMIC_TERM = "1"
     public static final String TOURNAMENT_NAME = "Tournament 1"
+    public static final LocalDateTime THREE_DAYS_EARLIER = DateHandler.now().minusDays(3)
+    public static final String THREE_DAYS_LATER = DateHandler.toISOString(DateHandler.now().plusDays(3))
+    public static final String ONE_DAY_LATER = DateHandler.toISOString(DateHandler.now().plusDays(1))
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -67,9 +71,6 @@ class TournamentScoreboardTest extends Specification {
     QuizAnswerRepository quizAnswerRepository
 
     def formatter
-    def THREE_DAYS_EARLIER
-    def THREE_DAYS_LATER
-    def ONE_DAY_LATER
     def TOPIC_LIST
     def COURSE_EXEC_ID
     def USER
@@ -83,11 +84,6 @@ class TournamentScoreboardTest extends Specification {
 
 
     def setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        THREE_DAYS_LATER = LocalDateTime.now().plusDays(3).format(formatter)
-        THREE_DAYS_EARLIER = LocalDateTime.now().minusDays(3).format(formatter)
-        ONE_DAY_LATER = LocalDateTime.now().plusDays(1).format(formatter)
-
         //Creates a course
         def course1 = new Course(COURSE_ABREV, Course.Type.TECNICO)
         courseRepository.save(course1)
@@ -168,7 +164,7 @@ class TournamentScoreboardTest extends Specification {
 
         and: "the student concludes the quiz incorrectly"
         def quiz = tournamentRepository.findAll().get(0).getQuiz()
-        quiz.setAvailableDate(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
+        quiz.setAvailableDate(THREE_DAYS_EARLIER)
         def quizAnswer = new QuizAnswer(student, quiz)
         quizAnswerRepository.save(quizAnswer)
 
@@ -204,7 +200,7 @@ class TournamentScoreboardTest extends Specification {
 
         and: "the first student concludes the tournament quiz correctly"
         def quiz = tournamentRepository.findAll().get(0).getQuiz()
-        quiz.setAvailableDate(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
+        quiz.setAvailableDate(THREE_DAYS_EARLIER)
         def quizAnswer = new QuizAnswer(student1, quiz)
         def statementAnswerDto = new StatementAnswerDto()
         statementAnswerDto.setOptionId(optionOk.getId())

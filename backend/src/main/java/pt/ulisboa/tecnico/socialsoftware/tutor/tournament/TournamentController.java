@@ -9,6 +9,7 @@ import java.security.Principal;
 import java.util.List;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentScoreboardDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
@@ -20,7 +21,7 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.AU
 
 @RestController
 public class TournamentController {
-    
+
     @Autowired
     private TournamentService tournamentService;
 
@@ -65,7 +66,7 @@ public class TournamentController {
 
         return ResponseEntity.ok().build();
     }
-  
+
     @GetMapping("/executions/{executionId}/tournaments")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public List<TournamentDto> getOpenTournaments(@PathVariable int executionId, Principal principal) {
@@ -90,7 +91,10 @@ public class TournamentController {
         TournamentScoreboardDto scoreboard = new TournamentScoreboardDto();
 
         scoreboard.setScores(tournamentService.getAllTournamentScores(tournamentId));
-        //scoreboard.setAverageScore(tournamentService.getTournamentAverageScore(tournamentId));
+        scoreboard.setAverageScore(tournamentService.getTournamentAverageScore(tournamentId));
+        scoreboard.setNumberOfParticipants(tournamentService.getTournamentSignedUpNumber(tournamentId));
+        scoreboard.setNumberOfQuestions(tournamentService.getTournamentNumberOfQuestions(tournamentId));
+        scoreboard.setTournamentTitle(tournamentService.getTournamentTitle(tournamentId));
 
         return scoreboard;
     }

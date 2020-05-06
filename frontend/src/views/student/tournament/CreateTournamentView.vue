@@ -31,6 +31,7 @@
           <VueCtkDateTimePicker
             label="Start time"
             format="YYYY-MM-DDTHH:mm:ssZ"
+            id="startTimer"
             v-model="tournamentManager.startTime"
             data-cy="startTimePicker"
           ></VueCtkDateTimePicker>
@@ -39,6 +40,7 @@
           <VueCtkDateTimePicker
             label="Finish time"
             format="YYYY-MM-DDTHH:mm:ssZ"
+            id="finishTime"
             v-model="tournamentManager.finishTime"
             data-cy="finishTimePicker"
           ></VueCtkDateTimePicker>
