@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
@@ -74,6 +76,21 @@ public class StudentQuestionService {
                 break;
             case REJECTED:
                 break;
+        }
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void studentQuestionApproveToAvailable(int questionId) {
+        StudentQuestion studentQuestion = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+
+        if(studentQuestion.getQuestionStatus().equals(StudentQuestion.QuestionStatus.APPROVED)) {
+            studentQuestion.setStatus(Question.Status.AVAILABLE);
+        }
+        else{
+            throw new TutorException(ErrorMessage.CANT_MAKE_QUESTION_AVAILABLE);
         }
     }
 

@@ -34,8 +34,7 @@
       </template>
 
       <template v-slot:item.content="{ item }">
-        <p
-          @click="showStudentQuestionDialog(item)"
+        <p @click="showStudentQuestionDialog(item)"
       /></template>
 
       <template v-slot:item.difficulty="{ item }">
@@ -45,6 +44,12 @@
           dark
           >{{ item.difficulty + '%' }}</v-chip
         >
+      </template>
+
+      <template v-slot:item.title="{ item }">
+        <p @click="showStudentQuestionDialog(item)" style="cursor: pointer">
+          {{ item.title }}
+        </p>
       </template>
 
       <template v-slot:item.topics="{ item }">
@@ -77,7 +82,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="showStudentQuestionDialog(item)"
@@ -86,8 +91,24 @@
           </template>
           <span>Show Question</span>
         </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              large
+              class="mr-2"
+              v-on="on"
+              @click="becomeAvailable(item.id)"
+              >fas fa-check</v-icon
+            >
+          </template>
+          <span>Make Available</span>
+        </v-tooltip>
       </template>
     </v-data-table>
+    <footer>
+      <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
+      it.
+    </footer>
     <show-question-dialog
       v-if="currentQuestion"
       :dialog="questionDialog"
@@ -101,7 +122,6 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import StudentQuestion from '@/models/management/StudentQuestion';
-import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/questions/ShowStudentQuestionDialog.vue';
 import EditStudentQuestionTopics from '@/views/teacher/questions/EditStudentQuestionTopics.vue';
@@ -122,8 +142,14 @@ export default class StudentQuestionManageView extends Vue {
   statusList = ['APPROVED', 'REJECTED', 'PENDING'];
 
   headers: object = [
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      width: '15%',
+      sortable: false
+    },
     { text: 'Title', value: 'title', align: 'center' },
-    { text: 'Question', value: 'content', align: 'left' },
     {
       text: 'Topics',
       value: 'topics',
@@ -137,12 +163,6 @@ export default class StudentQuestionManageView extends Vue {
       text: 'Creation Date',
       value: 'creationDate',
       align: 'center'
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false
     }
   ];
 
@@ -214,6 +234,16 @@ export default class StudentQuestionManageView extends Vue {
   showStudentQuestionDialog(question: StudentQuestion) {
     this.currentQuestion = question;
     this.questionDialog = true;
+  }
+
+  async becomeAvailable(questionId: number) {
+    if (confirm('Are you sure you want to make the question available?')) {
+      try {
+        await RemoteServices.makeAvailable(questionId);
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
   }
 
   isDisabled(questionId: number, question: StudentQuestion) {
