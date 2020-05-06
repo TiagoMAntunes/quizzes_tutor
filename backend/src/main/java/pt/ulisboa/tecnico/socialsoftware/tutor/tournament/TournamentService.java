@@ -33,7 +33,6 @@ import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,17 +81,11 @@ public class TournamentService {
         if (tournamentDto.getNumberOfQuestions() <= 0)
             throw new TutorException(ErrorMessage.TOURNAMENT_HAS_NO_QUESTIONS);
 
-        try {
-            LocalDateTime.parse(tournamentDto.getStartTime(),Tournament.formatter);
-        } catch (DateTimeParseException e) {
+        if ( DateHandler.toLocalDateTime(tournamentDto.getStartTime()) == null )
             throw new TutorException(ErrorMessage.TOURNAMENT_INVALID_START_TIME);
-        }
 
-        try {
-            LocalDateTime.parse(tournamentDto.getFinishTime(),Tournament.formatter);
-        } catch (DateTimeParseException e) {
+        if ( DateHandler.toLocalDateTime(tournamentDto.getFinishTime()) == null )
             throw new TutorException(ErrorMessage.TOURNAMENT_INVALID_FINISH_TIME);
-        }
 
         User creator = userRepository.findById(creatorId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, creatorId));
 
@@ -122,7 +115,7 @@ public class TournamentService {
     private void checkTournamentTimes(Tournament tournament) {
         if (tournament.getStartTime().isAfter(tournament.getFinishTime()) || tournament.getStartTime().isEqual(tournament.getFinishTime()))
             throw new TutorException(ErrorMessage.INVALID_TOURNAMENT_TIME);
-        else if (tournament.getStartTime().isBefore(LocalDateTime.now()))
+        else if (tournament.getStartTime().isBefore(DateHandler.now()))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_STARTED);
     }
 
@@ -136,7 +129,7 @@ public class TournamentService {
         if (!tournament.getCreator().getId().equals(userId))
             throw new TutorException(ErrorMessage.TOURNAMENT_USER_IS_NOT_THE_CREATOR);
 
-        if (tournament.getStartTime().isBefore(LocalDateTime.now()))
+        if (tournament.getStartTime().isBefore(DateHandler.now()))
             throw new TutorException(ErrorMessage.TOURNAMENT_HAS_STARTED);
 
         tournament.cancel();
@@ -160,7 +153,7 @@ public class TournamentService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean tournamentIsOpen(Integer tournamentId) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = DateHandler.now();
         Tournament tournament = getTournament(tournamentId);
         return (tournament.getFinishTime().isAfter(now) &&
                 tournament.getStartTime().isAfter(now));

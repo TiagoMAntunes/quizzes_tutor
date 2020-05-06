@@ -26,6 +26,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -48,8 +49,8 @@ class GetTournamentQuizTest extends Specification {
 
     public static final LocalDateTime BEFORE = DateHandler.now().minusDays(2)
     public static final LocalDateTime YESTERDAY = DateHandler.now().minusDays(1)
-    public static final LocalDateTime TOMORROW = DateHandler.now().plusDays(1)
-    public static final LocalDateTime LATER = DateHandler.now().plusDays(2)
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(2))
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -92,9 +93,6 @@ class GetTournamentQuizTest extends Specification {
     def openTournamentId
 
     def setup() {
-        def formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        def NOW_TIME = LocalDateTime.now().format(formatter)
-
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
@@ -154,8 +152,8 @@ class GetTournamentQuizTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(LocalDateTime.now().plusDays(1).format(formatter))
-        tournamentDto.setFinishTime(LocalDateTime.now().plusDays(2).format(formatter))
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(topicList)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
