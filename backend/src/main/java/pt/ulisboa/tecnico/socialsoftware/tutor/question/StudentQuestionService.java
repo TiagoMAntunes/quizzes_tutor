@@ -12,7 +12,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
@@ -90,6 +92,21 @@ public class StudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void studentQuestionApproveToAvailable(int questionId) {
+        StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+
+        if(question.getQuestionStatus().equals(StudentQuestion.QuestionStatus.APPROVED)) {
+            question.setStatus(Question.Status.AVAILABLE);
+        }
+        else{
+            throw new TutorException(ErrorMessage.CANT_MAKE_QUESTION_AVAILABLE);
+        }
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void setStudentQuestionExplanation(int questionId, String explanation) {
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
         checkStatusToAddExplanation(explanation, questionId);
@@ -129,6 +146,28 @@ public class StudentQuestionService {
     public boolean equalsCourses(int id, Set<CourseExecution> courses, int currentCourseId) {
         return courses.stream().
                 anyMatch(course -> course.getCourse().getId() == id && id == currentCourseId);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public int  findNumberStudentQuestionsSubmitted(int studentId, int courseId) {
+        User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
+        checkRoleStudent(user);
+        Integer count = studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId(), courseId);
+        return count;
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public int  findNumberStudentQuestionsApproved(int studentId, int courseId) {
+        User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
+        checkRoleStudent(user);
+        Integer count = studentQuestionRepository.findNumberStudentQuestionsApproved(user.getId(), courseId);
+        return count;
     }
 
     private void checkEnrolledCourseExecution(User student, Course course) {

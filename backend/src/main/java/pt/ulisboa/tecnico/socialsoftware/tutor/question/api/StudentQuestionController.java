@@ -13,6 +13,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.DashboardDto;
+
 import java.security.Principal;
 
 import java.util.List;
@@ -53,6 +55,13 @@ public class StudentQuestionController{
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/student_questions/available/{questionId}")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public ResponseEntity studentQuestionApproveToAvailable(@PathVariable Integer questionId) {
+        studentQuestionService.studentQuestionApproveToAvailable(questionId);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/student_questions/{questionId}/explanation")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity studentQuestionAddExplanation(@PathVariable Integer questionId, @Valid @RequestBody String explanation) {
@@ -71,5 +80,18 @@ public class StudentQuestionController{
         }
         question.setStatus(Question.Status.AVAILABLE.name());
         return this.studentQuestionService.createStudentQuestion(courseId, question, user.getId());
+    }
+
+    @GetMapping("/student/{courseId}/dashboard")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public DashboardDto createDashboard(Principal principal, @PathVariable int courseId) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        if(user == null){
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+        DashboardDto dashboard = new DashboardDto();
+        dashboard.setNumberQuestionsSubmitted(this.studentQuestionService.findNumberStudentQuestionsSubmitted(user.getId(), courseId));
+        dashboard.setNumberQuestionsApproved(this.studentQuestionService.findNumberStudentQuestionsApproved(user.getId(), courseId));
+        return dashboard;
     }
 }
