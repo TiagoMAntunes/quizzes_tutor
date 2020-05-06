@@ -147,8 +147,8 @@ let router = new Router({
           }
         },
         {
-          path: 'createQuestion',
-          name: 'createQuestion',
+          path: 'create-question',
+          name: 'create-question',
           component: CreateStudentQuestionView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Create a Question',
@@ -231,6 +231,15 @@ let router = new Router({
           component: StatsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Stats',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'dashboard',
+          name: 'dashboard',
+          component: StatsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Dashboard',
             requiredAuth: 'Student'
           }
         },
