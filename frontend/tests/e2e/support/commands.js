@@ -227,3 +227,11 @@ Cypress.Commands.add('joinTournament', () => {
 Cypress.Commands.add('cancelTournament', () => {
   cy.get(':nth-child(2) > .last-col > .v-icon').click();
 });
+
+Cypress.Commands.add('goToStats', () => {
+    cy.contains('Stats').click();
+});
+
+Cypress.Commands.add('logout', () => {
+    cy.contains('Logout').click();
+});
