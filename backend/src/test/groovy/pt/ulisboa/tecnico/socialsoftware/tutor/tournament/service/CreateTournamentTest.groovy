@@ -9,6 +9,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.dashboard.DashboardService
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
@@ -53,6 +54,9 @@ class CreateTournamentTest extends Specification {
 
     @Autowired
     CourseExecutionRepository courseExecutionRepository
+
+    @Autowired
+    DashboardService dashboardService
 
     def formatter
     def NOW_TIME
@@ -130,7 +134,7 @@ class CreateTournamentTest extends Specification {
         courseExecutionRepository.findAll().get(0).getTournaments().size() == 1
         topicRepository.findAll().get(0).getTournaments().size() == 1
 
-        tournamentService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 1
+        dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 1
     }
 
     def "the tournament is created with a start time after finish time"() {
@@ -152,7 +156,7 @@ class CreateTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.INVALID_TOURNAMENT_TIME
         tournamentRepository.count() == 0L
-        tournamentService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
+        dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
     }
 
     def "the tournament is created with a start time before the time of creation"() {
@@ -175,7 +179,7 @@ class CreateTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_ALREADY_STARTED
         tournamentRepository.count() == 0L
-        tournamentService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
+        dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
     }
 
     def "the tournament is created with 0 topics"() {
@@ -200,7 +204,7 @@ class CreateTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.NO_TOPICS_SELECTED
         tournamentRepository.count() == 0L
-        tournamentService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
+        dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
     }
 
     def "the tournament is created with 0 or less questions"() {
@@ -223,7 +227,7 @@ class CreateTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_HAS_NO_QUESTIONS
         tournamentRepository.count() == 0L
-        tournamentService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
+        dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
     }
 
     def "the tournament is created with repeated topics"() {
@@ -259,7 +263,7 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 1L
         def result = tournamentRepository.findAll().get(0)
         result.getTopics().size() == 1L
-        tournamentService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 1
+        dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 1
 
     }
 
@@ -282,7 +286,7 @@ class CreateTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
         tournamentRepository.count() == 0L
-        tournamentService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
+        dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
     }
 
     def "the user is not a student" () {
@@ -310,7 +314,7 @@ class CreateTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_CREATION_INCORRECT_ROLE
         tournamentRepository.count() == 0L
-        tournamentService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
+        dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
     }
 
     def "topics are null" () {
@@ -332,7 +336,7 @@ class CreateTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.NO_TOPICS_SELECTED
         tournamentRepository.count() == 0L
-        tournamentService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
+        dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 0
 
     }
 
@@ -363,6 +367,11 @@ class CreateTournamentTest extends Specification {
         @Bean
         QuestionService questionService() {
             return new QuestionService()
+        }
+
+        @Bean
+        DashboardService dashboardService() {
+            return new DashboardService()
         }
     }
 }
