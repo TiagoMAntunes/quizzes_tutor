@@ -227,3 +227,8 @@ Cypress.Commands.add('goToStats', () => {
 Cypress.Commands.add('logout', () => {
     cy.contains('Logout').click();
 });
+
+Cypress.Commands.add('joinTournamentWithFinishDate', (date) => {
+  cy.contains(date).parent().find('.last-col > .v-icon').click()
+})
+
