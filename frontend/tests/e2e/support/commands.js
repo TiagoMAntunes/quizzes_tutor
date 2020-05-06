@@ -112,7 +112,7 @@ Cypress.Commands.add('addTopicStudentQuestion', (title, topic) => {
       '[data-cy="topicsCy"] > .v-input > .v-input__control > .v-input__slot > .v-select__slot'
     )
     .click({ force: true });
-  cy.contains(topic).click();
+  cy.contains(topic).click({ force: true });
 });
 
 Cypress.Commands.add('createStudentQuestion', (title, question, options) => {
@@ -191,28 +191,24 @@ Cypress.Commands.add('openCreateTournament', () => {
   cy.get('[data-cy="createTournament"]').click();
 });
 
-Cypress.Commands.add('rejectQuestion', title => {
-  cy.contains(title)
-    .parent()
-    .should('have.length', 1)
-    .children()
-    .should('have.length', 8)
-    .find('[data-cy="questionStatusCy"]')
-    .parent()
-    .click({ force: true });
-  cy.contains('REJECT').click({ force: true });
+Cypress.Commands.add('statusQuestion', (title, status) => {
+  cy.get(
+    ':nth-child(1) > :nth-child(5) > .v-input > .v-input__control > .v-input__slot > .v-select__slot > .v-select__selections > .v-chip'
+  ).click({ force: true });
+  cy.contains(status).click({ force: true });
 });
 
 Cypress.Commands.add('addExplanation', (title, explanation) => {
-  cy.contains(title)
-    .parent()
-    .should('have.length', 1)
-    .children()
-    .should('have.length', 8)
-    .find('[data-cy="Explanation"]')
+  cy.get(
+    ':nth-child(1) > :nth-child(6) > .v-input > .v-input__control > .v-input__slot > .v-text-field__slot > [data-cy=Explanation]'
+  )
     .click({ force: true })
     .clear()
     .type(explanation);
+});
+
+Cypress.Commands.add('makeAvailable', () => {
+  cy.get(':nth-child(1) > .text-left > .fas').click({ force: true });
 });
 
 Cypress.Commands.add('openAvailableTournaments', () => {
