@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
@@ -22,6 +23,8 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
+
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.ACCESS_DENIED;
 
 @Service
 public class DashboardService {
@@ -34,6 +37,34 @@ public class DashboardService {
     @Autowired
     private QuizAnswerRepository quizAnswerRepository;
 
+    @Autowired
+    private StudentQuestionRepository studentQuestionRepository;
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public int  findNumberStudentQuestionsSubmitted(int studentId, int courseId) {
+        User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
+        checkRoleStudent(user);
+        return studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId(), courseId);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public int  findNumberStudentQuestionsApproved(int studentId, int courseId) {
+        User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
+        checkRoleStudent(user);
+        return studentQuestionRepository.findNumberStudentQuestionsApproved(user.getId(), courseId);
+    }
+
+    private void checkRoleStudent(User student) {
+        if(student.getRole() != User.Role.STUDENT){
+            throw new TutorException(ACCESS_DENIED);
+        }
+    }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int getCreatedTournamentsNumber(Integer userId, Integer executionId) {

@@ -38,6 +38,7 @@ class TournamentStatsTest extends Specification {
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_ABREV = "Software Architecture"
     public static final String ACADEMIC_TERM = "1"
+    public static final String TOURNAMENT_TITLE = "title"
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -143,6 +144,7 @@ class TournamentStatsTest extends Specification {
         USER_ID = USER.getId()
 
         def tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setStartTime(ONE_DAY_LATER)
         tournamentDto.setFinishTime(THREE_DAYS_LATER)
         tournamentDto.setTopics(TOPIC_LIST)
