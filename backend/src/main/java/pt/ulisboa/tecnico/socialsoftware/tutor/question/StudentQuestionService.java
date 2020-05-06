@@ -176,7 +176,7 @@ public class StudentQuestionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDto resubmitRejectedStudentQuestion(int studentQuestionId, QuestionDto questionDto) {
         StudentQuestion studentQuestion = studentQuestionRepository.findById(studentQuestionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, studentQuestionId));
-        studentQuestion.update(questionDto);
+        studentQuestion.updateRejectedQuestion(questionDto);
         return new StudentQuestionDto(studentQuestion);
     }
 

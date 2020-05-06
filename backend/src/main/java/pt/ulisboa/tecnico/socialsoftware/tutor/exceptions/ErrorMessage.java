@@ -34,6 +34,7 @@ public enum ErrorMessage {
     TOPIC_NOT_FOUND("Topic not found with id %d"),
     USER_NOT_FOUND("User not found with id %d"),
     COURSE_NOT_FOUND("Course not found with name %s"),
+    QUESTION_NOT_REJECTED("This question was not been rejected"),
 
     CANNOT_DELETE_COURSE_EXECUTION("The course execution cannot be deleted %s"),
     USERNAME_NOT_FOUND("Username %d not found"),
