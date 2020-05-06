@@ -112,7 +112,6 @@ export default class RemoteServices {
       .get(`/courses/${Store.getters.getCurrentCourse.courseId}/questions`)
       .then(response => {
         return response.data.map((question: any) => {
-          console.log(question);
           return new Question(question);
         });
       })
@@ -231,7 +230,6 @@ export default class RemoteServices {
       return httpClient
           .put(`/student_questions/available/${questionId}`, {})
           .then(response => {
-            console.log('4');
             return new StudentQuestion(response.data);
           })
           .catch(async error => {
