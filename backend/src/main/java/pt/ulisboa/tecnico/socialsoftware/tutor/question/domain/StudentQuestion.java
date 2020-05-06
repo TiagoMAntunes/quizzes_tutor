@@ -56,7 +56,7 @@ public class StudentQuestion extends Question {
     public void setUser(User userDto) { this.user = userDto; }
 
     public void updateQuestion(StudentQuestionDto questionDto) {
-        if (questionDto.getQuestionStatus().equals("APPROVED")) {
+        if (questionDto.getStatus().equals("AVAILABLE")) {
             throw new TutorException(CANNOT_CHANGE_ANSWERED_QUESTION);
         }
         setTitle(questionDto.getTitle());
