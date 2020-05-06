@@ -52,6 +52,7 @@
                 v-on="on"
                 @click="$emit('joinTournament', tournament.id)"
                 color="dark grey"
+                data-cy="join"
                 >fas fa-user-plus</v-icon
               >
             </template>
@@ -65,6 +66,7 @@
                 v-on="on"
                 @click="$emit('cancelTournament', tournament.id)"
                 color="red"
+                data-cy="cancel"
                 >delete</v-icon
               >
             </template>
