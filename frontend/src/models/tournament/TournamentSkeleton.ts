@@ -24,8 +24,8 @@ export default class TournamentSkeleton {
     let params = {
       title: this.title,
       topics: this.topics,
-      startTime: moment(this.startTime).format(TournamentSkeleton.FORMAT),
-      finishTime: moment(this.finishTime).format(TournamentSkeleton.FORMAT),
+      startTime: this.startTime,
+      finishTime: this.finishTime,
       numberOfQuestions: this.numberOfQuestions
     };
 
