@@ -21,8 +21,10 @@ describe('Student Questions walkthrough', () => {
         cy.goToStats()
         cy.logout()
         cy.demoTeacherLogin()
+        cy.openTeacherStudentQuestions();
         cy.statusQuestion(TITLE, 'APPROVED')
         cy.logout()
+        cy.demoStudentLogin()
         cy.goToStats()
     });
 });
