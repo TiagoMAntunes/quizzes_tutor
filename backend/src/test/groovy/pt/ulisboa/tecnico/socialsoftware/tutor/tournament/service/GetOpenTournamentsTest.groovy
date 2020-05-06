@@ -34,6 +34,7 @@ class GetOpenTournamentsTest extends Specification {
     public static final String DIFF_COURSE_NAME = "Object Oriented Programming"
     public static final String COURSE_ABREV = "SA"
     public static final String DIFF_COURSE_ABREV = "OOP"
+    public static final String TOURNAMENT_TITLE = "title"
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -121,6 +122,7 @@ class GetOpenTournamentsTest extends Specification {
         COURSE_EXEC_ID = course.getId()
 
         def tournamentDto1 = new TournamentDto()
+        tournamentDto1.setTitle(TOURNAMENT_TITLE)
         tournamentDto1.setStartTime(ONE_DAY_LATER)
         tournamentDto1.setFinishTime(THREE_DAYS_LATER)
         tournamentDto1.setTopics(TOPIC_LIST)
@@ -134,6 +136,7 @@ class GetOpenTournamentsTest extends Specification {
         DIFF_COURSE_EXEC_ID = diffCourse.getId()
 
         def diffTournamentDto = new TournamentDto()
+        diffTournamentDto.setTitle(TOURNAMENT_TITLE)
         diffTournamentDto.setStartTime(ONE_DAY_LATER)
         diffTournamentDto.setFinishTime(FIVE_DAYS_LATER)
         diffTournamentDto.setTopics(TOPIC_LIST)
@@ -143,6 +146,7 @@ class GetOpenTournamentsTest extends Specification {
 
         //Creates 2 more open tournaments for this course
         def tournamentDto2 = new TournamentDto()
+        tournamentDto2.setTitle(TOURNAMENT_TITLE)
         tournamentDto2.setStartTime(ONE_DAY_LATER)
         tournamentDto2.setFinishTime(THREE_DAYS_LATER)
         tournamentDto2.setTopics(TOPIC_LIST)
@@ -151,6 +155,7 @@ class GetOpenTournamentsTest extends Specification {
         openTournament2 = tournamentDto2
 
         def tournamentDto3 = new TournamentDto()
+        tournamentDto3.setTitle(TOURNAMENT_TITLE)
         tournamentDto3.setStartTime(ONE_DAY_LATER)
         tournamentDto3.setFinishTime(THREE_DAYS_LATER)
         tournamentDto3.setTopics(TOPIC_LIST)

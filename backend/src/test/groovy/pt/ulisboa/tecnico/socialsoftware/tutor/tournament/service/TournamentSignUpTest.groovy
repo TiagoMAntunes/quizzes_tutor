@@ -41,6 +41,7 @@ class TournamentSignUpTest extends Specification {
     public static final String COURSE_ABREV = "Software Architecture"
     public static final String ACADEMIC_TERM = "1"
     public static final String DIFF_ACADEMIC_TERM = "2"
+    public static final String TOURNAMENT_TITLE = "title"
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -165,6 +166,7 @@ class TournamentSignUpTest extends Specification {
         TEACHER_ID = TEACHER.getId()
 
         def tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setStartTime(ONE_DAY_LATER)
         tournamentDto.setFinishTime(THREE_DAYS_LATER)
         tournamentDto.setTopics(TOPIC_LIST)
@@ -259,7 +261,7 @@ class TournamentSignUpTest extends Specification {
 
     def "no user with the given id"(){
         given:"an unused user id"
-        
+
         int userId = userRepository.getMaxUserNumber() + 1
 
         when:

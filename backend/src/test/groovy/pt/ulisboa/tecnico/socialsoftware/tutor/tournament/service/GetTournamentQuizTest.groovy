@@ -44,6 +44,7 @@ class GetTournamentQuizTest extends Specification {
     public static final int NUMBER_QUESTIONS = 1
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_ABREV = "Software Architecture"
+    public static final String TOURNAMENT_TITLE = "title"
 
     public static final LocalDateTime BEFORE = DateHandler.now().minusDays(2)
     public static final LocalDateTime YESTERDAY = DateHandler.now().minusDays(1)
@@ -152,6 +153,7 @@ class GetTournamentQuizTest extends Specification {
         STUDENT_NOT_JOINED_ID = userRepository.findByKey(student2.getKey()).getId()
 
         def tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setStartTime(LocalDateTime.now().plusDays(1).format(formatter))
         tournamentDto.setFinishTime(LocalDateTime.now().plusDays(2).format(formatter))
         tournamentDto.setTopics(topicList)
@@ -177,7 +179,7 @@ class GetTournamentQuizTest extends Specification {
         statementQuizDtos.size() == 1
     }
 
-    def "Tournament quiz can be answered but hasn't joined"() {
+    def "Tournament quiz can be answered but didn't join"() {
         given: "A tournament with quiz associated that has started"
         tournamentService.joinTournament(openTournamentId, STUDENT_JOINED_ID)
 
@@ -195,7 +197,7 @@ class GetTournamentQuizTest extends Specification {
         tournamentService.joinTournament(openTournamentId, STUDENT_JOINED_ID)
 
         when:
-        def statementQuizDtos = statementService.getAvailableQuizzes(STUDENT_NOT_JOINED_ID, courseExecution.getId())
+        def statementQuizDtos = statementService.getAvailableQuizzes(STUDENT_JOINED_ID, courseExecution.getId())
 
         then:
         statementQuizDtos.size() == 0

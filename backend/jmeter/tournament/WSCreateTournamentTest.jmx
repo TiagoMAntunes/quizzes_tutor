@@ -197,7 +197,8 @@ END TRANSACTION;</stringProp>
 			&quot;parentTopic&quot; : null	&#xd;
 		}&#xd;
 	],&#xd;
-	&quot;numberOfQuestions&quot; : 1&#xd;
+	&quot;numberOfQuestions&quot; : 1,&#xd;
+	&quot;title&quot; : &quot;title&quot;&#xd;
 }</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
@@ -267,13 +268,14 @@ END TRANSACTION;</stringProp>
 Object result = vars.getObject(&quot;created_tournament&quot;).get(0);
 String startTime = result.get(&quot;start_time&quot;).toString();
 String finishTime = result.get(&quot;finish_time&quot;).toString();
+String title = result.get(&quot;title&quot;).toString();
 int numberOfQuestions = result.get(&quot;number_of_questions&quot;).intValue();
 
 log.info(&quot;---------startTime: &quot; + startTime);
 log.info(&quot;---------finishTime: &quot; + finishTime);
 log.info(&quot;---------numberOfQuestions: &quot; + numberOfQuestions);
 
-if (!startTime.equals(&quot;2022-03-17 04:20:00.0&quot;) || !finishTime.equals(&quot;2022-05-17 04:20:00.0&quot;) || numberOfQuestions != 1) {
+if (!startTime.equals(&quot;2022-03-17 04:20:00.0&quot;) || !finishTime.equals(&quot;2022-05-17 04:20:00.0&quot;) || !title.equals(&quot;title&quot;) || numberOfQuestions != 1) {
 	Failure = true;
 	FailureMessage = &quot;Invalid arguments. Values: &quot; + startTime + &quot; &quot; + finishTime + &quot; &quot; + numberOfQuestions;	
 }

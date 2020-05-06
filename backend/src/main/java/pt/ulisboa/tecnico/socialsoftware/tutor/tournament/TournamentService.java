@@ -209,7 +209,7 @@ public class TournamentService {
         quiz.setConclusionDate(DateHandler.toISOString(tournament.getFinishTime()));
         quiz.setResultsDate(DateHandler.toISOString(tournament.getFinishTime()));
         quiz.setScramble(true);
-        quiz.setTitle("Tournament" + tournament.getId());
+        quiz.setTitle("Tournament: " + tournament.getTitle());
         quiz.setKey(quizService.getMaxQuizKey() + 1);
 
         CourseExecution courseExecution = tournament.getCourseExecution();

@@ -128,7 +128,10 @@ Cypress.Commands.add('createStudentQuestion', (title, question, options) => {
 
 Cypress.Commands.add(
   'createTournament',
-  (topics, startDay, finishDay, numberOfQuestions) => {
+  (title, topics, startDay, finishDay, numberOfQuestions) => {
+    cy.get('[data-cy="title"')
+      .type(title);
+
     cy.contains('Select the tournament topics')
       .parent()
       .click();

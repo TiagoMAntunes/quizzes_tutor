@@ -105,7 +105,8 @@
 			&quot;parentTopic&quot; : null	&#xd;
 		}&#xd;
 	],&#xd;
-	&quot;numberOfQuestions&quot; : 1&#xd;
+	&quot;numberOfQuestions&quot; : 1,&#xd;
+	&quot;title&quot; : &quot;title&quot;&#xd;
 }</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
@@ -526,7 +527,8 @@ END TRANSACTION;</stringProp>
 	&quot;topics&quot; : [&#xd;
 		{&quot;name&quot;: &quot;${name_1}&quot;, &quot;id&quot;: &quot;${id_1}&quot;, &quot;course_id&quot;: &quot;${courseid_1}&quot;}&#xd;
 	],&#xd;
-	&quot;numberOfQuestions&quot; : 1&#xd;
+	&quot;numberOfQuestions&quot; : 1,&#xd;
+	&quot;title&quot; : &quot;title&quot;&#xd;
 }</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
