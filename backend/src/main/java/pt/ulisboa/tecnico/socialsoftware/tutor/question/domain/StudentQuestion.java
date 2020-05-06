@@ -51,6 +51,11 @@ public class StudentQuestion extends Question {
 
     public void setUser(User userDto) { this.user = userDto; }
 
+    public void update(QuestionDto questionDto) {
+        super.update(questionDto);
+        this.setQuestionStatus(QuestionStatus.PENDING);
+    }
+
 }
 
 
