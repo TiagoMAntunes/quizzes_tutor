@@ -12,7 +12,7 @@ describe('Student Questions walkthrough', () => {
     cy.createStudentQuestion(TITLE, QUESTION, OPTIONS)
   });
 
-  /*it('Creates a Question without title', () => {
+  it('Creates a Question without title', () => {
     cy.demoStudentLogin()
     cy.createStudentQuestion( '', QUESTION, OPTIONS)
     cy.contains('Invalid title for question')
@@ -37,7 +37,7 @@ describe('Student Questions walkthrough', () => {
     cy.demoStudentLogin()
     cy.openAvailableQuestions();
     cy.addTopicStudentQuestion(TITLE,'Adventure Builder');
-  });*/
+  });
 
   it('Reject a student question and add an explanation', () => {
     cy.demoTeacherLogin()

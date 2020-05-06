@@ -226,7 +226,6 @@ export default class RemoteServices {
   }
 
   static async makeAvailable(questionId: number): Promise<StudentQuestion> {
-    console.log('1');
       return httpClient
           .put(`/student_questions/available/${questionId}`, {})
           .then(response => {
