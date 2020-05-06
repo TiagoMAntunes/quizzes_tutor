@@ -13,6 +13,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+
 import java.security.Principal;
 
 import java.util.List;
@@ -50,6 +51,13 @@ public class StudentQuestionController{
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity studentQuestionApproveRejectStatus(@PathVariable Integer questionId, @PathVariable String status) {
         studentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.valueOf(status));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/student_questions/available/{questionId}")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public ResponseEntity studentQuestionApproveToAvailable(@PathVariable Integer questionId) {
+        studentQuestionService.studentQuestionApproveToAvailable(questionId);
         return ResponseEntity.ok().build();
     }
 

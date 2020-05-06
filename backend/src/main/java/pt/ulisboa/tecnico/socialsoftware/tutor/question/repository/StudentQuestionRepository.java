@@ -13,6 +13,12 @@ import java.util.List;
 @Repository
 @Transactional
 public interface StudentQuestionRepository extends JpaRepository<StudentQuestion, Integer> {
-    @Query(value = "SELECT * FROM studentQuestions c WHERE c.course_id = :courseId", nativeQuery = true)
+    @Query( value = "SELECT * FROM student_questions c WHERE c.course_id = :courseId", nativeQuery = true)
     List<Question> findStudentQuestions(int courseId);
+
+    @Query( value = "SELECT count(*) FROM student_questions sq NATURAL JOIN questions q WHERE sq.user_id = :userId and q.course_id = :courseId", nativeQuery = true)
+    Integer findNumberStudentQuestionsSubmitted(int userId, int courseId);
+
+    @Query( value = "SELECT count(*) FROM student_questions sq NATURAL JOIN questions q WHERE sq.user_id = :userId and sq.Question_Status = 'APPROVED' and q.course_id = :courseId", nativeQuery = true)
+    Integer findNumberStudentQuestionsApproved(int userId, int courseId);
 }
