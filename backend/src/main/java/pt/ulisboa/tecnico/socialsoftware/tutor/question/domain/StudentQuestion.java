@@ -39,6 +39,7 @@ public class StudentQuestion extends Question {
         this.user = user;
         this.explanation = null;
         this.setQuestionStatus(QuestionStatus.PENDING);
+        this.setStatus(Question.Status.DISABLED);
 
         user.addStudentQuestion(this);
     }

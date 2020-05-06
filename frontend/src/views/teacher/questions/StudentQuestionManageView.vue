@@ -103,6 +103,13 @@
           </template>
           <span>Make Available</span>
         </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon large class="mr-2" v-on="on"
+            >edit</v-icon>
+          </template>
+          <span>Edit Question</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <footer>
