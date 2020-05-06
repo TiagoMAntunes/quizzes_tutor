@@ -98,7 +98,6 @@ export default class RemoteServices {
       .get(`/courses/${Store.getters.getCurrentCourse.courseId}/questions`)
       .then(response => {
         return response.data.map((question: any) => {
-          console.log(question);
           return new Question(question);
         });
       })
@@ -206,6 +205,17 @@ export default class RemoteServices {
       });
   }
 
+  static async updateStudentQuestion(question: StudentQuestion): Promise<StudentQuestion> {
+    return httpClient
+      .put(`/student_questions/${question.id}/updateTeacher`, question)
+      .then(response => {
+        return new StudentQuestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async deleteQuestion(questionId: number) {
     return httpClient.delete(`/questions/${questionId}`).catch(async error => {
       throw Error(await this.errorMessage(error));
@@ -213,11 +223,9 @@ export default class RemoteServices {
   }
 
   static async makeAvailable(questionId: number): Promise<StudentQuestion> {
-    console.log('1');
       return httpClient
           .put(`/student_questions/available/${questionId}`, {})
           .then(response => {
-            console.log('4');
             return new StudentQuestion(response.data);
           })
           .catch(async error => {

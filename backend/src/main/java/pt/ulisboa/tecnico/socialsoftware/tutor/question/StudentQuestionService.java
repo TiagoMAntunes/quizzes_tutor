@@ -136,6 +136,9 @@ public class StudentQuestionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDto updateStudentQuestion(Integer questionId, StudentQuestionDto questionDto) {
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+        if (question.getStatus().equals(Question.Status.AVAILABLE)) {
+            throw new TutorException(CANNOT_CHANGE_ANSWERED_QUESTION);
+        }
         question.updateQuestion(questionDto);
         return new StudentQuestionDto(question);
     }

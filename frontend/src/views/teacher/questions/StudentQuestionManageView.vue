@@ -34,9 +34,11 @@
       </template>
 
       <template v-slot:item.content="{ item }">
-        <p @click="showStudentQuestionDialog(item)"
-      /></template>
-
+        <p
+          @click="showStudentQuestionDialog(item)"
+          @contextmenu="editQuestion(item, $event)"
+        />
+      </template>
       <template v-slot:item.difficulty="{ item }">
         <v-chip
           v-if="item.difficulty"
@@ -105,7 +107,7 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on"
+            <v-icon large class="mr-2" v-on="on" @click="editQuestion(item)"
             >edit</v-icon>
           </template>
           <span>Edit Question</span>
@@ -116,6 +118,12 @@
       <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
       it.
     </footer>
+    <edit-question-dialog
+      v-if="currentQuestion"
+      v-model="editQuestionDialog"
+      :question="currentQuestion"
+      v-on:save="onSaveQuestion"
+    />
     <show-question-dialog
       v-if="currentQuestion"
       :dialog="questionDialog"
@@ -132,17 +140,20 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/questions/ShowStudentQuestionDialog.vue';
 import EditStudentQuestionTopics from '@/views/teacher/questions/EditStudentQuestionTopics.vue';
+import EditQuestionDialog from '@/views/teacher/questions/EditStudentQuestionDialog.vue';
 
 @Component({
   components: {
     'show-question-dialog': ShowStudentQuestionDialog,
-    'edit-student-question-topics': EditStudentQuestionTopics
+    'edit-student-question-topics': EditStudentQuestionTopics,
+    'edit-question-dialog': EditQuestionDialog
   }
 })
 export default class StudentQuestionManageView extends Vue {
   questions: StudentQuestion[] = [];
   topics: Topic[] = [];
   currentQuestion: StudentQuestion | null = null;
+  editQuestionDialog: boolean = false;
   questionDialog: boolean = false;
   search: string = '';
   explanation: string = 'No explanation';
@@ -218,6 +229,13 @@ export default class StudentQuestionManageView extends Vue {
     else return 'green';
   }
 
+  async onSaveQuestion(question: StudentQuestion) {
+    this.questions = this.questions.filter(q => q.id !== question.id);
+    this.questions.unshift(question);
+    this.editQuestionDialog = false;
+    this.currentQuestion = null;
+  }
+
   async setStatus(questionId: number, status: string) {
     try {
       await RemoteServices.setStudentQuestionStatus(questionId, status);
@@ -236,6 +254,19 @@ export default class StudentQuestionManageView extends Vue {
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
+  }
+
+  @Watch('editQuestionDialog')
+  closeError() {
+    if (!this.editQuestionDialog) {
+      this.currentQuestion = null;
+    }
+  }
+
+  editQuestion(question: StudentQuestion, e?: Event) {
+    if (e) e.preventDefault();
+    this.currentQuestion = question;
+    this.editQuestionDialog = true;
   }
 
   showStudentQuestionDialog(question: StudentQuestion) {
@@ -278,6 +309,7 @@ export default class StudentQuestionManageView extends Vue {
     this.questionDialog = false;
   }
 }
+
 </script>
 
 <style lang="scss" scoped>
