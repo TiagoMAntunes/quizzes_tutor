@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -61,6 +62,12 @@ class TournamentSignUpTest extends Specification {
 
     @Autowired
     QuestionRepository questionRepository
+
+    @Autowired
+    AnswerService answerService
+
+    @Autowired
+    QuizAnswerRepository quizAnswerRepository
 
     def formatter
     def NOW_TIME
@@ -189,6 +196,7 @@ class TournamentSignUpTest extends Specification {
         def user = userRepository.findAll().get(0)
         !tournament.hasSignedUp(user)
         !user.hasTournament(tournament)
+        tournamentService.getNotYetParticipatedTournamentsNumber(user.getId(), COURSE_EXEC_ID) == 0
     }
 
     def "tournament has already started"(){
@@ -206,6 +214,7 @@ class TournamentSignUpTest extends Specification {
         def user = userRepository.findAll().get(0)
         !tournament.hasSignedUp(user)
         !user.hasTournament(tournament)
+        tournamentService.getNotYetParticipatedTournamentsNumber(user.getId(), COURSE_EXEC_ID) == 0
     }
 
     def "tournament is open and student hasnt signed up for it yet"(){
@@ -217,6 +226,7 @@ class TournamentSignUpTest extends Specification {
         def user = userRepository.findAll().get(0)
         tournament.hasSignedUp(user)
         user.hasTournament(tournament)
+        tournamentService.getNotYetParticipatedTournamentsNumber(user.getId(), COURSE_EXEC_ID) == 1
     }
 
     def "tournament is open and student has already signed up for it"(){
@@ -229,6 +239,7 @@ class TournamentSignUpTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_ALREADY_JOINED
+        tournamentService.getNotYetParticipatedTournamentsNumber(USER_ID, COURSE_EXEC_ID) == 1
     }
 
     def "tournament is open but user isnt a student"(){
@@ -243,6 +254,7 @@ class TournamentSignUpTest extends Specification {
         def user = userRepository.findAll().get(1)
         !tournament.hasSignedUp(user)
         !user.hasTournament(tournament)
+        tournamentService.getNotYetParticipatedTournamentsNumber(user.getId(), COURSE_EXEC_ID) == 0
     }
 
     def "no user with the given id"(){
@@ -276,6 +288,7 @@ class TournamentSignUpTest extends Specification {
 
         def user = userRepository.findAll().get(0)
         !user.hasTournament(tournament)
+        tournamentService.getNotYetParticipatedTournamentsNumber(user.getId(), COURSE_EXEC_ID) == 0
     }
 
     def "tournament is open but belongs to a different course execution"(){
@@ -290,6 +303,7 @@ class TournamentSignUpTest extends Specification {
         def user = userRepository.findAll().get(0)
         !tournament.hasSignedUp(user)
         !user.hasTournament(tournament)
+        tournamentService.getNotYetParticipatedTournamentsNumber(user.getId(), COURSE_EXEC_ID) == 0
     }
 
     def "tournament generates quiz when has 2 sign ups"() {
@@ -325,6 +339,8 @@ class TournamentSignUpTest extends Specification {
         quiz.getQuizQuestions().stream() // Check if all the questions are of at least one of the given topics
                             .allMatch({question -> question.getQuestion().getTopics().stream()
                                                         .anyMatch({topic -> tournament.getTopics().contains(topic)} as Predicate<Topic>)} as Predicate<Question>)
+        tournamentService.getNotYetParticipatedTournamentsNumber(student1.getId(), COURSE_EXEC_ID) == 1
+        tournamentService.getNotYetParticipatedTournamentsNumber(student2.getId(), COURSE_EXEC_ID) == 1
 
     }
 
@@ -345,6 +361,7 @@ class TournamentSignUpTest extends Specification {
 
         then:
         tournamentRepository.findAll().get(0).getQuiz() != null
+        tournamentService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 1
     }
 
     def "tournament has not generated quiz with 1 student"() {
@@ -362,6 +379,7 @@ class TournamentSignUpTest extends Specification {
 
         then: "no quiz is generated"
         tournamentRepository.findAll().get(0).getQuiz() == null
+        tournamentService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 1
     }
 
     def "tournament has quiz with more than 2 students signedup "() {
@@ -396,10 +414,13 @@ class TournamentSignUpTest extends Specification {
 
         then: "The quiz must be generated"
         tournamentRepository.findAll().get(0).getQuiz() != null
+        tournamentService.getNotYetParticipatedTournamentsNumber(student1.getId(), COURSE_EXEC_ID) == 1
+        tournamentService.getNotYetParticipatedTournamentsNumber(student2.getId(), COURSE_EXEC_ID) == 1
+        tournamentService.getNotYetParticipatedTournamentsNumber(student3.getId(), COURSE_EXEC_ID) == 1
     }
 
     def "tournament has not generated quiz with only the creator signed up"() {
-        given: "the creator of the tournamnet"
+        given: "the creator of the tournament"
         def creator = USER
 
         when: "signs up for the tournament"
@@ -407,6 +428,7 @@ class TournamentSignUpTest extends Specification {
 
         then: "no quiz is generated"
         tournamentRepository.findAll().get(0).getQuiz() == null
+        tournamentService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 1
     }
 
     def "the quiz does not have enough questions and resizes its number of questions"() {
@@ -437,6 +459,8 @@ class TournamentSignUpTest extends Specification {
         def tournament = tournamentRepository.findById(openTournamentId).get()
         tournament.getQuiz().getQuizQuestions().size() == 1
         tournament.getNumberOfQuestions() == 1
+        tournamentService.getNotYetParticipatedTournamentsNumber(student1.getId(), COURSE_EXEC_ID) == 1
+        tournamentService.getNotYetParticipatedTournamentsNumber(student2.getId(), COURSE_EXEC_ID) == 1
     }
 
 
