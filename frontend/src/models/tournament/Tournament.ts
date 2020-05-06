@@ -2,6 +2,7 @@ import Topic from '../management/Topic';
 
 export default class Tournament {
   id: number | undefined;
+  title: string | undefined;
   hasSignedUp: boolean | undefined;
   isCreator: boolean | undefined;
   startTime: string | undefined;
@@ -14,6 +15,7 @@ export default class Tournament {
   constructor(jsonObj?: Tournament) {
     if (jsonObj) {
       this.id = jsonObj.id;
+      this.title = jsonObj.title;
       this.hasSignedUp = jsonObj.hasSignedUp;
       this.isCreator = jsonObj.isCreator;
       this.startTime = jsonObj.startTime;

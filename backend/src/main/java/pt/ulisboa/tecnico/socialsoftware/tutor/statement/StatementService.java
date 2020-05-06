@@ -25,6 +25,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.statement.dto.SolvedQuizDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.statement.dto.StatementAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.statement.dto.StatementCreationDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.statement.dto.StatementQuizDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
@@ -64,6 +66,9 @@ public class StatementService {
 
     @Autowired
     private AnswerService answerService;
+
+    @Autowired
+    private TournamentRepository tournamentRepository;
 
     @Retryable(
       value = { SQLException.class },
@@ -167,6 +172,7 @@ public class StatementService {
                 .filter(quiz -> !quiz.getType().equals(Quiz.QuizType.GENERATED))
                 .filter(quiz -> quiz.getAvailableDate() == null || quiz.getAvailableDate().isBefore(now))
                 .filter(quiz -> !studentQuizIds.contains(quiz.getId()))
+                .filter(quiz -> !quiz.getType().equals(Quiz.QuizType.TOURNAMENT) || studentSignedUpQuizTournament(userId, quiz))
                 .forEach(quiz ->  {
                     if (quiz.getConclusionDate() == null || quiz.getConclusionDate().isAfter(now)) {
                         QuizAnswer quizAnswer = new QuizAnswer(user, quiz);
@@ -183,6 +189,12 @@ public class StatementService {
                 .map(StatementQuizDto::new)
                 .sorted(Comparator.comparing(StatementQuizDto::getAvailableDate, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
+    }
+
+    private boolean studentSignedUpQuizTournament(int userId, Quiz quiz) {
+        if (!quiz.getType().equals(Quiz.QuizType.TOURNAMENT)) return false;
+        Tournament tournament = tournamentRepository.findTournamentFromQuizId(quiz.getId()).get();
+        return tournament.hasSignedUpWithId(userId);
     }
 
     @Retryable(

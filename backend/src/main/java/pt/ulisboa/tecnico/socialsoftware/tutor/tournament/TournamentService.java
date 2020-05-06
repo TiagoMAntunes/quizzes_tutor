@@ -182,7 +182,7 @@ public class TournamentService {
         tournament.signUp(user);
         user.addTournament(tournament);
 
-        if(tournament.getSignedUpNumber() >= 2)
+        if(tournament.getSignedUpNumber() == 2)
             this.generateTournamentQuiz(tournament);
 
         return new TournamentDto(tournament, userId);
@@ -194,8 +194,9 @@ public class TournamentService {
         quiz.setType(Quiz.QuizType.TOURNAMENT.toString());
         quiz.setAvailableDate(DateHandler.toISOString(tournament.getStartTime()));
         quiz.setConclusionDate(DateHandler.toISOString(tournament.getFinishTime()));
+        quiz.setResultsDate(DateHandler.toISOString(tournament.getFinishTime()));
         quiz.setScramble(true);
-        quiz.setTitle("Tournament" + tournament.getId());
+        quiz.setTitle("Tournament: " + tournament.getTitle());
         quiz.setKey(quizService.getMaxQuizKey() + 1);
 
         CourseExecution courseExecution = tournament.getCourseExecution();

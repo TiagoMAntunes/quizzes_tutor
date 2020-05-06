@@ -65,7 +65,7 @@
           <stringProp name="dataSource">Populate</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
-INSERT INTO tournaments(id, finish_time, number_of_questions, start_time, course_execution_id, creator_id, quiz_id) VALUES(${tournamentId},  &apos;2099-12-31 23:59:59&apos;, 5, &apos;2099-01-01 00:00:00&apos;, 11, 676, null);
+INSERT INTO tournaments(id, finish_time, number_of_questions, start_time, course_execution_id, creator_id, quiz_id, title) VALUES(${tournamentId},  &apos;2099-12-31 23:59:59&apos;, 5, &apos;2099-01-01 00:00:00&apos;, 11, 676, null, &apos;title&apos;);
 INSERT INTO topics_tournaments(topics_id, tournaments_id) VALUES(88, ${tournamentId});
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>

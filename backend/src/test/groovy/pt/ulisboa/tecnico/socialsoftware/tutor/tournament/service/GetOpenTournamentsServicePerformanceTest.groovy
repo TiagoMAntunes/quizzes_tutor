@@ -32,6 +32,7 @@ class GetOpenTournamentsServicePerformanceTest extends Specification {
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_NAME = "Software Architecture"
     public static final String COURSE_ABREV = "ES1"
+    public static final String TOURNAMENT_TITLE = "title"
 
     //Should be 100000
     public static final int N_TOURNAMENTS = 1
@@ -95,6 +96,7 @@ class GetOpenTournamentsServicePerformanceTest extends Specification {
         def TOPIC_LIST = topicList
 
         tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setStartTime(NOW_TIME)
         tournamentDto.setFinishTime(FINISH_TIME)
         tournamentDto.setTopics(TOPIC_LIST)

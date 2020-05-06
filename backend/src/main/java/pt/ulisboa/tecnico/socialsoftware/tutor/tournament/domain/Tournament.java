@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
@@ -13,6 +15,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_TITLE_FOR_TOURNAMENT;
 
 @Entity
 @Table(name = "tournaments")
@@ -31,6 +35,9 @@ Tournament {
 
     @Column(name = "finish_time")
     private LocalDateTime finishTime = null;
+
+    @Column(nullable = false)
+    private String title = "Title";
 
     @ManyToOne
     private User creator;
@@ -59,6 +66,7 @@ Tournament {
         this.creator = creator;
         this.numberOfQuestions = tournamentDto.getNumberOfQuestions();
         this.topics = new HashSet<>(topic);
+        setTitle(tournamentDto.getTitle());
     }
 
     public int getId() {
@@ -76,6 +84,17 @@ Tournament {
     }
 
     public void setFinishTime(LocalDateTime time) { finishTime = time; }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        if (title == null || title.isBlank())
+            throw new TutorException(INVALID_TITLE_FOR_TOURNAMENT);
+
+        this.title = title;
+    }
 
     public User getCreator() {
         return creator;
@@ -115,6 +134,9 @@ Tournament {
 
         courseExecution.getTournaments().remove(this);
         courseExecution = null;
+
+        if (quiz != null) quiz.remove();
+        quiz = null;
     }
 
     public boolean hasSignedUp(User user){
