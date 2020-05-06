@@ -245,6 +245,37 @@ public class TournamentService {
         return getTournament(tournamentId).getSignedUpNumber();
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<Integer> getAllTournamentScores(Integer tournamentId){
+        Tournament tournament = getTournament(tournamentId);
+        Integer executionId = tournament.getCourseExecution().getId();
+        Quiz quiz = tournament.getQuiz();
+
+        List<Integer> scores = new ArrayList<>();
+
+        quiz.getQuizAnswers().stream()
+                .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId))
+                .forEach(quizAnswer -> scores.add(quizAnswer.getScore()));
+
+        return scores;
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public float getTournamentAverageScore(Integer tournamentId){
+        List<Integer> scores = getAllTournamentScores(tournamentId);
+
+        float total = scores.stream().reduce(0, Integer::sum);
+        float size = scores.size();
+
+        return total/size;
+    }
+
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int getCreatedTournamentsNumber(Integer userId, Integer executionId) {
         return getUser(userId).getCreatedTournamentsNumber(executionId);
