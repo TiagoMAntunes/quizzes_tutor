@@ -6,7 +6,7 @@ describe('Student Questions walkthrough', () => {
   afterEach(() => {
     cy.contains('Logout').click();
   });
-/*
+
   it('Creates a good Question', () => {
     cy.demoStudentLogin()
     cy.createStudentQuestion(TITLE, QUESTION, OPTIONS)
@@ -57,7 +57,7 @@ describe('Student Questions walkthrough', () => {
     cy.openTeacherStudentQuestions();
     cy.makeAvailable();
   });
-*/
+
   it('Make a resubmit of a rejected question', () => {
     cy.demoTeacherLogin();
     cy.openTeacherStudentQuestions();
