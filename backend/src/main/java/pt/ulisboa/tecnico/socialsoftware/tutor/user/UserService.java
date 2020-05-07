@@ -150,4 +150,9 @@ public class UserService {
 
         user.setTournamentPrivacy(privacy);
     }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public boolean getTournamentPrivacy(Integer userId) {
+        return this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND)).getTournamentPrivacy();
+    }
 }
