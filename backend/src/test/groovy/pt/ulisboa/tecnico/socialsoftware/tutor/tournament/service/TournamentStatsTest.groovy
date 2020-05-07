@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.dashboard.DashboardService
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
@@ -26,6 +27,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -37,6 +39,12 @@ class TournamentStatsTest extends Specification {
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_ABREV = "Software Architecture"
     public static final String ACADEMIC_TERM = "1"
+    public static final String QUESTION_TITLE = "Question"
+    public static final String TOURNAMENT_TITLE = "title"
+
+    public static final LocalDateTime YESTERDAY = DateHandler.now().minusDays(1)
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(2))
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -65,10 +73,9 @@ class TournamentStatsTest extends Specification {
     @Autowired
     QuizAnswerRepository quizAnswerRepository
 
-    def formatter
-    def THREE_DAYS_EARLIER
-    def THREE_DAYS_LATER
-    def ONE_DAY_LATER
+    @Autowired
+    DashboardService dashboardService
+
     def TOPIC_LIST
     def COURSE_EXEC_ID
     def USER
@@ -79,15 +86,10 @@ class TournamentStatsTest extends Specification {
     def openTournament2
     def openTournament2Id
     def courseExec
-    def QUESTION_TITLE = "Question"
     def optionOk
 
 
     def setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        THREE_DAYS_LATER = LocalDateTime.now().plusDays(3).format(formatter)
-        THREE_DAYS_EARLIER = LocalDateTime.now().minusDays(3).format(formatter)
-        ONE_DAY_LATER = LocalDateTime.now().plusDays(1).format(formatter)
 
         //Creates a course
         def course1 = new Course(COURSE_ABREV, Course.Type.TECNICO)
@@ -139,8 +141,9 @@ class TournamentStatsTest extends Specification {
         USER_ID = USER.getId()
 
         def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(ONE_DAY_LATER)
-        tournamentDto.setFinishTime(THREE_DAYS_LATER)
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -172,7 +175,7 @@ class TournamentStatsTest extends Specification {
 
         and: "the student concludes the quiz incorrectly"
         def quiz = tournamentRepository.findAll().get(0).getQuiz()
-        quiz.setAvailableDate(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
+        quiz.setAvailableDate(YESTERDAY)
         def quizAnswer = new QuizAnswer(student, quiz)
         quizAnswerRepository.save(quizAnswer)
 
@@ -180,13 +183,13 @@ class TournamentStatsTest extends Specification {
         answerService.concludeQuiz(student, quiz.getId())
 
         then:"the student has participated in 1 tournament, and the creator none, both have 0 avg score"
-        tournamentService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 1
-        tournamentService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
-        tournamentService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 0;
+        dashboardService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 1
+        dashboardService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
+        dashboardService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 0;
 
-        tournamentService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
-        tournamentService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 1
-        tournamentService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
+        dashboardService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
+        dashboardService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 1
+        dashboardService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
     }
 
 
@@ -209,7 +212,7 @@ class TournamentStatsTest extends Specification {
 
         and: "the student concludes a tournament quiz correctly"
         def quiz = tournamentRepository.findAll().get(0).getQuiz()
-        quiz.setAvailableDate(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
+        quiz.setAvailableDate(YESTERDAY)
         def quizAnswer = new QuizAnswer(student, quiz)
         def statementAnswerDto = new StatementAnswerDto()
         statementAnswerDto.setOptionId(optionOk.getId())
@@ -221,20 +224,20 @@ class TournamentStatsTest extends Specification {
 
         and: "the student concludes a tournament quiz incorrectly"
         quiz = tournamentRepository.findAll().get(1).getQuiz()
-        quiz.setAvailableDate(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
+        quiz.setAvailableDate(YESTERDAY)
         quizAnswer = new QuizAnswer(student, quiz)
         quizAnswerRepository.save(quizAnswer)
         student.addQuizAnswer(quizAnswer)
         answerService.concludeQuiz(student, quiz.getId())
 
         then:"the student has participated in 2 tournaments and has a 50% average tournament score"
-        tournamentService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 2
-        tournamentService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
-        tournamentService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 50;
+        dashboardService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 2
+        dashboardService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
+        dashboardService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 50;
 
-        tournamentService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
-        tournamentService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 2
-        tournamentService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
+        dashboardService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
+        dashboardService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 2
+        dashboardService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
     }
 
 
@@ -264,6 +267,11 @@ class TournamentStatsTest extends Specification {
         @Bean
         QuestionService questionService() {
             return new QuestionService()
+        }
+
+        @Bean
+        DashboardService dashboardService() {
+            return new DashboardService()
         }
     }
 }

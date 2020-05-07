@@ -7,15 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
-import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
-import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
@@ -37,7 +33,6 @@ import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,9 +65,6 @@ public class TournamentService {
     @Autowired
     private QuizRepository quizRepository;
 
-    @Autowired
-    private QuizAnswerRepository quizAnswerRepository;
-
     @Retryable(
         value = {SQLException.class },
         backoff = @Backoff(delay = 5000))
@@ -89,17 +81,11 @@ public class TournamentService {
         if (tournamentDto.getNumberOfQuestions() <= 0)
             throw new TutorException(ErrorMessage.TOURNAMENT_HAS_NO_QUESTIONS);
 
-        try {
-            LocalDateTime.parse(tournamentDto.getStartTime(),Tournament.formatter);
-        } catch (DateTimeParseException e) {
+        if ( DateHandler.toLocalDateTime(tournamentDto.getStartTime()) == null )
             throw new TutorException(ErrorMessage.TOURNAMENT_INVALID_START_TIME);
-        }
 
-        try {
-            LocalDateTime.parse(tournamentDto.getFinishTime(),Tournament.formatter);
-        } catch (DateTimeParseException e) {
+        if ( DateHandler.toLocalDateTime(tournamentDto.getFinishTime()) == null )
             throw new TutorException(ErrorMessage.TOURNAMENT_INVALID_FINISH_TIME);
-        }
 
         User creator = userRepository.findById(creatorId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, creatorId));
 
@@ -129,7 +115,7 @@ public class TournamentService {
     private void checkTournamentTimes(Tournament tournament) {
         if (tournament.getStartTime().isAfter(tournament.getFinishTime()) || tournament.getStartTime().isEqual(tournament.getFinishTime()))
             throw new TutorException(ErrorMessage.INVALID_TOURNAMENT_TIME);
-        else if (tournament.getStartTime().isBefore(LocalDateTime.now()))
+        else if (tournament.getStartTime().isBefore(DateHandler.now()))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_STARTED);
     }
 
@@ -143,7 +129,7 @@ public class TournamentService {
         if (!tournament.getCreator().getId().equals(userId))
             throw new TutorException(ErrorMessage.TOURNAMENT_USER_IS_NOT_THE_CREATOR);
 
-        if (tournament.getStartTime().isBefore(LocalDateTime.now()))
+        if (tournament.getStartTime().isBefore(DateHandler.now()))
             throw new TutorException(ErrorMessage.TOURNAMENT_HAS_STARTED);
 
         tournament.cancel();
@@ -167,16 +153,10 @@ public class TournamentService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean tournamentIsOpen(Integer tournamentId) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = DateHandler.now();
         Tournament tournament = getTournament(tournamentId);
         return (tournament.getFinishTime().isAfter(now) &&
                 tournament.getStartTime().isAfter(now));
-    }
-
-    private boolean tournamentNotOver(Integer tournamentId) {
-        LocalDateTime now = LocalDateTime.now();
-        Tournament tournament = getTournament(tournamentId);
-        return tournament.getFinishTime().isAfter(now);
     }
 
     @Retryable(
@@ -245,74 +225,6 @@ public class TournamentService {
         return getTournament(tournamentId).getSignedUpNumber();
     }
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public int getCreatedTournamentsNumber(Integer userId, Integer executionId) {
-        return getUser(userId).getCreatedTournamentsNumber(executionId);
-    }
-
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public int getParticipatedTournamentsNumber(Integer userId, Integer executionId){
-        User user = getUser(userId);
-        return (int) user.getSignedUpTournamentsCourseExec(executionId).stream()
-                .filter(tournament -> hasParticipatedInTournament(user, tournament)).count();
-    }
-
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public int getNotYetParticipatedTournamentsNumber(Integer userId, Integer executionId) {
-        User user = getUser(userId);
-        return (int) user.getSignedUpTournamentsCourseExec(executionId).stream()
-                .filter(tournament -> canParticipateInTournament(user, tournament)).count();
-    }
-
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public float getAverageTournamentScore(Integer userId, Integer executionId){
-        User user = getUser(userId);
-        int correctTournamentAnswers = (int) user.getQuizAnswers().stream()
-                .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId) && quizAnswer.getQuiz().getType().equals(Quiz.QuizType.TOURNAMENT))
-                .map(QuizAnswer::getQuestionAnswers)
-                .flatMap(Collection::stream)
-                .map(QuestionAnswer::getOption)
-                .filter(Objects::nonNull)
-                .filter(Option::getCorrect).count();
-
-        int totalTournamentAnswers = (int) user.getQuizAnswers().stream()
-                .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId) && quizAnswer.getQuiz().getType().equals(Quiz.QuizType.TOURNAMENT))
-                .map(QuizAnswer::getQuestionAnswers)
-                .mapToLong(Collection::size)
-                .sum();
-
-        if(totalTournamentAnswers == 0) return 0; //avoid division by 0
-
-        return ((float)correctTournamentAnswers)*100/totalTournamentAnswers;
-    }
-
-    private boolean canParticipateInTournament(User user, Tournament tournament) {
-        if(tournamentNotOver(tournament.getId())){
-            return !hasParticipatedInTournament(user, tournament);
-        }
-        return false;
-    }
-
-    private boolean hasParticipatedInTournament(User user, Tournament tournament){
-        if(tournament.hasQuiz()){
-            Quiz quiz = tournament.getQuiz();
-            QuizAnswer quizAnswer = quizAnswerRepository.findQuizAnswer(quiz.getId(), user.getId()).orElse(null);
-
-            if(quizAnswer == null) return false;
-
-            return quizAnswer.isCompleted();
-        }
-        return false;
-    }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public CourseDto findTournamentCourseExecution(int id) {

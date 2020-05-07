@@ -1,11 +1,10 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
-import org.springframework.data.annotation.Transient;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,9 +22,6 @@ public class TournamentDto implements Serializable {
     private Integer numberOfParticipants;
     private Set<TopicDto> topics;
 
-    @Transient
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
     public TournamentDto(){}
 
     public TournamentDto(Tournament tournament) {
@@ -35,9 +31,9 @@ public class TournamentDto implements Serializable {
         this.numberOfParticipants = tournament.getSignedUpNumber();
 
         if (tournament.getStartTime() != null)
-            this.startTime = tournament.getStartTime().format(formatter);
+            this.startTime = DateHandler.toISOString(tournament.getStartTime());
         if (tournament.getFinishTime() != null)
-            this.finishTime= tournament.getFinishTime().format(formatter);
+            this.finishTime= DateHandler.toISOString(tournament.getFinishTime());
 
         this.topics = tournament.getTopics().stream().map(TopicDto::new).collect(Collectors.toSet());
     }
