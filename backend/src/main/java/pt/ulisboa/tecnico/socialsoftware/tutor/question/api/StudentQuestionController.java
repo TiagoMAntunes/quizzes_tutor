@@ -48,7 +48,7 @@ public class StudentQuestionController{
         return this.studentQuestionService.getStudentQuestions(courseId, user.getId());
     }
 
-    @PostMapping("/student_questions/evaluate/{questionId}/{status}")
+    @PutMapping("/student_questions/evaluate/{questionId}/{status}")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity studentQuestionApproveRejectStatus(@PathVariable Integer questionId, @PathVariable String status) {
         studentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.valueOf(status));

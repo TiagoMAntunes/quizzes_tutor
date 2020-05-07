@@ -58,7 +58,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               data-cy="showQuestionCy"
               class="mr-2"
               v-on="on"
@@ -102,6 +102,12 @@ export default class StudentQuestionsView extends Vue {
   search: string = '';
 
   headers: object = [
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      sortable: false
+    },
     { text: 'Title', value: 'title', align: 'center' },
     { text: 'Question', value: 'content', align: 'left' },
     {
@@ -117,12 +123,6 @@ export default class StudentQuestionsView extends Vue {
       text: 'Creation Date',
       value: 'creationDate',
       align: 'center'
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false
     }
   ];
 
