@@ -97,6 +97,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               large
+              data-cy="makeAvailable"
               class="mr-2"
               v-on="on"
               @click="becomeAvailable(item.id)"

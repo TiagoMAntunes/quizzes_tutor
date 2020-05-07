@@ -149,7 +149,7 @@
           <template v-slot:activator="{ on }">
             <v-btn v-on="on" text dark>
               Quizzes
-              <v-icon>fas fa-file-alt</v-icon>
+              <v-icon data-cy="Quizzes">fas fa-file-alt</v-icon>
             </v-btn>
           </template>
           <v-list dense>
@@ -158,7 +158,8 @@
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Available</v-list-item-title>
+                <v-list-item-title data-cy="availableQuizzes"
+                >Available</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/student/create">
@@ -205,7 +206,7 @@
                 >
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="/student/createQuestion">
+            <v-list-item to="/student/create-question">
               <v-list-item-action>
                 <v-icon>create</v-icon>
               </v-list-item-action>
@@ -382,7 +383,7 @@
             <v-list-item-action>
               <v-icon>question_answer</v-icon>
             </v-list-item-action>
-            <v-list-item-content>Available questions</v-list-item-content>
+            <v-list-item-content>Submitted questions</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/create">

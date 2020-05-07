@@ -95,7 +95,7 @@ END TRANSACTION;</stringProp>
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
-INSERT INTO tournaments (id, start_time, finish_time, number_of_questions, course_execution_id, creator_id) VALUES (${tournamentId}, &apos;2022-04-30 04:20&apos;, &apos;2022-05-17 04:20&apos;, &apos;1&apos;, &apos;11&apos;, ${studentId});
+INSERT INTO tournaments (id, start_time, finish_time, title, number_of_questions, course_execution_id, creator_id) VALUES (${tournamentId}, &apos;2022-04-30 04:20&apos;, &apos;2022-05-17 04:20&apos;, &apos;title&apos;, &apos;1&apos;, &apos;11&apos;, ${studentId});
 INSERT INTO topics_tournaments (topics_id, tournaments_id) VALUES (&apos;82&apos;, ${tournamentId});
 END TRANSACTION;</stringProp>
           <stringProp name="queryArguments"></stringProp>

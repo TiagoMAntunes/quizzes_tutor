@@ -5,10 +5,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
-
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 import javax.persistence.*;
-
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_CHANGE_ANSWERED_QUESTION;
 
 
 @Entity
@@ -60,6 +58,14 @@ public class StudentQuestion extends Question {
         super.update(questionDto);
     }
 
+    public void updateRejectedQuestion(QuestionDto questionDto) {
+        if(this.getQuestionStatus() != QuestionStatus.REJECTED) {
+            throw new TutorException(QUESTION_NOT_REJECTED);
+        }
+        super.update(questionDto);
+        this.setQuestionStatus(QuestionStatus.PENDING);
+        this.setRejectionExplanation(null);
+    }
 }
 
 
