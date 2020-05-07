@@ -103,7 +103,8 @@ class StudentResubmitQuestion extends Specification {
     }
 
     def "student resubmit a pending question"() {
-        when: studentQuestionService.resubmitRejectedStudentQuestion(studentQuestion.getId(), questionDto)
+        when: 
+        studentQuestionService.resubmitRejectedStudentQuestion(studentQuestion.getId(), questionDto)
 
         then:
         def exception = thrown(TutorException)
@@ -117,7 +118,8 @@ class StudentResubmitQuestion extends Specification {
         def studentQuestionChanged = studentQuestionRepository.findAll().get(0)
         studentQuestionChanged.setQuestionStatus(StudentQuestion.QuestionStatus.APPROVED)
 
-        when: studentQuestionService.resubmitRejectedStudentQuestion(studentQuestion.getId(), questionDto)
+        when: 
+        studentQuestionService.resubmitRejectedStudentQuestion(studentQuestion.getId(), questionDto)
 
         then:
         def exception = thrown(TutorException)
@@ -130,7 +132,8 @@ class StudentResubmitQuestion extends Specification {
         def studentQuestionChanged = studentQuestionRepository.findAll().get(0)
         studentQuestionChanged.setQuestionStatus(StudentQuestion.QuestionStatus.REJECTED)
 
-        when: studentQuestionService.resubmitRejectedStudentQuestion(studentQuestion.getId(), questionDto)
+        when: 
+        studentQuestionService.resubmitRejectedStudentQuestion(studentQuestion.getId(), questionDto)
 
         then:"the student question is changed"
         studentQuestionRepository.count() == 1L
