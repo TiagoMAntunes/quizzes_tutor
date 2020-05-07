@@ -65,12 +65,20 @@ public class DashboardService {
         return dashboard;
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int  findNumberStudentQuestionsSubmitted(int studentId, int courseId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
         return studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId(), courseId);
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int  findNumberStudentQuestionsApproved(int studentId, int courseId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
@@ -83,16 +91,28 @@ public class DashboardService {
         }
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int getCreatedTournamentsNumber(Integer userId, Integer executionId) {
         return getUser(userId).getCreatedTournamentsNumber(executionId);
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int getParticipatedTournamentsNumber(Integer userId, Integer executionId){
         User user = getUser(userId);
         return (int) user.getSignedUpTournamentsCourseExec(executionId).stream()
                 .filter(tournament -> hasParticipatedInTournament(user, tournament)).count();
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int getNotYetParticipatedTournamentsNumber(Integer userId, Integer executionId) {
         User user = getUser(userId);
         return (int) user.getSignedUpTournamentsCourseExec(executionId).stream()
