@@ -18,24 +18,27 @@
       </v-card-title>
 
       <v-card-text class="text-left" v-if="editQuestion">
-        <v-text-field v-model="editQuestion.title" label="Title" />
+        <v-text-field v-model="editQuestion.title" label="Title" data-cy="Title"/>
         <v-textarea
           outline
           rows="10"
           v-model="editQuestion.content"
           label="Question"
+          data-cy="Question"
         ></v-textarea>
         <div v-for="index in editQuestion.options.length" :key="index">
           <v-switch
             v-model="editQuestion.options[index - 1].correct"
             class="ma-4"
             label="Correct"
+            :data-cy="'Correct' + index"
           />
           <v-textarea
             outline
             rows="10"
             v-model="editQuestion.options[index - 1].content"
             :label="`Option ${index}`"
+            :data-cy="'Option' + index"
           ></v-textarea>
         </div>
       </v-card-text>

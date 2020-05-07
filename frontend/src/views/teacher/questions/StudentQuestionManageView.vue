@@ -107,7 +107,7 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on" @click="editQuestion(item)"
+            <v-icon large class="mr-2" v-on="on" @click="editQuestion(item)" data-cy="editQuestionCy"
             >edit</v-icon>
           </template>
           <span>Edit Question</span>

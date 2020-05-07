@@ -211,6 +211,16 @@ Cypress.Commands.add('makeAvailable', () => {
   cy.get(':nth-child(1) > .text-left > .fas').click({ force: true });
 });
 
+Cypress.Commands.add('editQuestion', (title, question, options) => {
+  cy.get('[data-cy="editQuestionCy"]').first().click();
+  if (title != '') cy.get('[data-cy="Title"]').clear({force: true}).type(title, {force: true});
+  if (question != '') cy.get('[data-cy="Question"]').clear().type(question);
+  for (let option of options)
+      cy.get('[data-cy="' + option + '"]').clear().type(option + 'Test');
+  cy.contains('Save').click();
+});
+
+
 Cypress.Commands.add('openAvailableTournaments', () => {
   cy.contains('Tournaments').click();
   cy.get('[data-cy="availableTournaments"]').click();
