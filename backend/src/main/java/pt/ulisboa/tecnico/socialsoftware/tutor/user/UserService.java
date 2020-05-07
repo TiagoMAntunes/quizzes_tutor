@@ -144,6 +144,12 @@ public class UserService {
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void setQuestionPrivacy(Integer userId, boolean privacy) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND));
+
+        user.setQuestionPrivacy(privacy);
+    }
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean getQuestionPrivacy(Integer userId) {
         return this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND)).getQuestionPrivacy();
     }
