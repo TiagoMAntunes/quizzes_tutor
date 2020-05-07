@@ -69,6 +69,12 @@ public class StudentQuestionController{
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/student_questions/{questionId}/update_teacher")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public StudentQuestionDto teacherUpdatesQuestion(@PathVariable Integer questionId, @Valid @RequestBody StudentQuestionDto question) {
+        return this.studentQuestionService.updateStudentQuestion(questionId, question);
+    }
+
     @PostMapping("/courses/{courseId}/student_questions")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
     public StudentQuestionDto createStudentQuestion(@PathVariable int courseId, @Valid @RequestBody QuestionDto question, Principal principal) {
