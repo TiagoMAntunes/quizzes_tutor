@@ -65,13 +65,13 @@ public class DashboardService {
         return dashboard;
     }
 
-    private int  findNumberStudentQuestionsSubmitted(int studentId, int courseId) {
+    public int  findNumberStudentQuestionsSubmitted(int studentId, int courseId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
         return studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId(), courseId);
     }
 
-    private int  findNumberStudentQuestionsApproved(int studentId, int courseId) {
+    public int  findNumberStudentQuestionsApproved(int studentId, int courseId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
         return studentQuestionRepository.findNumberStudentQuestionsApproved(user.getId(), courseId);
