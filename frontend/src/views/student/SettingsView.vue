@@ -17,7 +17,7 @@
                     </v-btn-toggle>
                 </v-col>
             </v-row>
-            <v-row justify="center" align="center" data-cy="tournament">
+            <v-row justify="center" align="center" data-cy="question">
                 <v-col>
                     Question Privacy
                 </v-col>
