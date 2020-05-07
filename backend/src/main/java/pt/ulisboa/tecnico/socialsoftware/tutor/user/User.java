@@ -70,6 +70,9 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
 
+    @Column(name = "question_privacy", columnDefinition = "boolean default true")
+    private boolean questionPrivacy = true;
+
     public User() {
     }
 
@@ -484,6 +487,14 @@ public class User implements UserDetails, DomainEntity {
 
     public boolean hasCourseExecution(Integer id) {
         return courseExecutions.stream().anyMatch(execution -> execution.getId().equals(id));
+    }
+
+    public void setQuestionPrivacy(boolean privacy) {
+        this.questionPrivacy = privacy;
+    }
+
+    public boolean getQuestionPrivacy() {
+        return this.questionPrivacy;
     }
 
 }

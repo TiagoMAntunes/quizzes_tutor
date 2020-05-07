@@ -142,4 +142,9 @@ public class UserService {
 
         return newDemoUser;
     }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public boolean getQuestionPrivacy(Integer userId) {
+        return this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND)).getQuestionPrivacy();
+    }
 }
