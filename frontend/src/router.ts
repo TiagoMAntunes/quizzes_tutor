@@ -24,6 +24,7 @@ import TournamentView from '@/views/student/tournament/TournamentView.vue';
 import CreateTournamentView from '@/views/student/tournament/CreateTournamentView.vue';
 import CreateStudentQuestionView from '@/views/student/questions/CreateStudentQuestionView.vue';
 import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
+import SettingsView from '@/views/student/SettingsView.vue';
 
 import AdminManagementView from '@/views/admin/AdminManagementView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
@@ -249,6 +250,15 @@ let router = new Router({
           component: ScanView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Scan',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'settings',
+          name: 'settings',
+          component: SettingsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Settings',
             requiredAuth: 'Student'
           }
         }
