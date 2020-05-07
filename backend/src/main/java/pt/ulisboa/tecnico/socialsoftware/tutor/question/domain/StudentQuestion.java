@@ -61,6 +61,7 @@ public class StudentQuestion extends Question {
         }
         super.update(questionDto);
         this.setQuestionStatus(QuestionStatus.PENDING);
+        this.setRejectionExplanation(null);
     }
 }
 
