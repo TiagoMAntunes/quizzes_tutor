@@ -40,21 +40,32 @@ public class DashboardService {
     @Autowired
     private StudentQuestionRepository studentQuestionRepository;
 
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public int  findNumberStudentQuestionsSubmitted(int studentId, int courseId) {
-        User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
-        checkRoleStudent(user);
-        return studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId(), courseId);
-    }
+
 
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public int  findNumberStudentQuestionsApproved(int studentId, int courseId) {
+    public DashboardDto getStudentDashboard(Integer userId, Integer courseId){
+        DashboardDto dashboard = new DashboardDto();
+
+        dashboard.setNumberQuestionsSubmitted(findNumberStudentQuestionsSubmitted(userId, courseId));
+        dashboard.setNumberQuestionsApproved(findNumberStudentQuestionsApproved(userId, courseId));
+        dashboard.setCreatedTournaments(getCreatedTournamentsNumber(userId, courseId));
+        dashboard.setParticipatedTournamentsNumber(getParticipatedTournamentsNumber(userId, courseId));
+        dashboard.setNotYetParticipatedTournamentsNumber(getNotYetParticipatedTournamentsNumber(userId, courseId));
+        dashboard.setAverageTournamentScore(getAverageTournamentScore(userId, courseId));
+
+        return dashboard;
+    }
+
+    private int  findNumberStudentQuestionsSubmitted(int studentId, int courseId) {
+        User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
+        checkRoleStudent(user);
+        return studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId(), courseId);
+    }
+
+    private int  findNumberStudentQuestionsApproved(int studentId, int courseId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
         return studentQuestionRepository.findNumberStudentQuestionsApproved(user.getId(), courseId);
@@ -66,36 +77,23 @@ public class DashboardService {
         }
     }
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int getCreatedTournamentsNumber(Integer userId, Integer executionId) {
         return getUser(userId).getCreatedTournamentsNumber(executionId);
     }
 
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int getParticipatedTournamentsNumber(Integer userId, Integer executionId){
         User user = getUser(userId);
         return (int) user.getSignedUpTournamentsCourseExec(executionId).stream()
                 .filter(tournament -> hasParticipatedInTournament(user, tournament)).count();
     }
 
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public int getNotYetParticipatedTournamentsNumber(Integer userId, Integer executionId) {
         User user = getUser(userId);
         return (int) user.getSignedUpTournamentsCourseExec(executionId).stream()
                 .filter(tournament -> canParticipateInTournament(user, tournament)).count();
     }
 
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public float getAverageTournamentScore(Integer userId, Integer executionId){
+    private float getAverageTournamentScore(Integer userId, Integer executionId){
         User user = getUser(userId);
         int correctTournamentAnswers = (int) user.getQuizAnswers().stream()
                 .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId) && quizAnswer.getQuiz().getType().equals(Quiz.QuizType.TOURNAMENT))

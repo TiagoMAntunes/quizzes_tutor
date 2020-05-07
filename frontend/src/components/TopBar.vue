@@ -216,7 +216,7 @@
             </v-list-item>
           </v-list>
         </v-menu>
-        <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
+        <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark data-cy="Stats">
           Stats
           <v-icon>fas fa-user</v-icon>
         </v-btn>

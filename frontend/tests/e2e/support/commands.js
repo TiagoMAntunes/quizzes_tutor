@@ -244,3 +244,7 @@ Cypress.Commands.add('answerTournamentQuiz', () => {
     cy.wait(1000); // let everything load
     cy.get('.primary--text > .v-btn__content').click();
 })
+
+Cypress.Commands.add('openStats', () => {
+  cy.get('[data-cy=Stats]').click();
+})
