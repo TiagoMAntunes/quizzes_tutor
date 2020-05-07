@@ -745,7 +745,6 @@ export default class RemoteServices {
   }
 
   static async setTournamentPrivacy(privacy : boolean) {
-    console.log(`Sending data ${privacy}`)
     return httpClient
       .put(`/user/tournament/privacy?privacy=${privacy}` )
       .catch(async error => {
