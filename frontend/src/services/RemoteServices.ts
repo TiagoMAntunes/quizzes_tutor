@@ -732,4 +732,24 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
+
+  static async getTournamentPrivacy() {
+    return httpClient.
+      get('/user/tournament/privacy')
+      .then(response => {
+        return response.data
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error))
+      })
+  }
+
+  static async setTournamentPrivacy(privacy : boolean) {
+    console.log(`Sending data ${privacy}`)
+    return httpClient
+      .put(`/user/tournament/privacy?privacy=${privacy}` )
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
 }
