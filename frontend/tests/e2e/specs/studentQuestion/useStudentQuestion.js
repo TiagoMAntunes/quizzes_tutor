@@ -5,8 +5,8 @@ let OPTIONS =['Option1','Option2','Option3', 'Option4']
 describe('Student Questions walkthrough', () => {
   afterEach(() => {
     cy.contains('Logout').click();
-  })
-
+  });
+/*
   it('Creates a good Question', () => {
     cy.demoStudentLogin()
     cy.createStudentQuestion(TITLE, QUESTION, OPTIONS)
@@ -57,5 +57,16 @@ describe('Student Questions walkthrough', () => {
     cy.openTeacherStudentQuestions();
     cy.makeAvailable();
   });
-
+*/
+  it('Make a resubmit of a rejected question', () => {
+    cy.demoTeacherLogin();
+    cy.openTeacherStudentQuestions();
+    cy.statusQuestion(TITLE, 'REJECTED');
+    cy.logout();
+    cy.demoStudentLogin();
+    cy.contains('Questions').click();
+    cy.get('[data-cy="availableQuestions"]').click();
+    cy.resubmitStudentQuestion(TITLE);
+    cy.contains('Save').click();
+  });
 });
