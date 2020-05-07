@@ -301,11 +301,12 @@ END TRANSACTION;</stringProp>
           <hashTree/>
           <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert average score" enabled="true">
             <stringProp name="JSON_PATH">$.averageScore</stringProp>
-            <stringProp name="EXPECTED_VALUE">0,0</stringProp>
+            <stringProp name="EXPECTED_VALUE">0.0</stringProp>
             <boolProp name="JSONVALIDATION">true</boolProp>
             <boolProp name="EXPECT_NULL">false</boolProp>
             <boolProp name="INVERT">false</boolProp>
             <boolProp name="ISREGEX">false</boolProp>
+            <stringProp name="TestPlan.comments">Some systems might need value to be 0,0 (with a comma)</stringProp>
           </JSONPathAssertion>
           <hashTree/>
           <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert number of participants" enabled="true">

@@ -16,7 +16,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService;
@@ -25,6 +24,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto.QuizDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentScoreboardDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
@@ -238,7 +238,19 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<Integer> getAllTournamentScores(Integer tournamentId){
+    public TournamentScoreboardDto getTournamentScoreboard(Integer tournamentId){
+        TournamentScoreboardDto scoreboard = new TournamentScoreboardDto();
+
+        scoreboard.setScores(getAllTournamentScores(tournamentId));
+        scoreboard.setAverageScore(getTournamentAverageScore(tournamentId));
+        scoreboard.setNumberOfParticipants(getTournamentSignedUpNumber(tournamentId));
+        scoreboard.setNumberOfQuestions(getTournamentNumberOfQuestions(tournamentId));
+        scoreboard.setTournamentTitle(getTournamentTitle(tournamentId));
+
+        return scoreboard;
+    }
+
+    private List<Integer> getAllTournamentScores(Integer tournamentId){
         Tournament tournament = getTournament(tournamentId);
         Integer executionId = tournament.getCourseExecution().getId();
         Quiz quiz = tournament.getQuiz();
@@ -254,11 +266,7 @@ public class TournamentService {
         return scores;
     }
 
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public float getTournamentAverageScore(Integer tournamentId){
+    private float getTournamentAverageScore(Integer tournamentId){
         List<Integer> scores = getAllTournamentScores(tournamentId);
 
         float size = scores.size();

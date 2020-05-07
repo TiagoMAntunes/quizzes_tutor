@@ -88,15 +88,7 @@ public class TournamentController {
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
-        TournamentScoreboardDto scoreboard = new TournamentScoreboardDto();
-
-        scoreboard.setScores(tournamentService.getAllTournamentScores(tournamentId));
-        scoreboard.setAverageScore(tournamentService.getTournamentAverageScore(tournamentId));
-        scoreboard.setNumberOfParticipants(tournamentService.getTournamentSignedUpNumber(tournamentId));
-        scoreboard.setNumberOfQuestions(tournamentService.getTournamentNumberOfQuestions(tournamentId));
-        scoreboard.setTournamentTitle(tournamentService.getTournamentTitle(tournamentId));
-
-        return scoreboard;
+        return tournamentService.getTournamentScoreboard(tournamentId);
     }
 
 }
