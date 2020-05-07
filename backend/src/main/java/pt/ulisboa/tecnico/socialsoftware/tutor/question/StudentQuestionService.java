@@ -170,6 +170,16 @@ public class StudentQuestionService {
         return count;
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public StudentQuestionDto resubmitRejectedStudentQuestion(int studentQuestionId, QuestionDto questionDto) {
+        StudentQuestion studentQuestion = studentQuestionRepository.findById(studentQuestionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, studentQuestionId));
+        studentQuestion.updateRejectedQuestion(questionDto);
+        return new StudentQuestionDto(studentQuestion);
+    }
+
     private void checkEnrolledCourseExecution(User student, Course course) {
         List<CourseExecution> list = student.getCourseExecutions().stream().filter(
                 courseExecution -> courseExecution.getCourse() == course).collect(Collectors.toList());

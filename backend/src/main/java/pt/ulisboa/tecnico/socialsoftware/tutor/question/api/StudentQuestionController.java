@@ -94,4 +94,10 @@ public class StudentQuestionController{
         dashboard.setNumberQuestionsApproved(this.studentQuestionService.findNumberStudentQuestionsApproved(user.getId(), courseId));
         return dashboard;
     }
+
+    @PutMapping("/student/{studentQuestionId}/resubmit")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public StudentQuestionDto studentResubmitQuestion(@PathVariable Integer studentQuestionId, @Valid @RequestBody QuestionDto questionDto) {
+       return studentQuestionService.resubmitRejectedStudentQuestion(studentQuestionId, questionDto);
+    }
 }
