@@ -99,6 +99,7 @@ class GetAvailableQuizzesTest extends Specification {
         statementQuizDto.getQuizAnswerId() != null
         statementQuizDto.getTitle() == QUIZ_TITLE
         statementQuizDto.isOneWay()
+        !statementQuizDto.isForTournament()
         statementQuizDto.getAvailableDate() == DateHandler.toISOString(BEFORE)
         statementQuizDto.getConclusionDate() == DateHandler.toISOString(conclusionDate)
         statementQuizDto.getQuestions().size() == 0
@@ -152,6 +153,7 @@ class GetAvailableQuizzesTest extends Specification {
         statementQuizDto.getQuizAnswerId() != null
         statementQuizDto.getTitle() == QUIZ_TITLE
         statementQuizDto.isOneWay()
+        !statementQuizDto.isForTournament()
         statementQuizDto.getAvailableDate() == DateHandler.toISOString(BEFORE)
         statementQuizDto.getConclusionDate() == DateHandler.toISOString(TOMORROW)
         statementQuizDto.getTimeToAvailability() == null

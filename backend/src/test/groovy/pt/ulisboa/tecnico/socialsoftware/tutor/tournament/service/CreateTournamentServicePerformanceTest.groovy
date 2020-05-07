@@ -20,6 +20,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentR
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -32,6 +33,10 @@ class CreateTournamentServicePerformanceTest extends Specification {
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_NAME = "Software Architecture"
     public static final String COURSE_ABREV = "ES1"
+    public static final String TOURNAMENT_TITLE = "title"
+
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final String LATER =DateHandler.toISOString( DateHandler.now().plusDays(2))
 
     //Should be 1000000
     public static final int N_TOURNAMENTS = 1
@@ -54,18 +59,12 @@ class CreateTournamentServicePerformanceTest extends Specification {
     @Autowired
     CourseExecutionRepository courseExecutionRepository
 
-    def formatter
-    def NOW_TIME
-    def FINISH_TIME
     def TOPIC_LIST
     def course
     def courseExecution
     def courseExecutionEntity
 
     def setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        NOW_TIME = LocalDateTime.now().plusDays(1).format(formatter)
-        FINISH_TIME = LocalDateTime.now().plusDays(5).format(formatter)
 
         //Creates a user
         def user = new User()
@@ -99,8 +98,9 @@ class CreateTournamentServicePerformanceTest extends Specification {
     def "performance testing to create 1M tournaments"() {
         given: "a tournamentDto"
         def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 

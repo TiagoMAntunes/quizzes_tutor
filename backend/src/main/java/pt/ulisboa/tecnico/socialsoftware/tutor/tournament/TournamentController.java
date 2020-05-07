@@ -19,7 +19,7 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.AU
 
 @RestController
 public class TournamentController {
-    
+
     @Autowired
     private TournamentService tournamentService;
 
@@ -64,7 +64,7 @@ public class TournamentController {
 
         return ResponseEntity.ok().build();
     }
-  
+
     @GetMapping("/executions/{executionId}/tournaments")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public List<TournamentDto> getOpenTournaments(@PathVariable int executionId, Principal principal) {

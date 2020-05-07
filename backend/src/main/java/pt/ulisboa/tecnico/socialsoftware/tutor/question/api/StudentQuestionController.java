@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import pt.ulisboa.tecnico.socialsoftware.tutor.dashboard.DashboardDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
@@ -13,7 +14,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.DashboardDto;
 
 import java.security.Principal;
 
@@ -80,19 +80,6 @@ public class StudentQuestionController{
         }
         question.setStatus(Question.Status.AVAILABLE.name());
         return this.studentQuestionService.createStudentQuestion(courseId, question, user.getId());
-    }
-
-    @GetMapping("/student/{courseId}/dashboard")
-    @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public DashboardDto createDashboard(Principal principal, @PathVariable int courseId) {
-        User user = (User) ((Authentication) principal).getPrincipal();
-        if(user == null){
-            throw new TutorException(AUTHENTICATION_ERROR);
-        }
-        DashboardDto dashboard = new DashboardDto();
-        dashboard.setNumberQuestionsSubmitted(this.studentQuestionService.findNumberStudentQuestionsSubmitted(user.getId(), courseId));
-        dashboard.setNumberQuestionsApproved(this.studentQuestionService.findNumberStudentQuestionsApproved(user.getId(), courseId));
-        return dashboard;
     }
 
     @PutMapping("/student/{studentQuestionId}/resubmit")
