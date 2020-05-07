@@ -20,7 +20,7 @@
           </elementProp>
           <elementProp name="tournamentId" elementType="Argument">
             <stringProp name="Argument.name">tournamentId</stringProp>
-            <stringProp name="Argument.value">42069</stringProp>
+            <stringProp name="Argument.value">42075</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>

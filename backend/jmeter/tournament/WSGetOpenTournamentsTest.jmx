@@ -233,7 +233,7 @@ END TRANSACTION;</stringProp>
           <hashTree>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert open tournament startTime" enabled="true">
               <stringProp name="JSON_PATH">$[0].startTime</stringProp>
-              <stringProp name="EXPECTED_VALUE">2022-04-30 04:20</stringProp>
+              <stringProp name="EXPECTED_VALUE">2022-04-30T04:20:00Z</stringProp>
               <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
@@ -242,7 +242,7 @@ END TRANSACTION;</stringProp>
             <hashTree/>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert open tournament finishTime" enabled="true">
               <stringProp name="JSON_PATH">$[0].finishTime</stringProp>
-              <stringProp name="EXPECTED_VALUE">2022-05-17 04:20</stringProp>
+              <stringProp name="EXPECTED_VALUE">2022-05-17T04:20:00Z</stringProp>
               <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
