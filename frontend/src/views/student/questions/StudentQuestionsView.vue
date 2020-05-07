@@ -72,6 +72,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
                     small
+                    :disabled="isDisabledUpdate(item)"
                     data-cy="updateQuestionCy"
                     class="mr-2"
                     v-on="on"
@@ -201,7 +202,9 @@ export default class StudentQuestionsView extends Vue {
   onCloseShowStudentQuestionDialog() {
     this.questionDialog = false;
   }
-
+  isDisabledUpdate(question: StudentQuestion) {
+    return question.questionStatus != 'REJECTED';
+  }
   editQuestion(studentQuestion: StudentQuestion, e?: Event) {
     if (e) e.preventDefault();
     this.currentQuestion = studentQuestion;
