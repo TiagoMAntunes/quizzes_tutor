@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 @Transactional
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
-    @Query(value = "SELECT q FROM Question q WHERE q.course.id = :courseId AND type(q) = Question")
+    @Query(value = "SELECT q FROM Question q WHERE q.course.id = :courseId")
     List<Question> findQuestions(int courseId);
 
     @Query(value = "SELECT q FROM Question q WHERE q.course.id = :courseId AND q.status = 'AVAILABLE' and type(q) = Question ")

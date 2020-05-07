@@ -112,7 +112,7 @@ Cypress.Commands.add('addTopicStudentQuestion', (title, topic) => {
       '[data-cy="topicsCy"] > .v-input > .v-input__control > .v-input__slot > .v-select__slot'
     )
     .click({ force: true });
-  cy.contains(topic).click();
+  cy.contains(topic).click({ force: true });
 });
 
 Cypress.Commands.add('createStudentQuestion', (title, question, options) => {
@@ -194,28 +194,20 @@ Cypress.Commands.add('openCreateTournament', () => {
   cy.get('[data-cy="createTournament"]').click();
 });
 
-Cypress.Commands.add('rejectQuestion', title => {
-  cy.contains(title)
-    .parent()
-    .should('have.length', 1)
-    .children()
-    .should('have.length', 8)
-    .find('[data-cy="questionStatusCy"]')
-    .parent()
-    .click({ force: true });
-  cy.contains('REJECT').click({ force: true });
+Cypress.Commands.add('statusQuestion', (title, status) => {
+    cy.get('[data-cy="questionStatusCy"]').first().click({ force: true });
+    cy.get('[role="listbox"]').first().contains(status).click({ force: true });
 });
 
 Cypress.Commands.add('addExplanation', (title, explanation) => {
-  cy.contains(title)
-    .parent()
-    .should('have.length', 1)
-    .children()
-    .should('have.length', 8)
-    .find('[data-cy="Explanation"]')
+    cy.get('[data-cy="Explanation"]').first()
     .click({ force: true })
     .clear()
     .type(explanation);
+});
+
+Cypress.Commands.add('makeAvailable', () => {
+  cy.get('[data-cy="makeAvailable"]').first().click({ force: true });
 });
 
 Cypress.Commands.add('openAvailableTournaments', () => {
@@ -223,14 +215,31 @@ Cypress.Commands.add('openAvailableTournaments', () => {
   cy.get('[data-cy="availableTournaments"]').click();
 });
 
-Cypress.Commands.add('joinTournament', () => {
-  cy.get(':nth-child(2) > .last-col > .fas').click();
-});
-
 Cypress.Commands.add('cancelTournament', () => {
-  cy.get(':nth-child(2) > .last-col > .v-icon').click();
+    cy.get('[data-cy="cancel"]').first().click();
 });
 
-Cypress.Commands.add('joinTournamentWithFinishDate', (date) => {
-  cy.contains(date).parent().find('.last-col > .v-icon').click()
+Cypress.Commands.add('joinTournament', () => {
+    cy.get('[data-cy="join"]').first().click();
 })
+
+Cypress.Commands.add('openAvailableQuizzes', () => {
+    cy.get('[data-cy=Quizzes]').click();
+    cy.get('[data-cy="availableQuizzes"]').click();
+})
+
+Cypress.Commands.add('answerTournamentQuiz', () => {
+    cy.openAvailableQuizzes();
+    cy.get('[data-cy=tournamentQuiz]').click();
+    cy.wait(1000); // let everything load
+    cy.get('.end-quiz').click();
+    cy.wait(1000); // let everything load
+    cy.get('.primary--text > .v-btn__content').click();
+})
+Cypress.Commands.add('goToStats', () => {
+    cy.contains('Stats').click();
+});
+
+Cypress.Commands.add('logout', () => {
+    cy.contains('Logout').click();
+});

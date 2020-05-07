@@ -3,6 +3,7 @@
     <h2>Available Quizzes</h2>
     <ul>
       <li class="list-header">
+        <div class="type-col"></div>
         <div class="col">Title</div>
         <div class="col">Available since</div>
         <div class="col">Available until</div>
@@ -14,6 +15,9 @@
         :key="quiz.quizAnswerId"
         @click="solveQuiz(quiz)"
       >
+        <div class="type-col">
+          <v-icon v-if="quiz.forTournament" data-cy="tournamentQuiz">fas fa-trophy</v-icon>
+        </div>
         <div class="col">
           {{ quiz.title }}
         </div>
@@ -97,6 +101,12 @@ export default class AvailableQuizzesView extends Vue {
       text-transform: uppercase;
       letter-spacing: 0.03em;
       text-align: center;
+    }
+
+    .type-col {
+      width: 4%;
+      padding-right: 2%;
+      margin: auto;
     }
 
     .col {
