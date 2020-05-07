@@ -17,6 +17,21 @@
                     </v-btn-toggle>
                 </v-col>
             </v-row>
+            <v-row justify="center" align="center" data-cy="tournament">
+                <v-col>
+                    Question Privacy
+                </v-col>
+                <v-col>
+                    <v-btn-toggle
+                            mandatory
+                            class="button-group"
+                            v-model="questionPrivacy"
+                    >
+                        <v-btn width="50%" value="false" data-cy="public" @click="setQuestionPrivacy(false)">Public</v-btn>
+                        <v-btn width="50%" value="true" data-cy="private" @click="setQuestionPrivacy(true)">Private</v-btn>
+                    </v-btn-toggle>
+                </v-col>
+            </v-row>
             <!-- <v-divider></v-divider> This is good for when extra buttons are added-->
             
         </v-container>
@@ -31,12 +46,14 @@ import RemoteServices from '../../services/RemoteServices';
 export default class SettingsView extends Vue {
 
   tournamentPrivacy : String = "false";
+  questionPrivacy : String = "false";
 
   async created() {
     await this.$store.dispatch('loading');
     
     try {
         this.tournamentPrivacy = String(await RemoteServices.getTournamentPrivacy());
+        this.questionPrivacy = String(await RemoteServices.getQuestionPrivacy());
     } catch (error) {
         await this.$store.dispatch('error', error)
     }
@@ -51,6 +68,14 @@ export default class SettingsView extends Vue {
           await this.$store.dispatch('error', error)
       }
   }
+
+    async setQuestionPrivacy(arg : boolean) {
+        try {
+            await RemoteServices.setQuestionPrivacy(arg);
+        } catch (error) {
+            await this.$store.dispatch('error', error)
+        }
+    }
 }
 </script>
 
