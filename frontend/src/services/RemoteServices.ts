@@ -223,7 +223,7 @@ export default class RemoteServices {
     question: Question
   ): Promise<StudentQuestion> {
     return httpClient
-      .put(`/student_questions/${question.id}/updateTeacher`, question)
+      .put(`/student_questions/${question.id}/update_teacher`, question)
       .then(response => {
         return new StudentQuestion(response.data);
       })
