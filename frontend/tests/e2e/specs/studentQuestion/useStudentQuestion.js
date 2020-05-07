@@ -42,7 +42,7 @@ describe('Student Questions walkthrough', () => {
   it('Reject a student question and add an explanation', () => {
     cy.demoTeacherLogin()
     cy.openTeacherStudentQuestions();
-    cy.statusQuestion(TITLE, 'REJECT');
+    cy.statusQuestion(TITLE, 'REJECTED');
     cy.addExplanation(TITLE, 'not good');
   });
 

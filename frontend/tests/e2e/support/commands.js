@@ -192,23 +192,19 @@ Cypress.Commands.add('openCreateTournament', () => {
 });
 
 Cypress.Commands.add('statusQuestion', (title, status) => {
-  cy.get(
-    ':nth-child(1) > :nth-child(5) > .v-input > .v-input__control > .v-input__slot > .v-select__slot > .v-select__selections > .v-chip'
-  ).click({ force: true });
-  cy.contains(status).click({ force: true });
+    cy.get('[data-cy="questionStatusCy"]').first().click({ force: true });
+    cy.get('[role="listbox"]').first().contains(status).click({ force: true });
 });
 
 Cypress.Commands.add('addExplanation', (title, explanation) => {
-  cy.get(
-    ':nth-child(1) > :nth-child(6) > .v-input > .v-input__control > .v-input__slot > .v-text-field__slot > [data-cy=Explanation]'
-  )
+    cy.get('[data-cy="Explanation"]').first()
     .click({ force: true })
     .clear()
     .type(explanation);
 });
 
 Cypress.Commands.add('makeAvailable', () => {
-  cy.get(':nth-child(1) > .text-left > .fas').click({ force: true });
+  cy.get('[data-cy="makeAvailable"]').first().click({ force: true });
 });
 
 Cypress.Commands.add('openAvailableTournaments', () => {
@@ -231,3 +227,8 @@ Cypress.Commands.add('goToStats', () => {
 Cypress.Commands.add('logout', () => {
     cy.contains('Logout').click();
 });
+
+Cypress.Commands.add('joinTournamentWithFinishDate', (date) => {
+  cy.contains(date).parent().find('.last-col > .v-icon').click()
+})
+
