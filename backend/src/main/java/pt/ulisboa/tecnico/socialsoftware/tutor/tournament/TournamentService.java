@@ -226,11 +226,11 @@ public class TournamentService {
         return getTournament(tournamentId).getSignedUpNumber();
     }
 
-    public int getTournamentNumberOfQuestions(Integer tournamentId){
+    private int getTournamentNumberOfQuestions(Integer tournamentId){
         return getTournament(tournamentId).getNumberOfQuestions();
     }
 
-    public String getTournamentTitle(Integer tournamentId){
+    private String getTournamentTitle(Integer tournamentId){
         return getTournament(tournamentId).getTitle();
     }
 

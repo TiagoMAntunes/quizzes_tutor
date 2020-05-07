@@ -39,9 +39,9 @@ class TournamentScoreboardTest extends Specification {
     public static final String ACADEMIC_TERM = "1"
     public static final String TOURNAMENT_NAME = "Tournament 1"
     public static final String QUESTION_TITLE = "Question"
-    public static final LocalDateTime THREE_DAYS_EARLIER = DateHandler.now().minusDays(3)
-    public static final String THREE_DAYS_LATER = DateHandler.toISOString(DateHandler.now().plusDays(3))
-    public static final String ONE_DAY_LATER = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final LocalDateTime YESTERDAY = DateHandler.now().minusDays(1)
+    public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(3))
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -135,8 +135,8 @@ class TournamentScoreboardTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_NAME)
-        tournamentDto.setStartTime(ONE_DAY_LATER)
-        tournamentDto.setFinishTime(THREE_DAYS_LATER)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -167,19 +167,20 @@ class TournamentScoreboardTest extends Specification {
         given: "a student and the tournament creator"
         def creator = USER
 
-        when: "they sign up for the tournament"
+        and: "they sign up for the tournament"
         tournamentService.joinTournament(openTournamentId, student1.getId())
         tournamentService.joinTournament(openTournamentId, creator.getId())
 
         and: "the student concludes the quiz incorrectly"
         def quiz = tournamentRepository.findAll().get(0).getQuiz()
-        quiz.setAvailableDate(THREE_DAYS_EARLIER)
+        quiz.setAvailableDate(YESTERDAY)
         def quizAnswer = new QuizAnswer(student1, quiz)
         quizAnswerRepository.save(quizAnswer)
 
         student1.addQuizAnswer(quizAnswer)
         answerService.concludeQuiz(student1, quiz.getId())
 
+        when: "getting the scoreboard"
         def scoreboard = tournamentService.getTournamentScoreboard(openTournamentId)
 
         then:"tournament has one participant with 0 avg score"
@@ -189,13 +190,13 @@ class TournamentScoreboardTest extends Specification {
 
 
     def "two users participate in tournament quiz"(){
-        when: "two students sign up for the tournament"
+        given: "two students sign up for the tournament"
         tournamentService.joinTournament(openTournamentId, student1.getId())
         tournamentService.joinTournament(openTournamentId, student2.getId())
 
         and: "the first student concludes the tournament quiz correctly"
         def quiz = tournamentRepository.findAll().get(0).getQuiz()
-        quiz.setAvailableDate(THREE_DAYS_EARLIER)
+        quiz.setAvailableDate(YESTERDAY)
         def quizAnswer = new QuizAnswer(student1, quiz)
         def statementAnswerDto = new StatementAnswerDto()
         statementAnswerDto.setOptionId(optionOk.getId())
@@ -211,6 +212,7 @@ class TournamentScoreboardTest extends Specification {
         student2.addQuizAnswer(quizAnswer)
         answerService.concludeQuiz(student2, quiz.getId())
 
+        when: "getting the scoreboard"
         def scoreboard = tournamentService.getTournamentScoreboard(openTournamentId)
 
         then:"two students have participated in the tournament and it has a 0.5 avg score"
