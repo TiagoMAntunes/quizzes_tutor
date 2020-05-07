@@ -68,8 +68,27 @@
           </template>
           <span>Show Question</span>
         </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+                    small
+                    data-cy="updateQuestionCy"
+                    class="mr-2"
+                    v-on="on"
+                    @click="editQuestion(item)"
+            >edit</v-icon
+            >
+          </template>
+          <span>Update Question</span>
+        </v-tooltip>
       </template>
     </v-data-table>
+    <update-student-question-dialog
+            v-if="currentQuestion"
+            v-model="updateStudentQuestionDialog"
+            :question="currentQuestion"
+            v-on:save-question="onSaveQuestion"
+    />
     <show-student-question-dialog
       v-if="currentQuestion"
       :dialog="questionDialog"
@@ -83,15 +102,17 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import StudentQuestion from '@/models/management/StudentQuestion';
-import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/questions/ShowStudentQuestionDialog.vue';
 import ShowStudentQuestionTopics from '@/views/student/questions/ShowStudentQuestionTopics.vue';
+import Question from '@/models/management/Question';
+import UpdateStudentQuestionDialog from '@/views/student/questions/UpdateStudentQuestionDialog.vue';
 
 @Component({
   components: {
     'show-student-question-dialog': ShowStudentQuestionDialog,
-    'show-student-question-topics': ShowStudentQuestionTopics
+    'show-student-question-topics': ShowStudentQuestionTopics,
+    'update-student-question-dialog': UpdateStudentQuestionDialog
   }
 })
 export default class StudentQuestionsView extends Vue {
@@ -100,6 +121,7 @@ export default class StudentQuestionsView extends Vue {
   currentQuestion: StudentQuestion | null = null;
   questionDialog: boolean = false;
   search: string = '';
+  updateStudentQuestionDialog : boolean = false;
 
   headers: object = [
     { text: 'Title', value: 'title', align: 'center' },
@@ -125,7 +147,12 @@ export default class StudentQuestionsView extends Vue {
       sortable: false
     }
   ];
-
+  @Watch('updateStudentQuestionDialog')
+  closeError() {
+    if (!this.updateStudentQuestionDialog) {
+      this.currentQuestion = null;
+    }
+  }
   async created() {
     await this.$store.dispatch('loading');
     try {
@@ -173,6 +200,19 @@ export default class StudentQuestionsView extends Vue {
 
   onCloseShowStudentQuestionDialog() {
     this.questionDialog = false;
+  }
+
+  editQuestion(studentQuestion: StudentQuestion, e?: Event) {
+    if (e) e.preventDefault();
+    this.currentQuestion = studentQuestion;
+    this.updateStudentQuestionDialog = true;
+  }
+
+  async onSaveQuestion(studentQuestion: StudentQuestion) {
+    this.questions = this.questions.filter(q => q.id !== studentQuestion.id);
+    this.questions.unshift(studentQuestion);
+    this.updateStudentQuestionDialog = false;
+    this.currentQuestion = null;
   }
 }
 </script>
