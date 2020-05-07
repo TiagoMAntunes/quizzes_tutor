@@ -2,6 +2,7 @@ import Topic from '../management/Topic';
 import RemoteServices from '@/services/RemoteServices';
 import moment from 'moment';
 export default class TournamentSkeleton {
+  title: string;
   topics: Topic[];
   startTime: string;
   finishTime: string;
@@ -12,6 +13,7 @@ export default class TournamentSkeleton {
   private static _tournament: TournamentSkeleton = new TournamentSkeleton();
 
   constructor() {
+    this.title = '';
     this.topics = [];
     this.startTime = '';
     this.finishTime = '';
@@ -20,9 +22,10 @@ export default class TournamentSkeleton {
 
   async createTournament() {
     let params = {
+      title: this.title,
       topics: this.topics,
-      startTime: moment(this.startTime).format(TournamentSkeleton.FORMAT),
-      finishTime: moment(this.finishTime).format(TournamentSkeleton.FORMAT),
+      startTime: this.startTime,
+      finishTime: this.finishTime,
       numberOfQuestions: this.numberOfQuestions
     };
 
@@ -30,6 +33,7 @@ export default class TournamentSkeleton {
   }
 
   reset() {
+    this.title = '';
     this.topics = [];
     this.startTime = '';
     this.finishTime = '';

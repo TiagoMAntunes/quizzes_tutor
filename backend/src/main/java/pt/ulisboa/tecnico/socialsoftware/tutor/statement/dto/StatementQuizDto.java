@@ -16,6 +16,7 @@ public class StatementQuizDto implements Serializable {
     private Integer quizAnswerId;
     private String title;
     private boolean oneWay;
+    private boolean forTournament;
     private String availableDate;
     private String conclusionDate;
     private Long timeToAvailability;
@@ -31,6 +32,7 @@ public class StatementQuizDto implements Serializable {
         this.quizAnswerId = quizAnswer.getId();
         this.title = quizAnswer.getQuiz().getTitle();
         this.oneWay = quizAnswer.getQuiz().isOneWay();
+        this.forTournament = quizAnswer.getQuiz().getType() == Quiz.QuizType.TOURNAMENT;
         this.availableDate = DateHandler.toISOString(quizAnswer.getQuiz().getAvailableDate());
         this.conclusionDate = DateHandler.toISOString(quizAnswer.getQuiz().getConclusionDate());
 
@@ -79,6 +81,14 @@ public class StatementQuizDto implements Serializable {
 
     public void setOneWay(boolean oneWay) {
         this.oneWay = oneWay;
+    }
+
+    public boolean isForTournament() {
+        return forTournament;
+    }
+
+    public void setForTournament(boolean forTournament) {
+        this.forTournament = forTournament;
     }
 
     public String getAvailableDate() {

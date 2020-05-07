@@ -3,6 +3,14 @@
     <h2>Create Tournament</h2>
     <v-container class="create-form">
       <v-row justify="center">
+        <v-text-field
+          class="title"
+          v-model="tournamentManager.title"
+          label="*Title"
+          data-cy="title"
+        />
+      </v-row>
+      <v-row justify="center">
         <v-col>
           <v-select
             chips
@@ -23,6 +31,7 @@
           <VueCtkDateTimePicker
             label="Start time"
             format="YYYY-MM-DDTHH:mm:ssZ"
+            id="startTimer"
             v-model="tournamentManager.startTime"
             data-cy="startTimePicker"
           ></VueCtkDateTimePicker>
@@ -31,6 +40,7 @@
           <VueCtkDateTimePicker
             label="Finish time"
             format="YYYY-MM-DDTHH:mm:ssZ"
+            id="finishTime"
             v-model="tournamentManager.finishTime"
             data-cy="finishTimePicker"
           ></VueCtkDateTimePicker>
@@ -99,5 +109,8 @@ export default class CreateTournamentView extends Vue {
   border-width: 10px;
   border-style: solid;
   border-color: #818181;
+}
+.title {
+  margin: 10px;
 }
 </style>

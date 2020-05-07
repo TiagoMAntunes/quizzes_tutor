@@ -1,26 +1,26 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_TITLE_FOR_TOURNAMENT;
+
 @Entity
 @Table(name = "tournaments")
 public class
 Tournament {
-
-    @Transient
-    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -31,6 +31,9 @@ Tournament {
 
     @Column(name = "finish_time")
     private LocalDateTime finishTime = null;
+
+    @Column(nullable = false)
+    private String title = "Title";
 
     @ManyToOne
     private User creator;
@@ -54,11 +57,12 @@ Tournament {
 
     public Tournament(TournamentDto tournamentDto, Set<Topic> topic, User creator) {
         this.id = tournamentDto.getId();
-        this.startTime = LocalDateTime.parse(tournamentDto.getStartTime(), formatter);
-        this.finishTime = LocalDateTime.parse(tournamentDto.getFinishTime(), formatter);
+        this.startTime = DateHandler.toLocalDateTime(tournamentDto.getStartTime());
+        this.finishTime = DateHandler.toLocalDateTime(tournamentDto.getFinishTime());
         this.creator = creator;
         this.numberOfQuestions = tournamentDto.getNumberOfQuestions();
         this.topics = new HashSet<>(topic);
+        setTitle(tournamentDto.getTitle());
     }
 
     public int getId() {
@@ -76,6 +80,17 @@ Tournament {
     }
 
     public void setFinishTime(LocalDateTime time) { finishTime = time; }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        if (title == null || title.isBlank())
+            throw new TutorException(INVALID_TITLE_FOR_TOURNAMENT);
+
+        this.title = title;
+    }
 
     public User getCreator() {
         return creator;
@@ -115,6 +130,9 @@ Tournament {
 
         courseExecution.getTournaments().remove(this);
         courseExecution = null;
+
+        if (quiz != null) quiz.remove();
+        quiz = null;
     }
 
     public boolean hasSignedUp(User user){
@@ -140,6 +158,8 @@ Tournament {
     public void setQuiz(Quiz quiz) {
         this.quiz = quiz;
     }
+
+    public boolean hasQuiz() { return this.quiz != null; }
 
     public void setNumberOfQuestions(int size) {
         this.numberOfQuestions = size;
