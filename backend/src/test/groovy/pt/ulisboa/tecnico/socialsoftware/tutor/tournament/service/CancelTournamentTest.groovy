@@ -23,6 +23,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -36,6 +37,10 @@ class CancelTournamentTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String COURSE_ABREV = "ES1"
     public static final String TOURNAMENT_TITLE = "title"
+
+    public static final LocalDateTime YESTERDAY = DateHandler.now().minusDays(1)
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(2))
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -58,10 +63,6 @@ class CancelTournamentTest extends Specification {
     @Autowired
     QuizRepository quizRepository
 
-    def formatter
-    def TWO_DAYS_AGO_DATETIME
-    def IN_TWO_DAYS_TIME
-    def IN_FOUR_DAYS_TIME
     def TOPIC_LIST
     def courseExecutionId
     def userId
@@ -70,11 +71,6 @@ class CancelTournamentTest extends Specification {
     def courseExecution
 
     def setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        TWO_DAYS_AGO_DATETIME = LocalDateTime.now().minusDays(2)
-        IN_TWO_DAYS_TIME = LocalDateTime.now().plusDays(2).format(formatter)
-        IN_FOUR_DAYS_TIME = LocalDateTime.now().plusDays(4).format(formatter)
-
         //Creates a course
         def course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
@@ -118,8 +114,8 @@ class CancelTournamentTest extends Specification {
         //Creates a cancelable tournament
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(IN_TWO_DAYS_TIME)
-        tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
         tournamentService.createTournament(tournamentDto, courseExecutionId, userId)
@@ -170,7 +166,7 @@ class CancelTournamentTest extends Specification {
     def "cancel a tournament after it as started"() {
         given: "a tournament that has started"
         def tournament = tournamentRepository.findAll().get(0)
-        tournament.setStartTime(TWO_DAYS_AGO_DATETIME)
+        tournament.setStartTime(YESTERDAY)
 
         when: "tries to cancel"
         tournamentService.cancelTournament(tournamentId, userId)

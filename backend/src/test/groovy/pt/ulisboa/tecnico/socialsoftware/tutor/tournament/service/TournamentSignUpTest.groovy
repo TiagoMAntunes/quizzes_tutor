@@ -27,10 +27,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import spock.lang.Specification
 
-import java.util.function.Predicate; 
+import java.util.function.Predicate;
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -43,6 +44,10 @@ class TournamentSignUpTest extends Specification {
     public static final String ACADEMIC_TERM = "1"
     public static final String DIFF_ACADEMIC_TERM = "2"
     public static final String TOURNAMENT_TITLE = "title"
+
+    public static final LocalDateTime YESTERDAY = DateHandler.now().minusDays(1)
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(2))
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -74,14 +79,6 @@ class TournamentSignUpTest extends Specification {
     @Autowired
     DashboardService dashboardService
 
-    def formatter
-    def NOW_TIME
-    def FIVE_DAYS_EARLIER
-    def THREE_DAYS_EARLIER
-    def TWO_DAYS_EARLIER
-    def FIVE_DAYS_LATER
-    def THREE_DAYS_LATER
-    def ONE_DAY_LATER
     def TOPIC_LIST
     def COURSE_EXEC_ID
     def DIFF_COURSE_EXEC_ID
@@ -100,14 +97,6 @@ class TournamentSignUpTest extends Specification {
 
 
     def setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        NOW_TIME = LocalDateTime.now().format(formatter)
-        FIVE_DAYS_LATER = LocalDateTime.now().plusDays(5).format(formatter)
-        THREE_DAYS_LATER = LocalDateTime.now().plusDays(3).format(formatter)
-        FIVE_DAYS_EARLIER = LocalDateTime.now().minusDays(5).format(formatter)
-        THREE_DAYS_EARLIER = LocalDateTime.now().minusDays(3).format(formatter)
-        TWO_DAYS_EARLIER = LocalDateTime.now().minusDays(2).format(formatter)
-        ONE_DAY_LATER = LocalDateTime.now().plusDays(1).format(formatter)
 
         //Creates a course
         def course1 = new Course(COURSE_ABREV, Course.Type.TECNICO)
@@ -171,8 +160,8 @@ class TournamentSignUpTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(ONE_DAY_LATER)
-        tournamentDto.setFinishTime(THREE_DAYS_LATER)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -189,7 +178,7 @@ class TournamentSignUpTest extends Specification {
 
     def "tournament has ended"(){
         given:"a tournament that has already ended"
-        openTournament.setFinishTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
+        openTournament.setFinishTime(YESTERDAY)
 
         when:
         tournamentService.joinTournament(openTournamentId, USER_ID)
@@ -207,7 +196,7 @@ class TournamentSignUpTest extends Specification {
 
     def "tournament has already started"(){
         given:"a tournament that has already started"
-        openTournament.setStartTime(LocalDateTime.parse(THREE_DAYS_EARLIER, formatter))
+        openTournament.setStartTime(YESTERDAY)
 
         when:
         tournamentService.joinTournament(openTournamentId, USER_ID)

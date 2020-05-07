@@ -23,6 +23,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentR
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -36,6 +37,11 @@ class CreateTournamentTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String COURSE_ABREV = "ES1"
     public static final String TOURNAMENT_TITLE = "title"
+
+
+    public static final String YESTERDAY = DateHandler.toISOString(DateHandler.now().minusDays(1))
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(2))
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -58,18 +64,12 @@ class CreateTournamentTest extends Specification {
     @Autowired
     DashboardService dashboardService
 
-    def formatter
-    def NOW_TIME
-    def FINISH_TIME
     def TOPIC_LIST
     def course
     def courseExecution
     def courseExecutionEntity
 
     def setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        NOW_TIME = LocalDateTime.now().plusDays(1).format(formatter)
-        FINISH_TIME = LocalDateTime.now().plusDays(5).format(formatter)
 
         //Creates a user
         def user = new User()
@@ -105,8 +105,8 @@ class CreateTournamentTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -121,8 +121,8 @@ class CreateTournamentTest extends Specification {
         def result = tournamentRepository.findAll().get(0)
         result != null
         result.getTitle() == TOURNAMENT_TITLE
-        result.getStartTime().format(formatter) == NOW_TIME
-        result.getFinishTime().format(formatter) == FINISH_TIME
+        DateHandler.toISOString(result.getStartTime()) == TOMORROW
+        DateHandler.toISOString(result.getFinishTime()) == LATER
         result.getCreator() == user
         result.getTopics().size() == 1
         result.getNumberOfQuestions() == NUMBER_QUESTIONS
@@ -144,8 +144,8 @@ class CreateTournamentTest extends Specification {
         def tournamentDto = new TournamentDto()
 
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(FINISH_TIME)
-        tournamentDto.setFinishTime(NOW_TIME)
+        tournamentDto.setStartTime(LATER)
+        tournamentDto.setFinishTime(TOMORROW)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -169,9 +169,9 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setFinishTime(LATER)
 
-        tournamentDto.setStartTime(LocalDateTime.now().minusDays(3).format(formatter))
+        tournamentDto.setStartTime(YESTERDAY)
 
         and: "a user"
         def user = userRepository.findAll().get(0)
@@ -191,8 +191,8 @@ class CreateTournamentTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
 
@@ -217,8 +217,8 @@ class CreateTournamentTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
 
         tournamentDto.setNumberOfQuestions(0)
@@ -241,8 +241,8 @@ class CreateTournamentTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
         def topic = new Topic()
@@ -279,8 +279,8 @@ class CreateTournamentTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -302,8 +302,8 @@ class CreateTournamentTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -331,8 +331,8 @@ class CreateTournamentTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(null)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -354,8 +354,8 @@ class CreateTournamentTest extends Specification {
         given: "a tournamentDto"
 
         def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
@@ -376,8 +376,8 @@ class CreateTournamentTest extends Specification {
 
         def tournamentDto = new TournamentDto()
         tournamentDto.setTitle("")
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 

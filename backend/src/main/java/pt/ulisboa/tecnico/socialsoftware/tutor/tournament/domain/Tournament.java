@@ -1,16 +1,15 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -22,9 +21,6 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.IN
 @Table(name = "tournaments")
 public class
 Tournament {
-
-    @Transient
-    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -61,8 +57,8 @@ Tournament {
 
     public Tournament(TournamentDto tournamentDto, Set<Topic> topic, User creator) {
         this.id = tournamentDto.getId();
-        this.startTime = LocalDateTime.parse(tournamentDto.getStartTime(), formatter);
-        this.finishTime = LocalDateTime.parse(tournamentDto.getFinishTime(), formatter);
+        this.startTime = DateHandler.toLocalDateTime(tournamentDto.getStartTime());
+        this.finishTime = DateHandler.toLocalDateTime(tournamentDto.getFinishTime());
         this.creator = creator;
         this.numberOfQuestions = tournamentDto.getNumberOfQuestions();
         this.topics = new HashSet<>(topic);

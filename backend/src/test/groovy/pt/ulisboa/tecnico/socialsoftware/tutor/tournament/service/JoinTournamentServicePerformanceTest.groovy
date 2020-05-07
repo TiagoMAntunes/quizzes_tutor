@@ -19,6 +19,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import spock.lang.Specification
 
@@ -33,6 +34,9 @@ class JoinTournamentServicePerformanceTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String COURSE_ABREV = "ES1"
     public static final String TOURNAMENT_TITLE = "title"
+
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(2))
 
     //Should be 100000
     public static final int N_USERS = 1
@@ -59,10 +63,6 @@ class JoinTournamentServicePerformanceTest extends Specification {
     def courseExecution
 
     def setup() {
-        def formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        def NOW_TIME = LocalDateTime.now().plusDays(1).format(formatter)
-        def FINISH_TIME = LocalDateTime.now().plusDays(5).format(formatter)
-
 
         //Creates a course
         def course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -88,8 +88,8 @@ class JoinTournamentServicePerformanceTest extends Specification {
 
         tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
 
