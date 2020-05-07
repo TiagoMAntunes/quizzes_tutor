@@ -230,5 +230,9 @@ Cypress.Commands.add('logout', () => {
 
 Cypress.Commands.add('joinTournamentWithFinishDate', (date) => {
   cy.contains(date).parent().find('.last-col > .v-icon').click()
-})
+});
+
+Cypress.Commands.add('resubmitStudentQuestion', title => {
+    cy.get('[data-cy="updateQuestionCy"]').first().click({ force: true });
+});
 
