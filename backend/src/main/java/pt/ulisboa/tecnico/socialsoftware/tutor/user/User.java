@@ -70,6 +70,8 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
 
+    private boolean tournamentPrivacy;
+
     public User() {
     }
 
@@ -500,6 +502,14 @@ public class User implements UserDetails, DomainEntity {
 
     public int getCreatedTournamentsNumber(Integer executionId){
         return getCreatedTournamentsCourseExec(executionId).size();
+    }
+
+    public void setTournamentPrivacy(boolean privacy) {
+        this.tournamentPrivacy = privacy;
+    }
+
+    public boolean getTournamentPrivacy() {
+        return this.tournamentPrivacy;
     }
 
 }
