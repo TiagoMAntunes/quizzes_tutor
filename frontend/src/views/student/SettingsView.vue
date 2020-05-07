@@ -2,7 +2,7 @@
     <div class="container">
         <h2>Settings</h2>
         <v-container class="settings">
-            <v-row justify="center" align="center">
+            <v-row justify="center" align="center" data-cy="tournament">
                 <v-col>
                     Tournament Privacy
                 </v-col>
@@ -12,8 +12,8 @@
                     class="button-group" 
                     v-model="tournamentPrivacy"
                     >
-                        <v-btn width="50%" value="false" @click="setTournamentPrivacy(false)">Public</v-btn>
-                        <v-btn width="50%" value="true" @click="setTournamentPrivacy(true)">Private</v-btn>
+                        <v-btn width="50%" value="false" data-cy="public" @click="setTournamentPrivacy(false)">Public</v-btn>
+                        <v-btn width="50%" value="true" data-cy="private" @click="setTournamentPrivacy(true)">Private</v-btn>
                     </v-btn-toggle>
                 </v-col>
             </v-row>

@@ -234,3 +234,11 @@ Cypress.Commands.add('cancelTournament', () => {
 Cypress.Commands.add('joinTournamentWithFinishDate', (date) => {
   cy.contains(date).parent().find('.last-col > .v-icon').click()
 })
+
+Cypress.Commands.add('openSettings', () => {
+  cy.get('[data-cy="settings"]').click({force : true})
+})
+
+Cypress.Commands.add('setPrivacy', (row, setting) => {
+  cy.get(`[data-cy="${row}"]`).find(`[data-cy="${setting}"]`).click()
+})
