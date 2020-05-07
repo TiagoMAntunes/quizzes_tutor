@@ -118,9 +118,9 @@
       <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
       it.
     </footer>
-    <edit-question-dialog
+    <edit-student-question-dialog
       v-if="currentQuestion"
-      v-model="editQuestionDialog"
+      v-model="editStudentQuestionDialog"
       :question="currentQuestion"
       v-on:save="onSaveQuestion"
     />
@@ -140,20 +140,20 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/questions/ShowStudentQuestionDialog.vue';
 import EditStudentQuestionTopics from '@/views/teacher/questions/EditStudentQuestionTopics.vue';
-import EditQuestionDialog from '@/views/teacher/questions/EditStudentQuestionDialog.vue';
+import EditStudentQuestionDialog from '@/views/teacher/questions/EditStudentQuestionDialog.vue';
 
 @Component({
   components: {
     'show-question-dialog': ShowStudentQuestionDialog,
     'edit-student-question-topics': EditStudentQuestionTopics,
-    'edit-question-dialog': EditQuestionDialog
+    'edit-student-question-dialog': EditStudentQuestionDialog
   }
 })
 export default class StudentQuestionManageView extends Vue {
   questions: StudentQuestion[] = [];
   topics: Topic[] = [];
   currentQuestion: StudentQuestion | null = null;
-  editQuestionDialog: boolean = false;
+  editStudentQuestionDialog: boolean = false;
   questionDialog: boolean = false;
   search: string = '';
   explanation: string = 'No explanation';
@@ -232,7 +232,7 @@ export default class StudentQuestionManageView extends Vue {
   async onSaveQuestion(question: StudentQuestion) {
     this.questions = this.questions.filter(q => q.id !== question.id);
     this.questions.unshift(question);
-    this.editQuestionDialog = false;
+    this.editStudentQuestionDialog = false;
     this.currentQuestion = null;
   }
 
@@ -256,9 +256,9 @@ export default class StudentQuestionManageView extends Vue {
     }
   }
 
-  @Watch('editQuestionDialog')
+  @Watch('editStudentQuestionDialog')
   closeError() {
-    if (!this.editQuestionDialog) {
+    if (!this.editStudentQuestionDialog) {
       this.currentQuestion = null;
     }
   }
@@ -266,7 +266,7 @@ export default class StudentQuestionManageView extends Vue {
   editQuestion(question: StudentQuestion, e?: Event) {
     if (e) e.preventDefault();
     this.currentQuestion = question;
-    this.editQuestionDialog = true;
+    this.editStudentQuestionDialog = true;
   }
 
   showStudentQuestionDialog(question: StudentQuestion) {

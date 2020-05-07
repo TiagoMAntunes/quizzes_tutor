@@ -56,15 +56,15 @@
 
 <script lang="ts">
 import { Component, Model, Prop, Vue, Watch } from 'vue-property-decorator';
-import StudentQuestion from '@/models/management/StudentQuestion';
+import Question from '@/models/management/Question';
 import RemoteServices from '@/services/RemoteServices';
 
 @Component
 export default class EditQuestionDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
-  @Prop({ type: StudentQuestion, required: true }) readonly question!: StudentQuestion;
+  @Prop({ type: Question, required: true }) readonly question!: Question;
 
-  editQuestion!: StudentQuestion;
+  editQuestion!: Question;
 
   created() {
     this.updateQuestion();
@@ -72,7 +72,7 @@ export default class EditQuestionDialog extends Vue {
 
   @Watch('question', { immediate: true, deep: true })
   updateQuestion() {
-    this.editQuestion = new StudentQuestion(this.question);
+    this.editQuestion = new Question(this.question);
   }
 
 
@@ -89,7 +89,10 @@ export default class EditQuestionDialog extends Vue {
     }
 
     try {
-      const result = await RemoteServices.updateStudentQuestion(this.editQuestion)
+      const result =
+        this.editQuestion.id != null
+          ? await RemoteServices.updateStudentQuestion(this.editQuestion)
+          : await RemoteServices.createStudentQuestion(this.editQuestion);
 
       this.$emit('save', result);
     } catch (error) {

@@ -69,7 +69,7 @@ public class StudentQuestionController{
 
     @PutMapping("/student_questions/{questionId}/updateTeacher")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
-    public QuestionDto teacherUpdatesQuestion(@PathVariable Integer questionId, @Valid @RequestBody StudentQuestionDto question) {
+    public StudentQuestionDto teacherUpdatesQuestion(@PathVariable Integer questionId, @Valid @RequestBody StudentQuestionDto question) {
         return this.studentQuestionService.updateStudentQuestion(questionId, question);
     }
 
