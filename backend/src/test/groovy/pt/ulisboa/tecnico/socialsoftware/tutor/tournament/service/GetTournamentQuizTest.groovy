@@ -175,6 +175,15 @@ class GetTournamentQuizTest extends Specification {
 
         then:
         statementQuizDtos.size() == 1
+        def statementQuizDto = statementQuizDtos.get(0)
+        statementQuizDto.getId() != null
+        statementQuizDto.getQuizAnswerId() != null
+        statementQuizDto.getTitle() == TOURNAMENT_TITLE
+        !statementQuizDto.isOneWay()
+        statementQuizDto.isForTournament()
+        statementQuizDto.getAvailableDate() == DateHandler.toISOString(YESTERDAY)
+        statementQuizDto.getConclusionDate() == LATER
+        statementQuizDto.getTimeToAvailability() == null
     }
 
     def "Tournament quiz can be answered but didn't join"() {

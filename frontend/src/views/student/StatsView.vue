@@ -61,16 +61,16 @@
     <h2>Questions</h2>
     <div v-if="dashboard != null" class="stats-container">
       <div class="items">
-        <div class="icon-wrapper" ref="totalQuizzes">
-          <animated-number :number="dashboard.numberQuestionsSubmitted" />
+        <div class="icon-wrapper" ref="QuestionsSubmitted"  >
+          <animated-number  :number="dashboard.numberQuestionsSubmitted" />
         </div>
         <div class="project-name">
           <p>Total Questions Submitted</p>
         </div>
       </div>
       <div class="items">
-        <div class="icon-wrapper" ref="totalAnswers">
-          <animated-number :number="dashboard.numberQuestionsApproved" />
+        <div class="icon-wrapper" ref="QuestionsApproved" >
+          <animated-number    :number="dashboard.numberQuestionsApproved" />
         </div>
         <div class="project-name">
           <p>Total Questions Approved</p>

@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option;
@@ -40,21 +42,25 @@ public class DashboardService {
     @Autowired
     private StudentQuestionRepository studentQuestionRepository;
 
+    @Autowired
+    private CourseExecutionRepository courseExecutionRepository;
 
 
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public DashboardDto getStudentDashboard(Integer userId, Integer courseId){
+    public DashboardDto getStudentDashboard(Integer userId, Integer execId){
         DashboardDto dashboard = new DashboardDto();
+
+        Integer courseId = getCourseExecution(execId).getCourse().getId();
 
         dashboard.setNumberQuestionsSubmitted(findNumberStudentQuestionsSubmitted(userId, courseId));
         dashboard.setNumberQuestionsApproved(findNumberStudentQuestionsApproved(userId, courseId));
-        dashboard.setCreatedTournaments(getCreatedTournamentsNumber(userId, courseId));
-        dashboard.setParticipatedTournamentsNumber(getParticipatedTournamentsNumber(userId, courseId));
-        dashboard.setNotYetParticipatedTournamentsNumber(getNotYetParticipatedTournamentsNumber(userId, courseId));
-        dashboard.setAverageTournamentScore(getAverageTournamentScore(userId, courseId));
+        dashboard.setCreatedTournaments(getCreatedTournamentsNumber(userId, execId));
+        dashboard.setParticipatedTournamentsNumber(getParticipatedTournamentsNumber(userId, execId));
+        dashboard.setNotYetParticipatedTournamentsNumber(getNotYetParticipatedTournamentsNumber(userId, execId));
+        dashboard.setAverageTournamentScore(getAverageTournamentScore(userId, execId));
 
         return dashboard;
     }
@@ -141,6 +147,10 @@ public class DashboardService {
 
     private User getUser(Integer userId) {
         return userRepository.findById(userId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
+    }
+
+    private CourseExecution getCourseExecution(Integer execId) {
+        return courseExecutionRepository.findById(execId).orElseThrow(() -> new TutorException(ErrorMessage.COURSE_EXECUTION_NOT_FOUND));
     }
 
     private Tournament getTournament(Integer tournamentId) {

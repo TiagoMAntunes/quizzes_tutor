@@ -18,14 +18,14 @@ public class DashboardController {
     @Autowired
     private DashboardService dashboardService;
 
-    @GetMapping("/student/{courseId}/dashboard")
+    @GetMapping("/student/{execId}/dashboard")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public DashboardDto createDashboard(Principal principal, @PathVariable int courseId) {
+    public DashboardDto createDashboard(Principal principal, @PathVariable int execId) {
         User user = (User) ((Authentication) principal).getPrincipal();
         if(user == null){
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
-        return dashboardService.getStudentDashboard(user.getId(), courseId);
+        return dashboardService.getStudentDashboard(user.getId(), execId);
     }
 }

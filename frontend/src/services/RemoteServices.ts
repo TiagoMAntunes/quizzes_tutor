@@ -225,6 +225,17 @@ export default class RemoteServices {
     });
   }
 
+  static async makeAvailable(questionId: number): Promise<StudentQuestion> {
+      return httpClient
+          .put(`/student_questions/available/${questionId}`, {})
+          .then(response => {
+            return new StudentQuestion(response.data);
+          })
+          .catch(async error => {
+            throw Error(await this.errorMessage(error));
+          });
+  }
+
   static async setQuestionStatus(
     questionId: number,
     status: String
