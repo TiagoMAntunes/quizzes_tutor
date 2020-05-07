@@ -223,17 +223,9 @@ Cypress.Commands.add('openAvailableTournaments', () => {
   cy.get('[data-cy="availableTournaments"]').click();
 });
 
-Cypress.Commands.add('joinTournament', () => {
-  cy.get(':nth-child(2) > .last-col > .fas').click();
-});
-
 Cypress.Commands.add('cancelTournament', () => {
-  cy.get(':nth-child(2) > .last-col > .v-icon').click();
+    cy.get('[data-cy="cancel"]').first().click();
 });
-
-Cypress.Commands.add('joinTournamentWithFinishDate', (date) => {
-  cy.contains(date).parent().find('.last-col > .v-icon').click()
-})
 
 Cypress.Commands.add('openSettings', () => {
   cy.get('[data-cy="settings"]').click({force : true})
@@ -241,4 +233,22 @@ Cypress.Commands.add('openSettings', () => {
 
 Cypress.Commands.add('setPrivacy', (row, setting) => {
   cy.get(`[data-cy="${row}"]`).find(`[data-cy="${setting}"]`).click()
+})
+
+Cypress.Commands.add('joinTournament', () => {
+    cy.get('[data-cy="join"]').first().click();
+})
+
+Cypress.Commands.add('openAvailableQuizzes', () => {
+    cy.get('[data-cy=Quizzes]').click();
+    cy.get('[data-cy="availableQuizzes"]').click();
+})
+
+Cypress.Commands.add('answerTournamentQuiz', () => {
+    cy.openAvailableQuizzes();
+    cy.get(':nth-child(2) > .last-col').click();
+    cy.wait(1000); // let everything load
+    cy.get('.end-quiz').click();
+    cy.wait(1000); // let everything load
+    cy.get('.primary--text > .v-btn__content').click();
 })
