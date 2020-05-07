@@ -72,15 +72,6 @@ export default class UpdateStudentQuestionDialog extends Vue {
     this.editQuestion = new Question(this.question);
   }
 
-  // TODO use EasyMDE with these configs
-  // markdownConfigs: object = {
-  //   status: false,
-  //   spellChecker: false,
-  //   insertTexts: {
-  //     image: ['![image][image]', '']
-  //   }
-  // };
-
   async saveQuestion() {
     if (
       this.editQuestion &&
