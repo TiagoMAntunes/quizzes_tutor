@@ -100,8 +100,6 @@ class StudentResubmitQuestion extends Specification {
         optionDto.setCorrect(true)
         options.add(optionDto)
         questionDto.setOptions(options)
-
-
     }
 
     def "student resubmit a pending question"() {
