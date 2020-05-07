@@ -219,6 +219,11 @@
           Stats
           <v-icon>fas fa-user</v-icon>
         </v-btn>
+        
+        <v-btn to="/students/settings" v-if="isStudent && currentCourse" text dark>
+          Settings
+          <v-icon>fas fa-cog</v-icon>
+        </v-btn>
 
         <v-btn
           v-if="isLoggedIn && moreThanOneCourse"
