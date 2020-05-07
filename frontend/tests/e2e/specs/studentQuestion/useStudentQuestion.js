@@ -1,6 +1,8 @@
 let TITLE = 'Test Title'
 let QUESTION = 'Test Question'
 let OPTIONS =['Option1','Option2','Option3', 'Option4']
+let TITLE2 = 'New Title'
+let QUESTION2 = 'New Question'
 
 describe('Student Questions walkthrough', () => {
   afterEach(() => {
@@ -50,6 +52,12 @@ describe('Student Questions walkthrough', () => {
     cy.demoTeacherLogin()
     cy.openTeacherStudentQuestions();
     cy.statusQuestion(TITLE, 'APPROVED');
+  });
+
+  it('Edit a question properly', () => {
+    cy.demoTeacherLogin()
+    cy.openTeacherStudentQuestions();
+    cy.editQuestion(TITLE2, QUESTION2, OPTIONS);
   });
 
   it('Make question available', () => {
