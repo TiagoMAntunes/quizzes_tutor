@@ -82,19 +82,6 @@ public class StudentQuestionController{
         return this.studentQuestionService.createStudentQuestion(courseId, question, user.getId());
     }
 
-    @GetMapping("/student/{courseId}/dashboard")
-    @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public DashboardDto createDashboard(Principal principal, @PathVariable int courseId) {
-        User user = (User) ((Authentication) principal).getPrincipal();
-        if(user == null){
-            throw new TutorException(AUTHENTICATION_ERROR);
-        }
-        DashboardDto dashboard = new DashboardDto();
-        dashboard.setNumberQuestionsSubmitted(this.studentQuestionService.findNumberStudentQuestionsSubmitted(user.getId(), courseId));
-        dashboard.setNumberQuestionsApproved(this.studentQuestionService.findNumberStudentQuestionsApproved(user.getId(), courseId));
-        return dashboard;
-    }
-
     @PutMapping("/student/{studentQuestionId}/resubmit")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     public StudentQuestionDto studentResubmitQuestion(@PathVariable Integer studentQuestionId, @Valid @RequestBody QuestionDto questionDto) {
