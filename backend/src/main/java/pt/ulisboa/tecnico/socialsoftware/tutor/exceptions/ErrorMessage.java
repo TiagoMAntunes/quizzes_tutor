@@ -72,6 +72,7 @@ public enum ErrorMessage {
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
     USER_MISSING_DATA("Missing information for the creating of a student question"),
 
+    INVALID_TITLE_FOR_TOURNAMENT("Invalid title for tournament"),
     INVALID_TOURNAMENT_TIME("Start time of a tournament must be before finish time"),
     TOURNAMENT_ALREADY_STARTED("Start time of a tournament must be after the time of creation"),
     NO_TOPICS_SELECTED("Tournament requires at least one topic to be valid"),

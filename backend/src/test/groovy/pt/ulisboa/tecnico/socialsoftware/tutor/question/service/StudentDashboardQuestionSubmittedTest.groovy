@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.dashboard.DashboardService
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService
@@ -53,6 +54,9 @@ class StudentDashboardQuestionSubmittedTest extends Specification {
 
     @Autowired
     StudentQuestionService studentQuestionService
+
+    @Autowired
+    DashboardService dashboardService
 
     def course
     def courseExecution
@@ -102,7 +106,7 @@ class StudentDashboardQuestionSubmittedTest extends Specification {
         def studentQuestion2 = new StudentQuestion(course, questionDto, student2)
         studentQuestionRepository.save(studentQuestion2)
         when:
-        def result = studentQuestionService.findNumberStudentQuestionsSubmitted(student.getId(), courseExecution.getId());
+        def result = dashboardService.findNumberStudentQuestionsSubmitted(student.getId(), courseExecution.getId());
 
         then:
         result == 1
@@ -110,7 +114,7 @@ class StudentDashboardQuestionSubmittedTest extends Specification {
 
     def "find the number of questions submitted equals zero"() {
         when:
-        def result = studentQuestionService.findNumberStudentQuestionsSubmitted(student2.getId(), courseExecution.getId());
+        def result = dashboardService.findNumberStudentQuestionsSubmitted(student2.getId(), courseExecution.getId());
 
         then:
         result == 0
@@ -121,7 +125,7 @@ class StudentDashboardQuestionSubmittedTest extends Specification {
         given:
 
         when:
-        studentQuestionService.findNumberStudentQuestionsSubmitted(teacher.getId(), courseExecution.getId());
+        dashboardService.findNumberStudentQuestionsSubmitted(teacher.getId(), courseExecution.getId());
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
@@ -133,6 +137,11 @@ class StudentDashboardQuestionSubmittedTest extends Specification {
         @Bean
         StudentQuestionService studentQuestionService() {
             return new StudentQuestionService()
+        }
+
+        @Bean
+        DashboardService dashboardService() {
+            return new DashboardService()
         }
     }
 }

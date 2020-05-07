@@ -474,6 +474,12 @@ public class User implements UserDetails, DomainEntity {
 
     public Set<Tournament> getSignedUpTournaments() { return signedUpTournaments; }
 
+    public Set<Tournament> getSignedUpTournamentsCourseExec(Integer executionId) {
+        return getSignedUpTournaments().stream()
+                .filter(tournament -> tournament.getCourseExecution().getId().equals(executionId))
+                .collect(Collectors.toSet());
+    }
+
     public boolean hasTournament(Tournament tournament) {
         return signedUpTournaments.contains(tournament);
     }
@@ -482,8 +488,18 @@ public class User implements UserDetails, DomainEntity {
 
     public Set<Tournament> getCreatedTournaments() { return createdTournaments; }
 
+    public Set<Tournament> getCreatedTournamentsCourseExec(Integer executionId) {
+        return createdTournaments.stream()
+                .filter(tournament -> tournament.getCourseExecution().getId().equals(executionId))
+                .collect(Collectors.toSet());
+    }
+
     public boolean hasCourseExecution(Integer id) {
         return courseExecutions.stream().anyMatch(execution -> execution.getId().equals(id));
+    }
+
+    public int getCreatedTournamentsNumber(Integer executionId){
+        return getCreatedTournamentsCourseExec(executionId).size();
     }
 
 }
