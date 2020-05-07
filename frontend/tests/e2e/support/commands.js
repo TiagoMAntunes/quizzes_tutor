@@ -238,7 +238,7 @@ Cypress.Commands.add('openAvailableQuizzes', () => {
 
 Cypress.Commands.add('answerTournamentQuiz', () => {
     cy.openAvailableQuizzes();
-    cy.get(':nth-child(2) > .last-col').click();
+    cy.get('[data-cy=tournamentQuiz]').click();
     cy.wait(1000); // let everything load
     cy.get('.end-quiz').click();
     cy.wait(1000); // let everything load
