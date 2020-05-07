@@ -129,7 +129,7 @@ Cypress.Commands.add('createStudentQuestion', (title, question, options) => {
 Cypress.Commands.add(
   'createTournament',
   (title, topics, startDay, finishDay, numberOfQuestions) => {
-    cy.get('[data-cy="title"')
+    cy.get('[data-cy="title"]')
       .type(title);
 
     cy.contains('Select the tournament topics')
@@ -137,7 +137,7 @@ Cypress.Commands.add(
       .click();
     for (let topic of topics) cy.contains(topic).click(); //selects the given topics from the list
 
-    cy.get('[data-cy="startTimePicker"')
+    cy.get('[data-cy="startTimePicker"]')
       .click({ force: true })
       .parent()
       .parent() // Open menu
@@ -145,20 +145,20 @@ Cypress.Commands.add(
       .click() // go to next month
       .wait(1000); // needs to wait for load
 
-    cy.get('[data-cy="startTimePicker"')
+    cy.get('[data-cy="startTimePicker"]')
       .parent()
       .parent()
       .find('.month-container') // select dates
       .contains(startDay)
       .click();
 
-    cy.get('[data-cy="startTimePicker"')
+    cy.get('[data-cy="startTimePicker"]')
       .parent()
       .parent()
       .find('.validate')
       .click();
 
-    cy.get('[data-cy="finishTimePicker"')
+    cy.get('[data-cy="finishTimePicker"]')
       .click({ force: true })
       .parent()
       .parent() // Open menu
@@ -166,14 +166,14 @@ Cypress.Commands.add(
       .click() // go to next month
       .wait(1000); // needs to wait for load
 
-    cy.get('[data-cy="finishTimePicker"')
+    cy.get('[data-cy="finishTimePicker"]')
       .parent()
       .parent()
       .find('.month-container') // select dates
       .contains(finishDay)
       .click();
 
-    cy.get('[data-cy="finishTimePicker"')
+    cy.get('[data-cy="finishTimePicker"]')
       .parent()
       .parent()
       .find('.validate')

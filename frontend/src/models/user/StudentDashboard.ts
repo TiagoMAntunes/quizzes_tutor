@@ -14,8 +14,6 @@ export default class StudentDashboard {
             this.participatedTournamentsNumber = jsonObj.participatedTournamentsNumber;
             this.notYetParticipatedTournamentsNumber = jsonObj.notYetParticipatedTournamentsNumber;
             this.averageTournamentScore = jsonObj.averageTournamentScore;
-
-            console.log(jsonObj);
         }
     }
 }
