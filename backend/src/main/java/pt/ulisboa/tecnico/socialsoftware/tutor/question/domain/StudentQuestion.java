@@ -56,10 +56,8 @@ public class StudentQuestion extends Question {
 
     public void setUser(User userDto) { this.user = userDto; }
 
-    public void updateQuestion(StudentQuestionDto questionDto) {
-        setTitle(questionDto.getTitle());
-        setContent(questionDto.getContent());
-        setOptions(questionDto.getOptions());
+    public void updateQuestion(QuestionDto questionDto) {
+        super.update(questionDto);
     }
 
 }

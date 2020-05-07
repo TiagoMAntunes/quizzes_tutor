@@ -134,7 +134,7 @@ public class StudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public StudentQuestionDto updateStudentQuestion(Integer questionId, StudentQuestionDto questionDto) {
+    public StudentQuestionDto updateStudentQuestion(Integer questionId, QuestionDto questionDto) {
         StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
         if (question.getStatus().equals(Question.Status.AVAILABLE)) {
             throw new TutorException(CANNOT_CHANGE_ANSWERED_QUESTION);

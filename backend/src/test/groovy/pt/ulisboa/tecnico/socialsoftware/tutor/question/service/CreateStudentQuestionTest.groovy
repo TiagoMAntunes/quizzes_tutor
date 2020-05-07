@@ -113,7 +113,7 @@ class CreateStudentQuestionTest extends Specification {
         def result = studentQuestionRepository.findAll().get(0)
         result.getId() != null
         result.getKey() == 1
-        result.getStatus() == Question.Status.AVAILABLE
+        result.getStatus() == Question.Status.DISABLED
         result.getTitle() == QUESTION_TITLE
         result.getContent() == QUESTION_CONTENT
         result.getImage() == null
@@ -249,7 +249,7 @@ class CreateStudentQuestionTest extends Specification {
         def result = studentQuestionRepository.findAll().get(0)
         result.getId() != null
         result.getKey() == 1
-        result.getStatus() == Question.Status.AVAILABLE
+        result.getStatus() == Question.Status.DISABLED
         result.getTitle() == QUESTION_TITLE
         result.getContent() == QUESTION_CONTENT
         result.getImage().getId() != null

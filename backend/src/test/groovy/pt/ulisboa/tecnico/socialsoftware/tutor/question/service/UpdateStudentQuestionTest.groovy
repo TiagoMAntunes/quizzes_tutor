@@ -63,7 +63,8 @@ class UpdateStudentQuestionTest extends Specification{
     def student;
     def questionDto;
     def studentQuestion;
-    def userDto;
+    def options;
+    def optionDto;
     def courseExecution;
     def optionOK;
     def optionKO;
@@ -76,121 +77,84 @@ class UpdateStudentQuestionTest extends Specification{
 
         student = new User("User2", "student", 2, User.Role.STUDENT)
         userRepository.save(student)
-        userDto = new UserDto(student);
+        //userDto = new UserDto(student);
+
+        courseExecution.addUser(student)
         student.addCourse(courseExecution)
 
         studentQuestion = new StudentQuestion()
-        studentQuestion.setKey(1)
+        studentQuestion.setUser(student)
         studentQuestion.setTitle(QUESTION_TITLE)
         studentQuestion.setContent(QUESTION_CONTENT)
-        studentQuestion.setStatus(Question.Status.AVAILABLE)
-        studentQuestion.setNumberOfAnswers(2)
-        studentQuestion.setNumberOfCorrect(1)
-        studentQuestion.setUser(student)
 
         questionDto = new QuestionDto(studentQuestion)
         questionDto.setTitle(QUESTION_TITLE)
         questionDto.setContent(QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-
-        def optionDto = new OptionDto()
-        optionDto.setContent(OPTION_CONTENT)
-        optionDto.setCorrect(true)
-        def options = new ArrayList<OptionDto>()
-        options.add(optionDto)
-        questionDto.setOptions(options)
-
         optionOK = new Option()
         optionOK.setContent(OPTION_CONTENT)
         optionOK.setCorrect(true)
         optionOK.setSequence(0)
-        System.out.println(questionDto.getId())
         optionOK.setQuestion(studentQuestion)
         optionRepository.save(optionOK)
-        optionKO = new Option()
-        optionKO.setContent(OPTION_CONTENT)
-        optionKO.setCorrect(false)
-        optionKO.setSequence(1)
-        optionKO.setQuestion(studentQuestion)
-        optionRepository.save(optionKO)
-        questionRepository.save(studentQuestion)
-    }
+        studentQuestionRepository.save(studentQuestion)
 
-    def "update a question when it is not available"(){
-        given: "a student question"
-        studentQuestion.setStatus(Question.Status.DISABLED)
-        def studentQuestionDto = new StudentQuestionDto(studentQuestion)
-        studentQuestionDto.setTitle(NEW_QUESTION_TITLE)
-        studentQuestionDto.setContent(NEW_QUESTION_CONTENT)
-        and: '2 changed options'
-        def options = new ArrayList<OptionDto>()
-        def optionDto = new OptionDto(optionOK)
+        questionDto = new QuestionDto(studentQuestion)
+        questionDto.setTitle(NEW_QUESTION_TITLE)
+        questionDto.setContent(NEW_QUESTION_CONTENT)
+        options = new ArrayList<OptionDto>()
+        optionDto = new OptionDto(optionOK)
         optionDto.setContent(NEW_OPTION_CONTENT)
-        optionDto.setCorrect(false)
-        options.add(optionDto)
-        optionDto = new OptionDto(optionKO)
         optionDto.setCorrect(true)
         options.add(optionDto)
-        studentQuestionDto.setOptions(options)
-
-        when:
-        studentQuestionService.updateStudentQuestion(studentQuestionDto.getId(), studentQuestionDto)
-
-        then: "the question is changed"
-        studentQuestionRepository.count() == 1L
-        def result = studentQuestionRepository.findAll().get(0)
-        result.getId() == studentQuestionDto.getId()
-        result.getTitle() == NEW_QUESTION_TITLE
-        result.getContent() == NEW_QUESTION_CONTENT
-        and: 'are not changed'
-        result.getStatus() == Question.Status.DISABLED
-        result.getNumberOfAnswers() == 2
-        result.getNumberOfCorrect() == 1
-        result.getDifficulty() == 50
-        and: 'an option is changed'
-        result.getOptions().size() == 2
-        def resOptionOne = result.getOptions().stream().filter({option -> option.getId() == optionOK.getId()}).findAny().orElse(null)
-        resOptionOne.getContent() == NEW_OPTION_CONTENT
-        !resOptionOne.getCorrect()
-        def resOptionTwo = result.getOptions().stream().filter({option -> option.getId() == optionKO.getId()}).findAny().orElse(null)
-        resOptionTwo.getContent() == OPTION_CONTENT
-        resOptionTwo.getCorrect()
+        questionDto.setOptions(options)
     }
 
     def "update a question when it is already available"(){
         given: "a student question"
-        studentQuestion.setStatus(Question.Status.AVAILABLE)
-        def studentQuestionDto = new StudentQuestionDto(studentQuestion)
-        studentQuestionDto.setTitle(NEW_QUESTION_TITLE)
-        studentQuestionDto.setContent(NEW_QUESTION_CONTENT)
-        and: '2 changed options'
-        def options = new ArrayList<OptionDto>()
-        def optionDto = new OptionDto(optionOK)
-        optionDto.setContent(NEW_OPTION_CONTENT)
-        optionDto.setCorrect(false)
-        options.add(optionDto)
-        optionDto = new OptionDto(optionKO)
-        optionDto.setCorrect(true)
-        options.add(optionDto)
-        studentQuestionDto.setOptions(options)
+        def studentQuestionChanged = studentQuestionRepository.findAll().get(0)
+        studentQuestionChanged.setStatus(Question.Status.AVAILABLE)
 
         when:
-        studentQuestionService.updateStudentQuestion(studentQuestionDto.getId(), studentQuestionDto)
+        studentQuestionService.updateStudentQuestion(studentQuestion.getId(), questionDto)
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.CANNOT_CHANGE_ANSWERED_QUESTION
+    }
 
+
+
+    def "update a question when it is not available"(){
+        given: "a student question"
+        def studentQuestionChanged = studentQuestionRepository.findAll().get(0)
+        studentQuestionChanged.setStatus(Question.Status.DISABLED)
+
+        when:
+        studentQuestionService.updateStudentQuestion(studentQuestion.getId(), questionDto)
+
+        then: "the question is changed"
+        studentQuestionRepository.count() == 1L
+        def result = studentQuestionRepository.findAll().get(0)
+        result.getId() == studentQuestion.getId()
+        result.getTitle() == NEW_QUESTION_TITLE
+        result.getContent() == NEW_QUESTION_CONTENT
+        and: 'are not changed'
+        result.getStatus() == Question.Status.DISABLED
+        and: 'an option is changed'
+        result.getOptions().size() == 1
+        def resOptionOne = result.getOptions().stream().filter({option -> option.getId() == optionOK.getId()}).findAny().orElse(null)
+        resOptionOne.getContent() == NEW_OPTION_CONTENT
+        resOptionOne.getCorrect()
     }
 
     def "update a question with missing data"(){
         given: "a question"
-        studentQuestion.setStatus(Question.Status.DISABLED)
-        def studentQuestionDto = new StudentQuestionDto(studentQuestion)
-        studentQuestionDto.setTitle('     ')
+        def studentQuestionChanged = studentQuestionRepository.findAll().get(0)
+        studentQuestionChanged.setStatus(Question.Status.DISABLED)
+        questionDto.setTitle('     ')
 
         when:
-        studentQuestionService.updateStudentQuestion(studentQuestionDto.getId(), studentQuestionDto)
+        studentQuestionService.updateStudentQuestion(studentQuestion.getId(), questionDto)
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
