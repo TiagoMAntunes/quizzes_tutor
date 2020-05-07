@@ -188,7 +188,7 @@ public class TournamentService {
         quiz.setAvailableDate(DateHandler.toISOString(tournament.getStartTime()));
         quiz.setConclusionDate(DateHandler.toISOString(tournament.getFinishTime()));
         quiz.setScramble(true);
-        quiz.setTitle("Tournament: " + tournament.getTitle());
+        quiz.setTitle(tournament.getTitle());
         quiz.setKey(quizService.getMaxQuizKey() + 1);
 
         CourseExecution courseExecution = tournament.getCourseExecution();
