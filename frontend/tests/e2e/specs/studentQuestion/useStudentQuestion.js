@@ -33,17 +33,29 @@ describe('Student Questions walkthrough', () => {
     cy.showStudentQuestion(TITLE);
   });
 
-  it ('Add a topic to the question', () => {
+  it('Add a topic to the question', () => {
     cy.demoStudentLogin()
     cy.openAvailableQuestions();
     cy.addTopicStudentQuestion(TITLE,'Adventure Builder');
   });
 
-  it ('Reject a student question and add an explanation', () => {
+  it('Reject a student question and add an explanation', () => {
     cy.demoTeacherLogin()
     cy.openTeacherStudentQuestions();
-    cy.rejectQuestion(TITLE);
+    cy.statusQuestion(TITLE, 'REJECTED');
     cy.addExplanation(TITLE, 'not good');
+  });
+
+  it('Approve a student question', () => {
+    cy.demoTeacherLogin()
+    cy.openTeacherStudentQuestions();
+    cy.statusQuestion(TITLE, 'APPROVED');
+  });
+
+  it('Make question available', () => {
+    cy.demoTeacherLogin()
+    cy.openTeacherStudentQuestions();
+    cy.makeAvailable();
   });
 
 });
