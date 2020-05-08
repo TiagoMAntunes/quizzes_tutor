@@ -53,7 +53,7 @@ describe('Student using tournaments walkthrough', () => {
         startTime.setSeconds(startTime.getSeconds() + 5);
 
         const finish_time = new Date(startTime);
-        finish_time.setMinutes(finish_time.getMinutes() + 1);
+        finish_time.setMinutes(finish_time.getSeconds() + 15);
 
         //Create tournament in database
         cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"INSERT INTO tournaments(id, finish_time, number_of_questions, start_time, course_execution_id, creator_id, quiz_id, title) \
@@ -70,6 +70,11 @@ describe('Student using tournaments walkthrough', () => {
 
         //Answer quiz
         cy.answerTournamentQuiz();
+    })
+
+    it('Check detailed tournament scoreboard', () => {
+        cy.exec();
+        cy.wait(10000); // let tournament end
     })
 
 })

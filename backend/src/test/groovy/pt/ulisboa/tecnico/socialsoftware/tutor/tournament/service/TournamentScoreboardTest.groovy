@@ -40,6 +40,7 @@ class TournamentScoreboardTest extends Specification {
     public static final String TOURNAMENT_NAME = "Tournament 1"
     public static final String QUESTION_TITLE = "Question"
     public static final LocalDateTime YESTERDAY = DateHandler.now().minusDays(1)
+    public static final LocalDateTime BEFORE = DateHandler.now().minusDays(3)
     public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(3))
     public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
 
@@ -173,17 +174,23 @@ class TournamentScoreboardTest extends Specification {
 
         and: "the student concludes the quiz incorrectly"
         def quiz = tournamentRepository.findAll().get(0).getQuiz()
-        quiz.setAvailableDate(YESTERDAY)
+        quiz.setAvailableDate(BEFORE)
         def quizAnswer = new QuizAnswer(student1, quiz)
         quizAnswerRepository.save(quizAnswer)
 
         student1.addQuizAnswer(quizAnswer)
         answerService.concludeQuiz(student1, quiz.getId())
 
+        and: "the tournament concludes"
+        def tournament = tournamentRepository.findAll().get(0)
+        tournament.setFinishTime(YESTERDAY)
+
         when: "getting the scoreboard"
-        def scoreboard = tournamentService.getTournamentScoreboard(openTournamentId)
+        def scoreboards = tournamentService.getTournamentScoreboards(COURSE_EXEC_ID)
 
         then:"tournament has one participant with 0 avg score"
+        scoreboards.size() == 1
+        def scoreboard = scoreboards.get(0)
         scoreboard.getScores().size() == 1
         scoreboard.getAverageScore() == 0
     }
@@ -196,7 +203,7 @@ class TournamentScoreboardTest extends Specification {
 
         and: "the first student concludes the tournament quiz correctly"
         def quiz = tournamentRepository.findAll().get(0).getQuiz()
-        quiz.setAvailableDate(YESTERDAY)
+        quiz.setAvailableDate(BEFORE)
         def quizAnswer = new QuizAnswer(student1, quiz)
         def statementAnswerDto = new StatementAnswerDto()
         statementAnswerDto.setOptionId(optionOk.getId())
@@ -212,10 +219,16 @@ class TournamentScoreboardTest extends Specification {
         student2.addQuizAnswer(quizAnswer)
         answerService.concludeQuiz(student2, quiz.getId())
 
+        and: "the tournament concludes"
+        def tournament = tournamentRepository.findAll().get(0)
+        tournament.setFinishTime(YESTERDAY)
+
         when: "getting the scoreboard"
-        def scoreboard = tournamentService.getTournamentScoreboard(openTournamentId)
+        def scoreboards = tournamentService.getTournamentScoreboards(COURSE_EXEC_ID)
 
         then:"two students have participated in the tournament and it has a 0.5 avg score"
+        scoreboards.size() == 1
+        def scoreboard = scoreboards.get(0)
         scoreboard.getScores().size() == 2
         scoreboard.getAverageScore() == 0.5
     }

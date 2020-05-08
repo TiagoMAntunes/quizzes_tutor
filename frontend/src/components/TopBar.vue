@@ -142,6 +142,16 @@
                 >
               </v-list-item-content>
             </v-list-item>
+            <v-list-item to="/student/tournament/scoreboards">
+              <v-list-item-action>
+                <v-icon>create</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title data-cy="scoreboards"
+                  >Scoreboards</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-menu>
 
@@ -435,6 +445,14 @@
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-content>Create</v-list-item-content>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/student/tournament/scoreboards">
+            <v-list-item-action>
+              <v-icon>create</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-content>Scoreboards</v-list-item-content>
             </v-list-item-content>
           </v-list-item>
         </v-list-group>
