@@ -1,9 +1,9 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,11 +25,8 @@ public class QuizAnswerDto implements Serializable {
         this.id = quizAnswer.getId();
         this.username = quizAnswer.getUser().getUsername();
         this.name = quizAnswer.getUser().getName();
-        if (quizAnswer.getAnswerDate() != null)
-            this.answerDate = quizAnswer.getAnswerDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-        if (quizAnswer.getAnswerDate() != null)
-            this.creationDate = quizAnswer.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.answerDate = DateHandler.toISOString(quizAnswer.getAnswerDate());
+        this.creationDate = DateHandler.toISOString(quizAnswer.getCreationDate());
 
         this.questionAnswers = quizAnswer.getQuestionAnswers().stream()
                 .sorted(Comparator.comparing(qa -> qa.getQuizQuestion().getSequence()))
@@ -39,10 +36,6 @@ public class QuizAnswerDto implements Serializable {
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

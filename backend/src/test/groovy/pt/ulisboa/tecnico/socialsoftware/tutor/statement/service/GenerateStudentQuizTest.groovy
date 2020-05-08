@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Assessment
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
@@ -83,26 +84,26 @@ class GenerateStudentQuizTest extends Specification {
         user.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(user)
 
-        def topic = new Topic();
+        def topic = new Topic()
         topic.setName("TOPIC")
         topic.setCourse(course)
         topicRepository.save(topic)
 
         questionOne = new Question()
         questionOne.setKey(1)
+        questionOne.setContent("Question Content")
+        questionOne.setTitle("Question Title")
         questionOne.setStatus(Question.Status.AVAILABLE)
         questionOne.setCourse(course)
-        course.addQuestion(questionOne)
         questionOne.addTopic(topic)
-        topic.addQuestion(questionOne)
 
         questionTwo = new Question()
         questionTwo.setKey(2)
+        questionTwo.setContent("Question Content")
+        questionTwo.setTitle("Question Title")
         questionTwo.setStatus(Question.Status.AVAILABLE)
         questionTwo.setCourse(course)
-        course.addQuestion(questionTwo)
         questionTwo.addTopic(topic)
-        topic.addQuestion(questionTwo)
 
         userRepository.save(user)
         questionRepository.save(questionOne)
@@ -114,6 +115,7 @@ class GenerateStudentQuizTest extends Specification {
         topicConjunctionRepository.save(topicConjunction)
 
         assessment = new Assessment()
+        assessment.setTitle("Assessment title")
         assessment.setStatus(Assessment.Status.AVAILABLE)
         assessment.setCourseExecution(courseExecution)
         assessment.addTopicConjunction(topicConjunction)
@@ -126,10 +128,10 @@ class GenerateStudentQuizTest extends Specification {
         given:
         def quizForm = new StatementCreationDto()
         quizForm.setNumberOfQuestions(1)
-        quizForm.setAssessment(assessment.getId().toString())
+        quizForm.setAssessment(assessment.getId())
 
         when:
-        statementService.generateStudentQuiz(USERNAME, courseExecution.getId(), quizForm)
+        statementService.generateStudentQuiz(user.getId(), courseExecution.getId(), quizForm)
 
         then:
         quizRepository.count() == 1L
@@ -151,10 +153,10 @@ class GenerateStudentQuizTest extends Specification {
         given:
         def quizForm = new StatementCreationDto()
         quizForm.setNumberOfQuestions(2)
-        quizForm.setAssessment(assessment.getId().toString())
+        quizForm.setAssessment(assessment.getId())
 
         when:
-        statementService.generateStudentQuiz(USERNAME, courseExecution.getId(), quizForm)
+        statementService.generateStudentQuiz(user.getId(), courseExecution.getId(), quizForm)
 
         then:
         quizRepository.count() == 1L
@@ -174,10 +176,10 @@ class GenerateStudentQuizTest extends Specification {
         given:
         def quizForm = new StatementCreationDto()
         quizForm.setNumberOfQuestions(3)
-        quizForm.setAssessment(assessment.getId().toString())
+        quizForm.setAssessment(assessment.getId())
 
         when:
-        statementService.generateStudentQuiz(USERNAME, courseExecution.getId(), quizForm)
+        statementService.generateStudentQuiz(user.getId(), courseExecution.getId(), quizForm)
 
         then:
         TutorException exception = thrown()
@@ -206,6 +208,10 @@ class GenerateStudentQuizTest extends Specification {
         AnswersXmlImport answersXmlImport() {
             return new AnswersXmlImport()
         }
-    }
 
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+    }
 }

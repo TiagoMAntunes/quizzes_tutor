@@ -37,7 +37,7 @@ public class QuestionController {
 
     @GetMapping("/courses/{courseId}/questions")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseId, 'COURSE.ACCESS')")
-    public List<QuestionDto> getCourseQuestions(@PathVariable int courseId){
+    public List<QuestionDto> getCourseQuestions(@PathVariable int courseId) {
         return this.questionService.findQuestions(courseId);
     }
 
@@ -53,7 +53,7 @@ public class QuestionController {
 
     @GetMapping("/courses/{courseId}/questions/available")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseId, 'COURSE.ACCESS')")
-    public List<QuestionDto> getAvailableQuestions(@PathVariable int courseId){
+    public List<QuestionDto> getAvailableQuestions(@PathVariable int courseId) {
         return this.questionService.findAvailableQuestions(courseId);
     }
 
@@ -123,7 +123,7 @@ public class QuestionController {
     }
 
     @PutMapping("/questions/{questionId}/topics")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    @PreAuthorize("(hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')) and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity updateQuestionTopics(@PathVariable Integer questionId, @RequestBody TopicDto[] topics) {
         questionService.updateQuestionTopics(questionId, topics);
 
@@ -134,5 +134,4 @@ public class QuestionController {
         String fileLocation = figuresDir + url;
         return Paths.get(fileLocation);
     }
-
 }

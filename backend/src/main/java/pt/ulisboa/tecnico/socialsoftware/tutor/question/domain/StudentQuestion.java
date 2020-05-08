@@ -1,9 +1,10 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
-
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 import javax.persistence.*;
 
 
@@ -35,6 +36,7 @@ public class StudentQuestion extends Question {
         this.user = user;
         this.explanation = null;
         this.setQuestionStatus(QuestionStatus.PENDING);
+        this.setStatus(Question.Status.DISABLED);
 
         user.addStudentQuestion(this);
     }
@@ -51,7 +53,20 @@ public class StudentQuestion extends Question {
 
     public void setUser(User userDto) { this.user = userDto; }
 
+    public void updateQuestion(QuestionDto questionDto) {
+        super.update(questionDto);
+    }
+
+    public void updateRejectedQuestion(QuestionDto questionDto) {
+        if(this.getQuestionStatus() != QuestionStatus.REJECTED) {
+            throw new TutorException(QUESTION_NOT_REJECTED);
+        }
+        super.update(questionDto);
+        this.setQuestionStatus(QuestionStatus.PENDING);
+        this.setRejectionExplanation(null);
+    }
 }
+
 
 
 

@@ -8,6 +8,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.Demo;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
@@ -31,7 +32,7 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 @Service
 public class AssessmentService {
     @SuppressWarnings("unused")
-    private static Logger logger = LoggerFactory.getLogger(AssessmentService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AssessmentService.class);
 
     @Autowired
     private AssessmentRepository assessmentRepository;
@@ -155,6 +156,14 @@ public class AssessmentService {
     public void assessmentSetStatus(Integer assessmentId, Assessment.Status status) {
         Assessment assessment = assessmentRepository.findById(assessmentId).orElseThrow(() -> new TutorException(ASSESSMENT_NOT_FOUND, assessmentId));
         assessment.setStatus(status);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void resetDemoAssessments() {
+        this.assessmentRepository.findByExecutionCourseId(Demo.COURSE_EXECUTION_ID).stream().filter(assessment -> assessment.getId() > 10).forEach(assessment -> assessmentRepository.delete(assessment));
     }
 
 }

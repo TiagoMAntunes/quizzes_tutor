@@ -1,9 +1,9 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.user.dto;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
 
 public class StudentDto implements Serializable {
     private String username;
@@ -21,19 +21,21 @@ public class StudentDto implements Serializable {
     private int percentageOfCorrectStudentAnswers = 0;
     private String creationDate;
     private String lastAccess;
+    private boolean tournamentPrivacy;
 
     public StudentDto(User user) {
         this.username = user.getUsername();
         this.name = user.getName();
-
         this.numberOfTeacherQuizzes = user.getNumberOfTeacherQuizzes();
         this.numberOfInClassQuizzes = user.getNumberOfInClassQuizzes();
         this.numberOfStudentQuizzes = user.getNumberOfStudentQuizzes();
-
         this.numberOfAnswers = user.getNumberOfTeacherAnswers() + user.getNumberOfInClassAnswers() + user.getNumberOfStudentAnswers();
         this.numberOfTeacherAnswers = user.getNumberOfTeacherAnswers();
         this.numberOfInClassAnswers = user.getNumberOfInClassAnswers();
         this.numberOfStudentAnswers = user.getNumberOfStudentAnswers();
+        this.lastAccess = DateHandler.toISOString(user.getLastAccess());
+        this.creationDate = DateHandler.toISOString(user.getCreationDate());
+        this.tournamentPrivacy = user.getTournamentPrivacy();
 
         if (this.numberOfTeacherAnswers != 0)
             this.percentageOfCorrectTeacherAnswers = user.getNumberOfCorrectTeacherAnswers() * 100 / this.numberOfTeacherAnswers;
@@ -44,10 +46,6 @@ public class StudentDto implements Serializable {
         if (this.numberOfAnswers != 0)
             this.percentageOfCorrectAnswers = (user.getNumberOfCorrectTeacherAnswers() + user.getNumberOfCorrectInClassAnswers() + user.getNumberOfCorrectStudentAnswers())  * 100 / this.numberOfAnswers;
 
-        if (user.getLastAccess() != null)
-            this.lastAccess = user.getLastAccess().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        if (user.getCreationDate() != null)
-            this.creationDate = user.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     public String getUsername() {
@@ -184,5 +182,13 @@ public class StudentDto implements Serializable {
                 ", creationDate='" + creationDate + '\'' +
                 ", lastAccess='" + lastAccess + '\'' +
                 '}';
+    }
+
+    public boolean getTournamentPrivacy() {
+        return tournamentPrivacy;
+    }
+
+    public void setTournamentPrivacy(boolean tournamentPrivacy) {
+        this.tournamentPrivacy = tournamentPrivacy;
     }
 }

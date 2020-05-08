@@ -4,12 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
@@ -18,6 +21,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService;
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -30,6 +37,11 @@ class CancelTournamentTest extends Specification {
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_NAME = "Software Architecture"
     public static final String COURSE_ABREV = "ES1"
+    public static final String TOURNAMENT_TITLE = "title"
+
+    public static final LocalDateTime YESTERDAY = DateHandler.now().minusDays(1)
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(2))
 
     @Autowired
     TournamentRepository tournamentRepository
@@ -49,28 +61,17 @@ class CancelTournamentTest extends Specification {
     @Autowired
     CourseExecutionRepository courseExecutionRepository
 
-    def formatter
-    def TWO_DAYS_AGO_DATETIME
-    def IN_TWO_DAYS_TIME
-    def IN_FOUR_DAYS_TIME
+    @Autowired
+    QuizRepository quizRepository
+
     def TOPIC_LIST
     def courseExecutionId
     def userId
+    def STUDENT_JOINED_ID
     def tournamentId
+    def courseExecution
 
     def setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        TWO_DAYS_AGO_DATETIME = LocalDateTime.now().minusDays(2)
-        IN_TWO_DAYS_TIME = LocalDateTime.now().plusDays(2).format(formatter)
-        IN_FOUR_DAYS_TIME = LocalDateTime.now().plusDays(4).format(formatter)
-
-        //Creates a user
-        def user = new User()
-        user.setKey(1)
-        user.setRole(User.Role.STUDENT)
-        userRepository.save(user)
-        userId = userRepository.findAll().get(0).getId()
-
         //Creates a course
         def course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
@@ -78,7 +79,25 @@ class CancelTournamentTest extends Specification {
         //Creates a course execution
         def newCourseExecution = new CourseExecution(course, COURSE_NAME, COURSE_ABREV, Course.Type.TECNICO)
         courseExecutionRepository.save(newCourseExecution)
-        courseExecutionId = courseExecutionRepository.findAll().get(0).getId()
+        courseExecution = courseExecutionRepository.findAll().get(0)
+        courseExecutionId = courseExecution.getId()
+
+        //Creates a user
+        def user = new User()
+        user.setKey(1)
+        user.setRole(User.Role.STUDENT)
+        user.addCourse(courseExecution)
+        userRepository.save(user)
+        userId = userRepository.findAll().get(0).getId()
+
+        def student1 = new User()
+        student1.setKey(userRepository.getMaxUserNumber() + 1)
+        student1.setRole(User.Role.STUDENT)
+        student1.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(student1)
+        userRepository.save(student1)
+
+        STUDENT_JOINED_ID = userRepository.findByKey(student1.getKey()).getId()
 
         //Creates a topic
         def topic = new Topic()
@@ -95,8 +114,9 @@ class CancelTournamentTest extends Specification {
 
         //Creates a cancelable tournament
         def tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(IN_TWO_DAYS_TIME)
-        tournamentDto.setFinishTime(IN_FOUR_DAYS_TIME)
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
         tournamentService.createTournament(tournamentDto, courseExecutionId, userId)
@@ -147,7 +167,7 @@ class CancelTournamentTest extends Specification {
     def "cancel a tournament after it as started"() {
         given: "a tournament that has started"
         def tournament = tournamentRepository.findAll().get(0)
-        tournament.setStartTime(TWO_DAYS_AGO_DATETIME)
+        tournament.setStartTime(YESTERDAY)
 
         when: "tries to cancel"
         tournamentService.cancelTournament(tournamentId, userId)
@@ -163,7 +183,7 @@ class CancelTournamentTest extends Specification {
 
     def "cancel a tournament with 1 student signed up"() {
         given: "a cancelable tournament with 1 student signed up"
-        tournamentService.joinTournament(tournamentId, courseExecutionId, userId)
+        tournamentService.joinTournament(tournamentId, userId)
 
         when: "cancel tournament"
         tournamentService.cancelTournament(tournamentId, userId)
@@ -176,12 +196,54 @@ class CancelTournamentTest extends Specification {
         topicRepository.findAll().get(0).getTournaments().size() == 0
     }
 
+    def "cancel a tournament with a quiz associated"() {
+        given: "a cancelable tournament with a quiz associated"
+        tournamentService.joinTournament(tournamentId, userId)
+        tournamentService.joinTournament(tournamentId, STUDENT_JOINED_ID)
+
+        when: "cancel tournament"
+        tournamentService.cancelTournament(tournamentId, userId)
+
+        then: "tournament is canceled"
+        tournamentRepository.count() == 0L
+        userRepository.findAll().get(0).getCreatedTournaments().size() == 0
+        userRepository.findAll().get(0).getSignedUpTournaments().size() == 0
+        courseExecutionRepository.findAll().get(0).getTournaments().size() == 0
+        topicRepository.findAll().get(0).getTournaments().size() == 0
+        quizRepository.count() == 0L
+    }
+
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {
 
         @Bean
         TournamentService tournamentService() {
             return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        AnswersXmlImport answersXmlImport() {
+            return new AnswersXmlImport()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        UserService userService() {
+            return new UserService()
         }
     }
 }

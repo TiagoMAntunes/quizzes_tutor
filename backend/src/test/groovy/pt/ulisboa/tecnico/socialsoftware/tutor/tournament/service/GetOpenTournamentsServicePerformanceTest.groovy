@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
@@ -16,6 +19,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService;
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -28,6 +34,10 @@ class GetOpenTournamentsServicePerformanceTest extends Specification {
     public static final String TOPIC_NAME = "Main_Topic"
     public static final String COURSE_NAME = "Software Architecture"
     public static final String COURSE_ABREV = "ES1"
+    public static final String TOURNAMENT_TITLE = "title"
+
+    public static final String TOMORROW = DateHandler.toISOString(DateHandler.now().plusDays(1))
+    public static final String LATER = DateHandler.toISOString(DateHandler.now().plusDays(2))
 
     //Should be 100000
     public static final int N_TOURNAMENTS = 1
@@ -57,9 +67,6 @@ class GetOpenTournamentsServicePerformanceTest extends Specification {
     def courseExecution
 
     def setup() {
-        def formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        def NOW_TIME = LocalDateTime.now().plusDays(1).format(formatter)
-        def FINISH_TIME = LocalDateTime.now().plusDays(5).format(formatter)
 
         //Creates a user
         def user = new User()
@@ -91,8 +98,9 @@ class GetOpenTournamentsServicePerformanceTest extends Specification {
         def TOPIC_LIST = topicList
 
         tournamentDto = new TournamentDto()
-        tournamentDto.setStartTime(NOW_TIME)
-        tournamentDto.setFinishTime(FINISH_TIME)
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setStartTime(TOMORROW)
+        tournamentDto.setFinishTime(LATER)
         tournamentDto.setTopics(TOPIC_LIST)
         tournamentDto.setNumberOfQuestions(NUMBER_QUESTIONS)
     }
@@ -103,7 +111,7 @@ class GetOpenTournamentsServicePerformanceTest extends Specification {
 
         when:
         int count = 0
-        1.upto(N_USERS, {count += tournamentService.getOpenTournaments(courseExecution).size()})
+        1.upto(N_USERS, {count += tournamentService.getOpenTournaments(courseExecution, user_id).size()})
 
         then:
         count == N_USERS * N_TOURNAMENTS
@@ -116,6 +124,30 @@ class GetOpenTournamentsServicePerformanceTest extends Specification {
         @Bean
         TournamentService tournamentService() {
             return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        AnswersXmlImport answersXmlImport() {
+            return new AnswersXmlImport()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        UserService userService() {
+            return new UserService()
         }
     }
 }

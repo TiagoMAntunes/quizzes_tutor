@@ -1,6 +1,7 @@
 import Option from '@/models/management/Option';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
+import { ISOtoString } from '@/services/ConvertDateService';
 
 export default class Question {
   id: number | null = null;
@@ -30,8 +31,8 @@ export default class Question {
       this.numberOfCorrect = jsonObj.numberOfCorrect;
       this.difficulty = jsonObj.difficulty;
       this.content = jsonObj.content;
+      this.creationDate = ISOtoString(jsonObj.creationDate);
       this.image = jsonObj.image;
-      this.creationDate = jsonObj.creationDate;
 
       this.options = jsonObj.options.map(
         (option: Option) => new Option(option)

@@ -15,6 +15,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import java.security.Principal;
+
 import java.util.List;
 import javax.validation.Valid;
 
@@ -23,28 +24,54 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.AU
 @RestController
 public class StudentQuestionController{
 
-    static class Information{
-        public String status;
-        public String explanation;
-        public int teacherId;
-        public int courseExecutionId;
-    }
-
     @Autowired
     private StudentQuestionService  studentQuestionService;
 
+    @GetMapping("/student_questions/{courseId}/all")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    public List<StudentQuestionDto> getAllQuestionsOfCourses(@PathVariable int courseId, Principal principal){
+        User user = (User) ((Authentication) principal).getPrincipal();
 
-    @GetMapping("/student_questions/{studentId}")
+        if(user == null){
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+        return this.studentQuestionService.getStudentQuestionsByCourses(user.getCourseExecutions(), courseId);
+    }
+    @GetMapping("/student_questions/{courseId}/logged_student")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public List<StudentQuestionDto> getAllStudentQuestions(@PathVariable int studentId){
-        return this.studentQuestionService.getStudentQuestions(studentId);
+    public List<StudentQuestionDto> getSpecificStudentQuestions(@PathVariable int courseId, Principal principal){
+        User user = (User) ((Authentication) principal).getPrincipal();
+        if(user == null){
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+        return this.studentQuestionService.getStudentQuestions(courseId, user.getId());
     }
 
-    @PostMapping("/student_questions/{questionId}/approve-reject")
+    @PutMapping("/student_questions/evaluate/{questionId}/{status}")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
-    public ResponseEntity studentQuestionApproveRejectStatus(@PathVariable Integer questionId, @Valid @RequestBody Information inform) {
-        studentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.valueOf(inform.status), inform.explanation, inform.teacherId,  inform.courseExecutionId);
+    public ResponseEntity studentQuestionApproveRejectStatus(@PathVariable Integer questionId, @PathVariable String status) {
+        studentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.valueOf(status));
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/student_questions/available/{questionId}")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public ResponseEntity studentQuestionApproveToAvailable(@PathVariable Integer questionId) {
+        studentQuestionService.studentQuestionApproveToAvailable(questionId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/student_questions/{questionId}/explanation")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public ResponseEntity studentQuestionAddExplanation(@PathVariable Integer questionId, @Valid @RequestBody String explanation) {
+        studentQuestionService.setStudentQuestionExplanation(questionId, explanation);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/student_questions/{questionId}/update_teacher")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public StudentQuestionDto teacherUpdatesQuestion(@PathVariable Integer questionId, @Valid @RequestBody StudentQuestionDto question) {
+        return this.studentQuestionService.updateStudentQuestion(questionId, question);
     }
 
     @PostMapping("/courses/{courseId}/student_questions")
@@ -58,5 +85,11 @@ public class StudentQuestionController{
         }
         question.setStatus(Question.Status.AVAILABLE.name());
         return this.studentQuestionService.createStudentQuestion(courseId, question, user.getId());
+    }
+
+    @PutMapping("/student/{studentQuestionId}/resubmit")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public StudentQuestionDto studentResubmitQuestion(@PathVariable Integer studentQuestionId, @Valid @RequestBody QuestionDto questionDto) {
+       return studentQuestionService.resubmitRejectedStudentQuestion(studentQuestionId, questionDto);
     }
 }

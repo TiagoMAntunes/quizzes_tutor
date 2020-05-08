@@ -58,6 +58,62 @@
         </div>
       </div>
     </div>
+    <h2>Questions</h2>
+    <div v-if="dashboard != null" class="stats-container">
+      <div class="items">
+        <div class="icon-wrapper" ref="QuestionsSubmitted"  >
+          <animated-number  :number="dashboard.numberQuestionsSubmitted" />
+        </div>
+        <div class="project-name">
+          <p>Total Questions Submitted</p>
+        </div>
+      </div>
+      <div class="items">
+        <div class="icon-wrapper" ref="QuestionsApproved" >
+          <animated-number    :number="dashboard.numberQuestionsApproved" />
+        </div>
+        <div class="project-name">
+          <p>Total Questions Approved</p>
+        </div>
+      </div>
+    </div>
+    <h2>Tournaments</h2>
+    <div v-if="dashboard != null" class="stats-container">
+      <div class="items">
+        <div class="icon-wrapper" ref="createdTournaments">
+          <animated-number :number="dashboard.createdTournaments" />
+        </div>
+        <div class="project-name">
+          <p>Created Tournaments</p>
+        </div>
+      </div>
+      <div class="items">
+        <div class="icon-wrapper" ref="participatedTournaments">
+          <animated-number :number="dashboard.participatedTournamentsNumber" />
+        </div>
+        <div class="project-name">
+          <p>Participated Tournaments</p>
+        </div>
+      </div>
+      <div class="items">
+        <div class="icon-wrapper" ref="averageScore">
+          <animated-number :number="dashboard.averageTournamentScore" 
+          >%</animated-number
+          >
+        </div>
+        <div class="project-name">
+          <p>Average Tournament Score</p>
+        </div>
+      </div>
+      <div class="items">
+        <div class="icon-wrapper" ref="notYetParticipated">
+          <animated-number :number="dashboard.notYetParticipatedTournamentsNumber" />
+        </div>
+        <div class="project-name">
+          <p>Joined Tournaments with Available Quizzes</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -66,16 +122,19 @@ import { Component, Vue } from 'vue-property-decorator';
 import StudentStats from '@/models/statement/StudentStats';
 import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
+import StudentDashboard from '@/models/user/StudentDashboard';
 
 @Component({
   components: { AnimatedNumber }
 })
 export default class StatsView extends Vue {
   stats: StudentStats | null = null;
+  dashboard: StudentDashboard | null = null;
 
   async created() {
     await this.$store.dispatch('loading');
     try {
+      this.dashboard =  await RemoteServices.getStudentDashboard();
       this.stats = await RemoteServices.getUserStats();
     } catch (error) {
       await this.$store.dispatch('error', error);
@@ -103,6 +162,7 @@ export default class StatsView extends Vue {
     margin: 20px;
     cursor: pointer;
     transition: all 0.6s;
+    padding: 0px 10px;
   }
 }
 

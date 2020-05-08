@@ -24,17 +24,11 @@ class FilterQuestionsByStudentModelTest extends Specification {
 
     def setup() {
         questionOne = new Question()
-        questionOne.setId(1)
         questionTwo = new Question()
-        questionTwo.setId(2)
         def questionThree = new Question()
-        questionThree.setId(3)
         def questionFour = new Question()
-        questionFour.setId(4)
         def questionFive = new Question()
-        questionFive.setId(5)
         def questionSix = new Question()
-        questionSix.setId(6)
         quiz = new Quiz()
         quiz.setKey(1)
         quizQuestionOne = new QuizQuestion(quiz, questionOne, 0)
@@ -62,7 +56,9 @@ class FilterQuestionsByStudentModelTest extends Specification {
         given:
         def quizAnswer = new QuizAnswer(user, quiz)
         def option = new Option()
+        option.setContent("Option Content")
         option.setCorrect(true)
+        option.setSequence(0)
         new QuestionAnswer(quizAnswer, quizQuestionOne,  10, option,  0)
 
         when:
@@ -78,7 +74,9 @@ class FilterQuestionsByStudentModelTest extends Specification {
         given:
         def quizAnswer = new QuizAnswer(user, quiz)
         def option = new Option()
+        option.setContent("Option Content")
         option.setCorrect(true)
+        option.setSequence(0)
         new QuestionAnswer(quizAnswer, quizQuestionThree,  10, option,  0)
         new QuestionAnswer(quizAnswer, quizQuestionFour,  10, option,  0)
         new QuestionAnswer(quizAnswer, quizQuestionFive,  10, option,  0)
@@ -98,7 +96,9 @@ class FilterQuestionsByStudentModelTest extends Specification {
         given:
         def quizAnswer = new QuizAnswer(user, quiz)
         def option = new Option()
+        option.setContent("Option Content")
         option.setCorrect(true)
+        option.setSequence(0)
         new QuestionAnswer(quizAnswer, quizQuestionTwo,  10, option,  0)
         new QuestionAnswer(quizAnswer, quizQuestionThree,  10, option,  0)
         new QuestionAnswer(quizAnswer, quizQuestionFour,  10, option,  0)
@@ -113,5 +113,4 @@ class FilterQuestionsByStudentModelTest extends Specification {
         and: 'it contains the not answered question'
         result.contains(questionOne)
     }
-
 }

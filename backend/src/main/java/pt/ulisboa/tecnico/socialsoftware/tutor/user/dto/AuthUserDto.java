@@ -27,7 +27,7 @@ public class AuthUserDto implements Serializable {
         this.role = user.getRole();
         this.courses = getActiveAndInactiveCourses(user, currentCourses);
     }
-
+    
     public String getName() {
         return name;
     }
@@ -65,7 +65,7 @@ public class AuthUserDto implements Serializable {
         courses.stream()
                 .forEach(courseDto -> {
                     if (courseExecutions.stream().noneMatch(c -> c.getAcronym().equals(courseDto.getAcronym()) && c.getAcademicTerm().equals(courseDto.getAcademicTerm()))) {
-                        if(courseDto.getStatus() == null) {
+                        if (courseDto.getStatus() == null) {
                             courseDto.setStatus(CourseExecution.Status.INACTIVE);
                         }
                         courseExecutions.add(courseDto);

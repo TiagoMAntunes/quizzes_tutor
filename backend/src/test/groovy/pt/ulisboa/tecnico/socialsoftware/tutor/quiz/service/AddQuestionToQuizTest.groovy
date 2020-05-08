@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
@@ -32,6 +35,7 @@ class AddQuestionToQuizTest extends Specification {
         quizRepository.save(quiz)
         def question = new Question()
         question.setKey(1)
+        question.setTitle("Question title")
         questionRepository.save(question)
     }
 
@@ -62,6 +66,21 @@ class AddQuestionToQuizTest extends Specification {
         @Bean
         QuizService quizService() {
             return new QuizService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        AnswersXmlImport xmlImporter() {
+            return new AnswersXmlImport()
         }
     }
 }

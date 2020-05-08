@@ -3,8 +3,8 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.user;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
@@ -58,7 +58,7 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
     private Set<QuizAnswer> quizAnswers = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
     @ManyToMany
@@ -70,6 +70,12 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
 
+    @Column(name = "question_privacy", columnDefinition = "boolean default true")
+    private boolean questionPrivacy = true;
+
+    @Column(name = "tournament_privacy", columnDefinition = "boolean default true")
+    private boolean tournamentPrivacy = true;
+
     public User() {
     }
 
@@ -78,7 +84,7 @@ public class User implements UserDetails, DomainEntity {
         setUsername(username);
         this.key = key;
         this.role = role;
-        this.creationDate = LocalDateTime.now();
+        this.creationDate = DateHandler.now();
         this.numberOfTeacherQuizzes = 0;
         this.numberOfInClassQuizzes = 0;
         this.numberOfStudentQuizzes = 0;
@@ -97,10 +103,6 @@ public class User implements UserDetails, DomainEntity {
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Integer getKey() {
@@ -187,7 +189,7 @@ public class User implements UserDetails, DomainEntity {
     }
 
     public Integer getNumberOfStudentQuizzes() {
-        if(this.numberOfStudentQuizzes == null)
+        if (this.numberOfStudentQuizzes == null)
             this.numberOfStudentQuizzes = (int) getQuizAnswers().stream()
                     .filter(QuizAnswer::isCompleted)
                     .filter(quizAnswer -> quizAnswer.getQuiz().getType().equals(Quiz.QuizType.GENERATED))
@@ -312,6 +314,29 @@ public class User implements UserDetails, DomainEntity {
 
     public void setNumberOfCorrectStudentAnswers(Integer numberOfCorrectStudentAnswers) {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", key=" + key +
+                ", role=" + role +
+                ", username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", enrolledCoursesAcronyms='" + enrolledCoursesAcronyms + '\'' +
+                ", numberOfTeacherQuizzes=" + numberOfTeacherQuizzes +
+                ", numberOfStudentQuizzes=" + numberOfStudentQuizzes +
+                ", numberOfInClassQuizzes=" + numberOfInClassQuizzes +
+                ", numberOfTeacherAnswers=" + numberOfTeacherAnswers +
+                ", numberOfInClassAnswers=" + numberOfInClassAnswers +
+                ", numberOfStudentAnswers=" + numberOfStudentAnswers +
+                ", numberOfCorrectTeacherAnswers=" + numberOfCorrectTeacherAnswers +
+                ", numberOfCorrectInClassAnswers=" + numberOfCorrectInClassAnswers +
+                ", numberOfCorrectStudentAnswers=" + numberOfCorrectStudentAnswers +
+                ", creationDate=" + creationDate +
+                ", lastAccess=" + lastAccess +
+                '}';
     }
 
     public void increaseNumberOfQuizzes(Quiz.QuizType type) {
@@ -440,7 +465,7 @@ public class User implements UserDetails, DomainEntity {
         Random rand = new Random(System.currentTimeMillis());
         while (numberOfAddedQuestions < numberOfQuestions) {
             int next = rand.nextInt(studentAnsweredQuestions.size());
-            if(!result.contains(studentAnsweredQuestions.get(next))) {
+            if (!result.contains(studentAnsweredQuestions.get(next))) {
                 result.add(studentAnsweredQuestions.get(next));
                 numberOfAddedQuestions++;
             }
@@ -455,6 +480,12 @@ public class User implements UserDetails, DomainEntity {
 
     public Set<Tournament> getSignedUpTournaments() { return signedUpTournaments; }
 
+    public Set<Tournament> getSignedUpTournamentsCourseExec(Integer executionId) {
+        return getSignedUpTournaments().stream()
+                .filter(tournament -> tournament.getCourseExecution().getId().equals(executionId))
+                .collect(Collectors.toSet());
+    }
+
     public boolean hasTournament(Tournament tournament) {
         return signedUpTournaments.contains(tournament);
     }
@@ -463,4 +494,34 @@ public class User implements UserDetails, DomainEntity {
 
     public Set<Tournament> getCreatedTournaments() { return createdTournaments; }
 
+    public Set<Tournament> getCreatedTournamentsCourseExec(Integer executionId) {
+        return createdTournaments.stream()
+                .filter(tournament -> tournament.getCourseExecution().getId().equals(executionId))
+                .collect(Collectors.toSet());
+    }
+
+    public boolean hasCourseExecution(Integer id) {
+        return courseExecutions.stream().anyMatch(execution -> execution.getId().equals(id));
+    }
+
+    public void setQuestionPrivacy(boolean privacy) {
+        this.questionPrivacy = privacy;
+    }
+
+    public boolean getQuestionPrivacy() {
+        return this.questionPrivacy;
+    }
+
+    public int getCreatedTournamentsNumber(Integer executionId){
+        return getCreatedTournamentsCourseExec(executionId).size();
+
+    }
+
+    public void setTournamentPrivacy(boolean privacy) {
+        this.tournamentPrivacy = privacy;
+    }
+
+    public boolean getTournamentPrivacy() {
+        return this.tournamentPrivacy;
+    }
 }

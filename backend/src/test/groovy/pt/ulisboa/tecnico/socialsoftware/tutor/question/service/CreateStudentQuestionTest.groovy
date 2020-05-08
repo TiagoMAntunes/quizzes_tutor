@@ -113,7 +113,7 @@ class CreateStudentQuestionTest extends Specification {
         def result = studentQuestionRepository.findAll().get(0)
         result.getId() != null
         result.getKey() == 1
-        result.getStatus() == Question.Status.AVAILABLE
+        result.getStatus() == Question.Status.DISABLED
         result.getTitle() == QUESTION_TITLE
         result.getContent() == QUESTION_CONTENT
         result.getImage() == null
@@ -209,12 +209,10 @@ class CreateStudentQuestionTest extends Specification {
 
         where:
         Title             | Content            | Option             || errorMessage
-        BLANK             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        EMPTY             | QUESTION_CONTENT   | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | BLANK              | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | QUESTION_CONTENT   | BLANK              || QUESTION_MISSING_DATA
-        QUESTION_TITLE    | QUESTION_CONTENT   | EMPTY              || QUESTION_MISSING_DATA
+        EMPTY             | QUESTION_CONTENT   | OPTION_CONTENT     || INVALID_TITLE_FOR_QUESTION
+        BLANK             | QUESTION_CONTENT   | OPTION_CONTENT     || INVALID_TITLE_FOR_QUESTION
+        QUESTION_TITLE    | BLANK              | OPTION_CONTENT     || INVALID_CONTENT_FOR_QUESTION
+        QUESTION_TITLE    | EMPTY              | OPTION_CONTENT     || INVALID_CONTENT_FOR_QUESTION
     }
 
 
@@ -251,7 +249,7 @@ class CreateStudentQuestionTest extends Specification {
         def result = studentQuestionRepository.findAll().get(0)
         result.getId() != null
         result.getKey() == 1
-        result.getStatus() == Question.Status.AVAILABLE
+        result.getStatus() == Question.Status.DISABLED
         result.getTitle() == QUESTION_TITLE
         result.getContent() == QUESTION_CONTENT
         result.getImage().getId() != null

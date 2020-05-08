@@ -4,6 +4,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.question.dto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class TopicDto implements Serializable {
     private Integer id;
@@ -24,10 +25,6 @@ public class TopicDto implements Serializable {
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -52,5 +49,18 @@ public class TopicDto implements Serializable {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TopicDto topic = (TopicDto) o;
+        return name.equals(topic.name);
     }
 }
