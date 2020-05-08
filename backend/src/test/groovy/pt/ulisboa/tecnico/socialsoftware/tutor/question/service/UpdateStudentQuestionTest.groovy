@@ -77,7 +77,6 @@ class UpdateStudentQuestionTest extends Specification{
 
         student = new User("User2", "student", 2, User.Role.STUDENT)
         userRepository.save(student)
-        //userDto = new UserDto(student);
 
         courseExecution.addUser(student)
         student.addCourse(courseExecution)
