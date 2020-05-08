@@ -144,6 +144,9 @@ public class UserService {
         return newDemoUser;
     }
 
+    @Retryable(
+        value = { SQLException.class },
+        backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void setTournamentPrivacy(int userId, boolean privacy) {
         User user = this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND));
@@ -151,6 +154,9 @@ public class UserService {
         user.setTournamentPrivacy(privacy);
     }
 
+    @Retryable(
+        value = { SQLException.class },
+        backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean getTournamentPrivacy(Integer userId) {
         return this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND)).getTournamentPrivacy();
