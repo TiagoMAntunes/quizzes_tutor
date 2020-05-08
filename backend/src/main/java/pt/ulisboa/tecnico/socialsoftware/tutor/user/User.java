@@ -524,13 +524,4 @@ public class User implements UserDetails, DomainEntity {
     public boolean getTournamentPrivacy() {
         return this.tournamentPrivacy;
     }
-
-    public void setTournamentPrivacy(boolean privacy) {
-        this.tournamentPrivacy = privacy;
-    }
-
-    public boolean getTournamentPrivacy() {
-        return this.tournamentPrivacy;
-    }
-
 }
