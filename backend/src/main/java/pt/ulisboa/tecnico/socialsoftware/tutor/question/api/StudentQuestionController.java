@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import pt.ulisboa.tecnico.socialsoftware.tutor.dashboard.DashboardDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
@@ -68,6 +69,12 @@ public class StudentQuestionController{
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/student_questions/{questionId}/update_teacher")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public StudentQuestionDto teacherUpdatesQuestion(@PathVariable Integer questionId, @Valid @RequestBody StudentQuestionDto question) {
+        return this.studentQuestionService.updateStudentQuestion(questionId, question);
+    }
+
     @PostMapping("/courses/{courseId}/student_questions")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
     public StudentQuestionDto createStudentQuestion(@PathVariable int courseId, @Valid @RequestBody QuestionDto question, Principal principal) {
@@ -79,5 +86,11 @@ public class StudentQuestionController{
         }
         question.setStatus(Question.Status.AVAILABLE.name());
         return this.studentQuestionService.createStudentQuestion(courseId, question, user.getId());
+    }
+
+    @PutMapping("/student/{studentQuestionId}/resubmit")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public StudentQuestionDto studentResubmitQuestion(@PathVariable Integer studentQuestionId, @Valid @RequestBody QuestionDto questionDto) {
+       return studentQuestionService.resubmitRejectedStudentQuestion(studentQuestionId, questionDto);
     }
 }

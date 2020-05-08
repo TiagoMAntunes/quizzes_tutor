@@ -70,6 +70,12 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
 
+    @Column(name = "question_privacy", columnDefinition = "boolean default true")
+    private boolean questionPrivacy = true;
+
+    @Column(name = "tournament_privacy", columnDefinition = "boolean default true")
+    private boolean tournamentPrivacy = true;
+
     public User() {
     }
 
@@ -498,8 +504,24 @@ public class User implements UserDetails, DomainEntity {
         return courseExecutions.stream().anyMatch(execution -> execution.getId().equals(id));
     }
 
-    public int getCreatedTournamentsNumber(Integer executionId){
-        return getCreatedTournamentsCourseExec(executionId).size();
+    public void setQuestionPrivacy(boolean privacy) {
+        this.questionPrivacy = privacy;
     }
 
+    public boolean getQuestionPrivacy() {
+        return this.questionPrivacy;
+    }
+
+    public int getCreatedTournamentsNumber(Integer executionId){
+        return getCreatedTournamentsCourseExec(executionId).size();
+
+    }
+
+    public void setTournamentPrivacy(boolean privacy) {
+        this.tournamentPrivacy = privacy;
+    }
+
+    public boolean getTournamentPrivacy() {
+        return this.tournamentPrivacy;
+    }
 }

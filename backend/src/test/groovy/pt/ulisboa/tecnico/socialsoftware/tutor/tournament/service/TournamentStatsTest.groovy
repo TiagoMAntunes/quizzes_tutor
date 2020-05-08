@@ -169,7 +169,7 @@ class TournamentStatsTest extends Specification {
         student = userRepository.findByKey(student.getKey())
         def creator = USER
 
-        when: "they sign up for the tournament"
+        and: "they sign up for the tournament"
         tournamentService.joinTournament(openTournamentId, student.getId())
         tournamentService.joinTournament(openTournamentId, creator.getId())
 
@@ -182,14 +182,18 @@ class TournamentStatsTest extends Specification {
         student.addQuizAnswer(quizAnswer)
         answerService.concludeQuiz(student, quiz.getId())
 
-        then:"the student has participated in 1 tournament, and the creator none, both have 0 avg score"
-        dashboardService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 1
-        dashboardService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
-        dashboardService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 0;
+        when:
+        def studentDash = dashboardService.getStudentDashboard(student.getId(), COURSE_EXEC_ID)
+        def creatorDash = dashboardService.getStudentDashboard(creator.getId(), COURSE_EXEC_ID)
 
-        dashboardService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
-        dashboardService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 1
-        dashboardService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
+        then:"the student has participated in 1 tournament, and the creator none, both have 0 avg score"
+        studentDash.getParticipatedTournamentsNumber() == 1
+        studentDash.getNotYetParticipatedTournamentsNumber() == 0
+        studentDash.getAverageTournamentScore() == 0;
+
+        creatorDash.getParticipatedTournamentsNumber() == 0
+        creatorDash.getNotYetParticipatedTournamentsNumber() == 1
+        creatorDash.getAverageTournamentScore() == 0;
     }
 
 
@@ -204,7 +208,7 @@ class TournamentStatsTest extends Specification {
         student = userRepository.findByKey(student.getKey())
         def creator = USER
 
-        when: "they sign up for both tournaments"
+        and: "they sign up for both tournaments"
         tournamentService.joinTournament(openTournamentId, student.getId())
         tournamentService.joinTournament(openTournamentId, creator.getId())
         tournamentService.joinTournament(openTournament2Id, student.getId())
@@ -230,14 +234,18 @@ class TournamentStatsTest extends Specification {
         student.addQuizAnswer(quizAnswer)
         answerService.concludeQuiz(student, quiz.getId())
 
-        then:"the student has participated in 2 tournaments and has a 50% average tournament score"
-        dashboardService.getParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 2
-        dashboardService.getNotYetParticipatedTournamentsNumber(student.getId(), COURSE_EXEC_ID) == 0
-        dashboardService.getAverageTournamentScore(student.getId(), COURSE_EXEC_ID) == 50;
+        when:
+        def student1Dash = dashboardService.getStudentDashboard(student.getId(), COURSE_EXEC_ID)
+        def student2Dash = dashboardService.getStudentDashboard(creator.getId(), COURSE_EXEC_ID)
 
-        dashboardService.getParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 0
-        dashboardService.getNotYetParticipatedTournamentsNumber(creator.getId(), COURSE_EXEC_ID) == 2
-        dashboardService.getAverageTournamentScore(creator.getId(), COURSE_EXEC_ID) == 0;
+        then:"the student has participated in 2 tournaments and has a 50% average tournament score"
+        student1Dash.getParticipatedTournamentsNumber() == 2
+        student1Dash.getNotYetParticipatedTournamentsNumber() == 0
+        student1Dash.getAverageTournamentScore() == 50;
+
+        student2Dash.getParticipatedTournamentsNumber() == 0
+        student2Dash.getNotYetParticipatedTournamentsNumber() == 2
+        student2Dash.getAverageTournamentScore() == 0
     }
 
 

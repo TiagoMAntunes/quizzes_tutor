@@ -116,8 +116,8 @@ Cypress.Commands.add('addTopicStudentQuestion', (title, topic) => {
 });
 
 Cypress.Commands.add('createStudentQuestion', (title, question, options) => {
-  cy.contains('Questions').click();
-  cy.contains('Create').click();
+  cy.get('[data-cy="questions"]').click();
+  cy.get('[data-cy="createQuestions"]').click();
   if (title != '') cy.get('[data-cy="Title"]').type(title);
   if (question != '') cy.get('[data-cy="Question"]').type(question);
   cy.get('[data-cy="Correct1"]').click({ force: true });
@@ -129,7 +129,7 @@ Cypress.Commands.add('createStudentQuestion', (title, question, options) => {
 Cypress.Commands.add(
   'createTournament',
   (title, topics, startDay, finishDay, numberOfQuestions) => {
-    cy.get('[data-cy="title"')
+    cy.get('[data-cy="title"]')
       .type(title);
 
     cy.contains('Select the tournament topics')
@@ -137,7 +137,7 @@ Cypress.Commands.add(
       .click();
     for (let topic of topics) cy.contains(topic).click(); //selects the given topics from the list
 
-    cy.get('[data-cy="startTimePicker"')
+    cy.get('[data-cy="startTimePicker"]')
       .click({ force: true })
       .parent()
       .parent() // Open menu
@@ -145,20 +145,20 @@ Cypress.Commands.add(
       .click() // go to next month
       .wait(1000); // needs to wait for load
 
-    cy.get('[data-cy="startTimePicker"')
+    cy.get('[data-cy="startTimePicker"]')
       .parent()
       .parent()
       .find('.month-container') // select dates
       .contains(startDay)
       .click();
 
-    cy.get('[data-cy="startTimePicker"')
+    cy.get('[data-cy="startTimePicker"]')
       .parent()
       .parent()
       .find('.validate')
       .click();
 
-    cy.get('[data-cy="finishTimePicker"')
+    cy.get('[data-cy="finishTimePicker"]')
       .click({ force: true })
       .parent()
       .parent() // Open menu
@@ -166,14 +166,14 @@ Cypress.Commands.add(
       .click() // go to next month
       .wait(1000); // needs to wait for load
 
-    cy.get('[data-cy="finishTimePicker"')
+    cy.get('[data-cy="finishTimePicker"]')
       .parent()
       .parent()
       .find('.month-container') // select dates
       .contains(finishDay)
       .click();
 
-    cy.get('[data-cy="finishTimePicker"')
+    cy.get('[data-cy="finishTimePicker"]')
       .parent()
       .parent()
       .find('.validate')
@@ -210,6 +210,16 @@ Cypress.Commands.add('makeAvailable', () => {
   cy.get('[data-cy="makeAvailable"]').first().click({ force: true });
 });
 
+Cypress.Commands.add('editQuestion', (title, question, options) => {
+  cy.get('[data-cy="editQuestionCy"]').first().click();
+  if (title != '') cy.get('[data-cy="Title"]').clear({force: true}).type(title, {force: true});
+  if (question != '') cy.get('[data-cy="Question"]').clear().type(question);
+  for (let option of options)
+      cy.get('[data-cy="' + option + '"]').clear().type(option + 'Test');
+  cy.contains('Save').click();
+});
+
+
 Cypress.Commands.add('openAvailableTournaments', () => {
   cy.contains('Tournaments').click();
   cy.get('[data-cy="availableTournaments"]').click();
@@ -218,6 +228,14 @@ Cypress.Commands.add('openAvailableTournaments', () => {
 Cypress.Commands.add('cancelTournament', () => {
     cy.get('[data-cy="cancel"]').first().click();
 });
+
+Cypress.Commands.add('openSettings', () => {
+  cy.get('[data-cy="settings"]').click({force : true})
+})
+
+Cypress.Commands.add('setPrivacy', (row, setting) => {
+  cy.get(`[data-cy="${row}"]`).find(`[data-cy="${setting}"]`).click()
+})
 
 Cypress.Commands.add('joinTournament', () => {
     cy.get('[data-cy="join"]').first().click();
@@ -236,6 +254,11 @@ Cypress.Commands.add('answerTournamentQuiz', () => {
     cy.wait(1000); // let everything load
     cy.get('.primary--text > .v-btn__content').click();
 })
+
+Cypress.Commands.add('openStats', () => {
+  cy.get('[data-cy=Stats]').click();
+})
+
 Cypress.Commands.add('goToStats', () => {
     cy.contains('Stats').click();
 });
@@ -243,3 +266,12 @@ Cypress.Commands.add('goToStats', () => {
 Cypress.Commands.add('logout', () => {
     cy.contains('Logout').click();
 });
+
+Cypress.Commands.add('joinTournamentWithFinishDate', (date) => {
+  cy.contains(date).parent().find('.last-col > .v-icon').click()
+});
+
+Cypress.Commands.add('resubmitStudentQuestion', title => {
+    cy.get('[data-cy="updateQuestionCy"]').first().click({ force: true });
+});
+
