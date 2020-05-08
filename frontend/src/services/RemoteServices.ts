@@ -280,7 +280,7 @@ export default class RemoteServices {
     status: string
   ): Promise<StudentQuestion> {
     return httpClient
-      .post(`/student_questions/evaluate/${questionId}/${status}`, {})
+      .put(`/student_questions/evaluate/${questionId}/${status}`, {})
       .then(response => {
         return new StudentQuestion(response.data);
       })
