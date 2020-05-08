@@ -79,16 +79,16 @@ public class TournamentController {
         return this.tournamentService.getOpenTournaments(executionId, user.getId());
     }
 
-    @GetMapping("/tournaments/scoreboard/{tournamentId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.ACCESS')")
-    public TournamentScoreboardDto getTournamentScoreboard(@PathVariable Integer tournamentId, Principal principal) {
+    @GetMapping("/executions/{executionId}/tournaments/scoreboards")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    public List<TournamentScoreboardDto> getTournamentScoreboards(@PathVariable Integer executionId, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
         if (user == null) {
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
-        return tournamentService.getTournamentScoreboard(tournamentId);
+        return tournamentService.getTournamentScoreboards(executionId);
     }
 
 }

@@ -57,6 +57,30 @@ class TournamentPrivacyTest extends Specification {
         student.getTournamentPrivacy() == false
     }
 
+    def "User get private tournament privacy"() {
+        given: "a student with tournament privacy set as private"
+        def student = STUDENT
+        student.setTournamentPrivacy(true)
+
+        when: "gets his privacy"
+        def privacy = userService.getTournamentPrivacy(student.getId())
+
+        then:
+        privacy == true
+    }
+
+    def "User get public tournament privacy"() {
+        given: "a student with tournament privacy set as private"
+        def student = STUDENT
+        student.setTournamentPrivacy(false)
+
+        when: "gets his privacy"
+        def privacy = userService.getTournamentPrivacy(student.getId())
+
+        then:
+        privacy == false
+    }
+
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {
 

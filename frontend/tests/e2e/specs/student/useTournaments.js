@@ -53,7 +53,7 @@ describe('Student using tournaments walkthrough', () => {
         startTime.setSeconds(startTime.getSeconds() + 5);
 
         const finish_time = new Date(startTime);
-        finish_time.setMinutes(finish_time.getMinutes() + 1);
+        finish_time.setSeconds(finish_time.getSeconds() + 10);
 
         //Create tournament in database
         cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"INSERT INTO tournaments(id, finish_time, number_of_questions, start_time, course_execution_id, creator_id, quiz_id, title) \
@@ -72,9 +72,18 @@ describe('Student using tournaments walkthrough', () => {
         cy.answerTournamentQuiz();
     })
 
+    
     it('Tournament stats test', () => {
         cy.openStats();
         cy.wait(1000); // let everything load
+    })
+
+    it('Check detailed tournament scoreboard', () => {
+        cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"UPDATE users SET tournament_privacy = false WHERE id = 647;\"");
+        cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"UPDATE users SET tournament_privacy = false WHERE id = 676;\"");
+        cy.wait(8000); // let tournament end
+        cy.openTournamentScoreboards();
+        cy.openDetailedScoreboard();
     })
 
 })
