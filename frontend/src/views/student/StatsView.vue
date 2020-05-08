@@ -77,6 +77,43 @@
         </div>
       </div>
     </div>
+    <h2>Tournaments</h2>
+    <div v-if="dashboard != null" class="stats-container">
+      <div class="items">
+        <div class="icon-wrapper" ref="createdTournaments">
+          <animated-number :number="dashboard.createdTournaments" />
+        </div>
+        <div class="project-name">
+          <p>Created Tournaments</p>
+        </div>
+      </div>
+      <div class="items">
+        <div class="icon-wrapper" ref="participatedTournaments">
+          <animated-number :number="dashboard.participatedTournamentsNumber" />
+        </div>
+        <div class="project-name">
+          <p>Participated Tournaments</p>
+        </div>
+      </div>
+      <div class="items">
+        <div class="icon-wrapper" ref="averageScore">
+          <animated-number :number="dashboard.averageTournamentScore" 
+          >%</animated-number
+          >
+        </div>
+        <div class="project-name">
+          <p>Average Tournament Score</p>
+        </div>
+      </div>
+      <div class="items">
+        <div class="icon-wrapper" ref="notYetParticipated">
+          <animated-number :number="dashboard.notYetParticipatedTournamentsNumber" />
+        </div>
+        <div class="project-name">
+          <p>Joined Tournaments with Available Quizzes</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -125,6 +162,7 @@ export default class StatsView extends Vue {
     margin: 20px;
     cursor: pointer;
     transition: all 0.6s;
+    padding: 0px 10px;
   }
 }
 
