@@ -1,7 +1,5 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
-
 import java.io.Serializable;
 import java.util.*;
 
@@ -12,7 +10,9 @@ public class TournamentScoreboardDto implements Serializable {
     private Integer numberOfQuestions = 0;
     private String tournamentTitle;
 
-    public TournamentScoreboardDto(){}
+    public TournamentScoreboardDto(){
+        //empty
+    }
 
     public List<TournamentScoreDto> getScores() {
         return scores;

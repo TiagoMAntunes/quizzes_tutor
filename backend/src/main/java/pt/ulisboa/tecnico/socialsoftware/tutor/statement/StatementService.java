@@ -193,7 +193,7 @@ public class StatementService {
 
     private boolean studentSignedUpQuizTournament(int userId, Quiz quiz) {
         if (!quiz.getType().equals(Quiz.QuizType.TOURNAMENT)) return false;
-        Tournament tournament = tournamentRepository.findTournamentFromQuizId(quiz.getId()).get();
+        Tournament tournament = tournamentRepository.findTournamentFromQuizId(quiz.getId()).orElseThrow();
         return tournament.hasSignedUpWithId(userId);
     }
 

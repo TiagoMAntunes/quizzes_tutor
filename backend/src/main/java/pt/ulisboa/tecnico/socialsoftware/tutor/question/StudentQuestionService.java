@@ -159,8 +159,7 @@ public class StudentQuestionService {
     public int  findNumberStudentQuestionsSubmitted(int studentId, int courseId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
-        Integer count = studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId(), courseId);
-        return count;
+        return studentQuestionRepository.findNumberStudentQuestionsSubmitted(user.getId(), courseId);
     }
 
     @Retryable(
@@ -170,8 +169,7 @@ public class StudentQuestionService {
     public int  findNumberStudentQuestionsApproved(int studentId, int courseId) {
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ACCESS_DENIED, studentId));
         checkRoleStudent(user);
-        Integer count = studentQuestionRepository.findNumberStudentQuestionsApproved(user.getId(), courseId);
-        return count;
+        return studentQuestionRepository.findNumberStudentQuestionsApproved(user.getId(), courseId);
     }
 
     @Retryable(
