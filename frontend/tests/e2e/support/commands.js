@@ -116,8 +116,8 @@ Cypress.Commands.add('addTopicStudentQuestion', (title, topic) => {
 });
 
 Cypress.Commands.add('createStudentQuestion', (title, question, options) => {
-  cy.contains('Questions').click();
-  cy.contains('Create').click();
+  cy.get('[data-cy="questions"]').click();
+  cy.get('[data-cy="createQuestions"]').click();
   if (title != '') cy.get('[data-cy="Title"]').type(title);
   if (question != '') cy.get('[data-cy="Question"]').type(question);
   cy.get('[data-cy="Correct1"]').click({ force: true });
