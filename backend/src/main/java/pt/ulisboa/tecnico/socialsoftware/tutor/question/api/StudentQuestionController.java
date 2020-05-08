@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pt.ulisboa.tecnico.socialsoftware.tutor.dashboard.DashboardDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentQuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
@@ -48,7 +47,7 @@ public class StudentQuestionController{
         return this.studentQuestionService.getStudentQuestions(courseId, user.getId());
     }
 
-    @PostMapping("/student_questions/evaluate/{questionId}/{status}")
+    @PutMapping("/student_questions/evaluate/{questionId}/{status}")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ResponseEntity studentQuestionApproveRejectStatus(@PathVariable Integer questionId, @PathVariable String status) {
         studentQuestionService.studentQuestionApproveReject(questionId, StudentQuestion.QuestionStatus.valueOf(status));

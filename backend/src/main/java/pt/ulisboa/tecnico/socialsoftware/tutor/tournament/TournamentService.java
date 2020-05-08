@@ -223,7 +223,7 @@ public class TournamentService {
         quiz.setQuestions(quizQuestions);
 
         quizService.createQuiz(courseExecution.getId(), quiz);
-        tournament.setQuiz(quizRepository.findByKey(quiz.getKey()).get()); // No need to throw as we just created it
+        tournament.setQuiz(quizRepository.findByKey(quiz.getKey()).orElseThrow());
     }
 
     public int getTournamentSignedUpNumber(Integer tournamentId) {
