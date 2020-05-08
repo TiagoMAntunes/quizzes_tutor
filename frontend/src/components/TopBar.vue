@@ -220,6 +220,11 @@
           Stats
           <v-icon>fas fa-user</v-icon>
         </v-btn>
+        
+        <v-btn to="/student/settings" data-cy="settings" v-if="isStudent && currentCourse" text dark>
+          Settings
+          <v-icon>fas fa-cog</v-icon>
+        </v-btn>
 
         <v-btn
           v-if="isLoggedIn && moreThanOneCourse"
@@ -412,6 +417,13 @@
               <v-icon>fas fa-user</v-icon>
             </v-list-item-action>
             <v-list-item-content>Stats</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="/student/settings">
+            <v-list-item-action>
+              <v-icon>fas fa-cog</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Settings</v-list-item-content>
           </v-list-item>
         </v-list-group>
 
