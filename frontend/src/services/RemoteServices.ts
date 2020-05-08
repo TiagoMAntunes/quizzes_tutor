@@ -219,6 +219,30 @@ export default class RemoteServices {
       });
   }
 
+  static async updateStudentQuestionTeacher(
+    question: Question
+  ): Promise<StudentQuestion> {
+    return httpClient
+      .put(`/student_questions/${question.id}/update_teacher`, question)
+      .then(response => {
+        return new StudentQuestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+     
+  static async updateStudentQuestion(question: Question): Promise<StudentQuestion> {
+    return httpClient
+        .put(`/student/${question.id}/resubmit`, question)
+        .then(response => {
+          return new StudentQuestion(response.data);
+        })
+        .catch(async error => {
+          throw Error(await this.errorMessage(error));
+        });
+  }
+
   static async deleteQuestion(questionId: number) {
     return httpClient.delete(`/questions/${questionId}`).catch(async error => {
       throw Error(await this.errorMessage(error));
@@ -226,14 +250,14 @@ export default class RemoteServices {
   }
 
   static async makeAvailable(questionId: number): Promise<StudentQuestion> {
-      return httpClient
-          .put(`/student_questions/available/${questionId}`, {})
-          .then(response => {
-            return new StudentQuestion(response.data);
-          })
-          .catch(async error => {
-            throw Error(await this.errorMessage(error));
-          });
+    return httpClient
+      .put(`/student_questions/available/${questionId}`, {})
+      .then(response => {
+        return new StudentQuestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
   }
 
   static async setQuestionStatus(
@@ -731,5 +755,43 @@ export default class RemoteServices {
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  static async getTournamentPrivacy() {
+    return httpClient.
+      get('/user/tournament/privacy')
+      .then(response => {
+        return response.data
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error))
+      })
+  }
+
+  static async setTournamentPrivacy(privacy : boolean) {
+    return httpClient
+      .put(`/user/tournament/privacy?privacy=${privacy}` )
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getQuestionPrivacy() {
+    return httpClient.
+    get('/user/question/privacy')
+        .then(response => {
+          return response.data
+        })
+        .catch(async error => {
+          throw Error(await this.errorMessage(error))
+        })
+  }
+
+  static async setQuestionPrivacy(privacy : boolean) {
+    return httpClient
+        .put(`/user/question/privacy?privacy=${privacy}` )
+        .catch(async error => {
+          throw Error(await this.errorMessage(error));
+        });
   }
 }

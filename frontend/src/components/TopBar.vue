@@ -149,7 +149,7 @@
           <template v-slot:activator="{ on }">
             <v-btn v-on="on" text dark>
               Quizzes
-              <v-icon>fas fa-file-alt</v-icon>
+              <v-icon data-cy="Quizzes">fas fa-file-alt</v-icon>
             </v-btn>
           </template>
           <v-list dense>
@@ -158,7 +158,8 @@
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Available</v-list-item-title>
+                <v-list-item-title data-cy="availableQuizzes"
+                >Available</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/student/create">
@@ -218,6 +219,11 @@
         <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
           Stats
           <v-icon>fas fa-user</v-icon>
+        </v-btn>
+        
+        <v-btn to="/student/settings" data-cy="settings" v-if="isStudent && currentCourse" text dark>
+          Settings
+          <v-icon>fas fa-cog</v-icon>
         </v-btn>
 
         <v-btn
@@ -411,6 +417,13 @@
               <v-icon>fas fa-user</v-icon>
             </v-list-item-action>
             <v-list-item-content>Stats</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="/student/settings">
+            <v-list-item-action>
+              <v-icon>fas fa-cog</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Settings</v-list-item-content>
           </v-list-item>
         </v-list-group>
 

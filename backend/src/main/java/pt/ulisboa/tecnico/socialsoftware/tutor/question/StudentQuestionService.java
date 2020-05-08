@@ -7,10 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -18,7 +16,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDto;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
@@ -44,12 +41,6 @@ public class StudentQuestionService {
 
     @Autowired
     private StudentQuestionRepository studentQuestionRepository;
-
-    @Autowired
-    private QuestionRepository questionRepository;
-
-    @Autowired
-    private CourseExecutionRepository courseExecutionRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -143,6 +134,19 @@ public class StudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public StudentQuestionDto updateStudentQuestion(Integer questionId, QuestionDto questionDto) {
+        StudentQuestion question = studentQuestionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+        if (question.getStatus().equals(Question.Status.AVAILABLE)) {
+            throw new TutorException(CANNOT_CHANGE_ANSWERED_QUESTION);
+        }
+        question.updateQuestion(questionDto);
+        return new StudentQuestionDto(question);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean equalsCourses(int id, Set<CourseExecution> courses, int currentCourseId) {
         return courses.stream().
                 anyMatch(course -> course.getCourse().getId() == id && id == currentCourseId);
@@ -168,6 +172,16 @@ public class StudentQuestionService {
         checkRoleStudent(user);
         Integer count = studentQuestionRepository.findNumberStudentQuestionsApproved(user.getId(), courseId);
         return count;
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public StudentQuestionDto resubmitRejectedStudentQuestion(int studentQuestionId, QuestionDto questionDto) {
+        StudentQuestion studentQuestion = studentQuestionRepository.findById(studentQuestionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, studentQuestionId));
+        studentQuestion.updateRejectedQuestion(questionDto);
+        return new StudentQuestionDto(studentQuestion);
     }
 
     private void checkEnrolledCourseExecution(User student, Course course) {

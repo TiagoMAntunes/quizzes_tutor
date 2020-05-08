@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.config.Demo;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.UsersXmlExport;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.UsersXmlImport;
@@ -141,5 +142,28 @@ public class UserService {
         }
 
         return newDemoUser;
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void setQuestionPrivacy(Integer userId, boolean privacy) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND));
+
+        user.setQuestionPrivacy(privacy);
+    }
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public boolean getQuestionPrivacy(Integer userId) {
+        return this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND)).getQuestionPrivacy();
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void setTournamentPrivacy(int userId, boolean privacy) {
+        User user = this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND));
+
+        user.setTournamentPrivacy(privacy);
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public boolean getTournamentPrivacy(Integer userId) {
+        return this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND)).getTournamentPrivacy();
     }
 }

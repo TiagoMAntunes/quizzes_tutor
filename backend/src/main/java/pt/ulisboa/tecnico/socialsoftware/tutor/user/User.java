@@ -70,6 +70,12 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
 
+    @Column(name = "question_privacy", columnDefinition = "boolean default true")
+    private boolean questionPrivacy = true;
+
+    @Column(name = "tournament_privacy", columnDefinition = "boolean default true")
+    private boolean tournamentPrivacy = true;
+
     public User() {
     }
 
@@ -474,6 +480,12 @@ public class User implements UserDetails, DomainEntity {
 
     public Set<Tournament> getSignedUpTournaments() { return signedUpTournaments; }
 
+    public Set<Tournament> getSignedUpTournamentsCourseExec(Integer executionId) {
+        return getSignedUpTournaments().stream()
+                .filter(tournament -> tournament.getCourseExecution().getId().equals(executionId))
+                .collect(Collectors.toSet());
+    }
+
     public boolean hasTournament(Tournament tournament) {
         return signedUpTournaments.contains(tournament);
     }
@@ -482,8 +494,34 @@ public class User implements UserDetails, DomainEntity {
 
     public Set<Tournament> getCreatedTournaments() { return createdTournaments; }
 
+    public Set<Tournament> getCreatedTournamentsCourseExec(Integer executionId) {
+        return createdTournaments.stream()
+                .filter(tournament -> tournament.getCourseExecution().getId().equals(executionId))
+                .collect(Collectors.toSet());
+    }
+
     public boolean hasCourseExecution(Integer id) {
         return courseExecutions.stream().anyMatch(execution -> execution.getId().equals(id));
     }
 
+    public void setQuestionPrivacy(boolean privacy) {
+        this.questionPrivacy = privacy;
+    }
+
+    public boolean getQuestionPrivacy() {
+        return this.questionPrivacy;
+    }
+
+    public int getCreatedTournamentsNumber(Integer executionId){
+        return getCreatedTournamentsCourseExec(executionId).size();
+
+    }
+
+    public void setTournamentPrivacy(boolean privacy) {
+        this.tournamentPrivacy = privacy;
+    }
+
+    public boolean getTournamentPrivacy() {
+        return this.tournamentPrivacy;
+    }
 }
