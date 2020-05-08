@@ -58,7 +58,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               data-cy="showQuestionCy"
               class="mr-2"
               v-on="on"
@@ -71,12 +71,12 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-                    small
-                    :disabled="isDisabledUpdate(item)"
-                    data-cy="updateQuestionCy"
-                    class="mr-2"
-                    v-on="on"
-                    @click="editQuestion(item)"
+              large
+              :disabled="isDisabledUpdate(item)"
+              data-cy="updateQuestionCy"
+              class="mr-2"
+              v-on="on"
+              @click="editQuestion(item)"
             >edit</v-icon
             >
           </template>
@@ -125,6 +125,12 @@ export default class StudentQuestionsView extends Vue {
   updateStudentQuestionDialog : boolean = false;
 
   headers: object = [
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      sortable: false
+    },
     { text: 'Title', value: 'title', align: 'center' },
     { text: 'Question', value: 'content', align: 'left' },
     {
@@ -140,12 +146,6 @@ export default class StudentQuestionsView extends Vue {
       text: 'Creation Date',
       value: 'creationDate',
       align: 'center'
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false
     }
   ];
   @Watch('updateStudentQuestionDialog')
