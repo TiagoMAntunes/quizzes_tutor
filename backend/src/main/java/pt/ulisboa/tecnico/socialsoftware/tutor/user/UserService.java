@@ -148,6 +148,17 @@ public class UserService {
         value = { SQLException.class },
         backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void setQuestionPrivacy(Integer userId, boolean privacy) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND));
+
+        user.setQuestionPrivacy(privacy);
+    }
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public boolean getQuestionPrivacy(Integer userId) {
+        return this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND)).getQuestionPrivacy();
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void setTournamentPrivacy(int userId, boolean privacy) {
         User user = this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND));
 
