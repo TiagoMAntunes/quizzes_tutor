@@ -116,7 +116,7 @@
 
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="tournaments">
               Tournaments
               <v-icon>fas fa-trophy</v-icon>
             </v-btn>
@@ -139,6 +139,16 @@
               <v-list-item-content>
                 <v-list-item-title data-cy="createTournament"
                   >Create</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item to="/student/tournament/scoreboards">
+              <v-list-item-action>
+                <v-icon>fas fa-medal</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title data-cy="scoreboards"
+                  >Scoreboards</v-list-item-title
                 >
               </v-list-item-content>
             </v-list-item>
@@ -190,7 +200,7 @@
         </v-menu>
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="questions">
               Questions
               <v-icon>question_answer</v-icon>
             </v-btn>
@@ -206,7 +216,7 @@
                 >
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="/student/create-question">
+            <v-list-item to="/student/create-question" data-cy="createQuestions">
               <v-list-item-action>
                 <v-icon>create</v-icon>
               </v-list-item-action>
@@ -216,7 +226,7 @@
             </v-list-item>
           </v-list>
         </v-menu>
-        <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
+        <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark data-cy="Stats">
           Stats
           <v-icon>fas fa-user</v-icon>
         </v-btn>
@@ -447,6 +457,14 @@
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-content>Create</v-list-item-content>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/student/tournament/scoreboards">
+            <v-list-item-action>
+              <v-icon>fas fa-medal</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-content>Scoreboards</v-list-item-content>
             </v-list-item-content>
           </v-list-item>
         </v-list-group>

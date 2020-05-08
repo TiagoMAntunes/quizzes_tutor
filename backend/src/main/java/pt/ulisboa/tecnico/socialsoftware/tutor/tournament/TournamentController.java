@@ -9,7 +9,9 @@ import java.security.Principal;
 import java.util.List;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentScoreboardDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 
@@ -75,6 +77,18 @@ public class TournamentController {
         }
 
         return this.tournamentService.getOpenTournaments(executionId, user.getId());
+    }
+
+    @GetMapping("/executions/{executionId}/tournaments/scoreboards")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    public List<TournamentScoreboardDto> getTournamentScoreboards(@PathVariable Integer executionId, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+
+        return tournamentService.getTournamentScoreboards(executionId);
     }
 
 }

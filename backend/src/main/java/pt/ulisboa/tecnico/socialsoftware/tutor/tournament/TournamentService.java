@@ -24,9 +24,12 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto.QuizDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentScoreDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentScoreboardDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -49,6 +52,9 @@ public class TournamentService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private CourseExecutionRepository courseExecutionRepository;
@@ -222,6 +228,88 @@ public class TournamentService {
 
     public int getTournamentSignedUpNumber(Integer tournamentId) {
         return getTournament(tournamentId).getSignedUpNumber();
+    }
+
+    private int getTournamentNumberOfQuestions(Integer tournamentId){
+        return getTournament(tournamentId).getNumberOfQuestions();
+    }
+
+    private String getTournamentTitle(Integer tournamentId){
+        return getTournament(tournamentId).getTitle();
+    }
+
+    private TournamentScoreboardDto getTournamentScoreboard(Integer tournamentId){
+        TournamentScoreboardDto scoreboard = new TournamentScoreboardDto();
+
+        scoreboard.setScores(getAllTournamentScores(tournamentId));
+        scoreboard.setAverageScore(getTournamentAverageScore(tournamentId));
+        scoreboard.setNumberOfParticipants(getTournamentSignedUpNumber(tournamentId));
+        scoreboard.setNumberOfQuestions(getTournamentNumberOfQuestions(tournamentId));
+        scoreboard.setTournamentTitle(getTournamentTitle(tournamentId));
+
+        return scoreboard;
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<TournamentScoreboardDto> getTournamentScoreboards(Integer execId){
+        return tournamentRepository.findAll().stream()
+                .filter(tournament -> tournament.getCourseExecution().getId().equals(execId)
+                        && tournamentIsOver(tournament.getId()))
+                .map( tournament -> getTournamentScoreboard(tournament.getId()) )
+                .collect(Collectors.toList());
+    }
+
+    private boolean tournamentIsOver(Integer tournamentId){
+        LocalDateTime now = DateHandler.now();
+        Tournament tournament = getTournament(tournamentId);
+        return tournament.getFinishTime().isBefore(now);
+    }
+
+    private List<TournamentScoreDto> getAllTournamentScores(Integer tournamentId){
+        Tournament tournament = getTournament(tournamentId);
+        Integer executionId = tournament.getCourseExecution().getId();
+        Quiz quiz = tournament.getQuiz();
+
+        List<TournamentScoreDto> scores = new ArrayList<>();
+
+        if(quiz != null) {
+            quiz.getQuizAnswers().stream()
+                    .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId)
+                    && !(userService.getTournamentPrivacy(quizAnswer.getUser().getId())))
+                    .forEach(quizAnswer -> scores.add(new TournamentScoreDto(quizAnswer.getUser().getName(), quizAnswer.getScore())));
+        }
+
+        return scores;
+    }
+
+    private List<Integer> getAllTournamentScoreValues(Integer tournamentId){
+        Tournament tournament = getTournament(tournamentId);
+        Integer executionId = tournament.getCourseExecution().getId();
+        Quiz quiz = tournament.getQuiz();
+
+        List<Integer> scores = new ArrayList<>();
+
+        if(quiz != null) {
+            quiz.getQuizAnswers().stream()
+                    .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId))
+                    .forEach(quizAnswer -> scores.add(quizAnswer.getScore()));
+        }
+
+        return scores;
+    }
+
+    private float getTournamentAverageScore(Integer tournamentId){
+        List<Integer> scores = getAllTournamentScoreValues(tournamentId);
+
+        float size = scores.size();
+        if(size == 0) return 0;
+
+        float total = scores.stream().reduce(0, Integer::sum);
+
+        return total/size;
     }
 
 
