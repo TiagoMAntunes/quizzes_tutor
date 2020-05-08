@@ -289,11 +289,12 @@ END TRANSACTION;</stringProp>
             <hashTree/>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Average Tournament Score Assertion" enabled="true">
               <stringProp name="JSON_PATH">$.averageTournamentScore</stringProp>
-              <stringProp name="EXPECTED_VALUE">0,0</stringProp>
+              <stringProp name="EXPECTED_VALUE">0.0</stringProp>
               <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
               <boolProp name="ISREGEX">false</boolProp>
+              <stringProp name="TestPlan.comments">Might need to change to 0,0 on some systems</stringProp>
             </JSONPathAssertion>
             <hashTree/>
           </hashTree>
