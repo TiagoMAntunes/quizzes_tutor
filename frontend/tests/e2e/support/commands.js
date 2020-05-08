@@ -229,6 +229,14 @@ Cypress.Commands.add('cancelTournament', () => {
     cy.get('[data-cy="cancel"]').first().click();
 });
 
+Cypress.Commands.add('openSettings', () => {
+  cy.get('[data-cy="settings"]').click({force : true})
+})
+
+Cypress.Commands.add('setPrivacy', (row, setting) => {
+  cy.get(`[data-cy="${row}"]`).find(`[data-cy="${setting}"]`).click()
+})
+
 Cypress.Commands.add('joinTournament', () => {
     cy.get('[data-cy="join"]').first().click();
 })
