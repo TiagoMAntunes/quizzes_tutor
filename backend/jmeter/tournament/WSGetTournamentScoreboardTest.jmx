@@ -24,6 +24,11 @@
             <stringProp name="Argument.value">676</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="executionId" elementType="Argument">
+            <stringProp name="Argument.name">executionId</stringProp>
+            <stringProp name="Argument.value">11</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </Arguments>
       <hashTree/>
@@ -90,7 +95,7 @@ END TRANSACTION;</stringProp>
           <stringProp name="query">START TRANSACTION;
 
 INSERT INTO tournaments (id, start_time, finish_time, title, number_of_questions, course_execution_id, creator_id)
-VALUES (${tournament_id}, &apos;2022-04-30 04:20&apos;, &apos;2022-05-17 04:20&apos;, &apos;title&apos;, &apos;1&apos;, &apos;11&apos;, ${student_id});
+VALUES (${tournament_id}, &apos;2002-04-30 04:20&apos;, &apos;2002-05-17 04:20&apos;, &apos;title&apos;, &apos;1&apos;, &apos;11&apos;, ${student_id});
 
 INSERT INTO topics_tournaments (topics_id, tournaments_id)
 VALUES (&apos;82&apos;, ${tournament_id});
@@ -110,11 +115,11 @@ END TRANSACTION;</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
 
-INSERT INTO users(id)
-VALUES(&apos;1&apos;);
+INSERT INTO users(id, name, tournament_privacy)
+VALUES(&apos;1&apos;, &apos;Nof&apos;, &apos;false&apos;);
 
-INSERT INTO users(id)
-VALUES(&apos;2&apos;);
+INSERT INTO users(id, name, tournament_privacy)
+VALUES(&apos;2&apos;, &apos;Tiago&apos;, &apos;false&apos;);
 
 INSERT INTO users_signed_up_tournaments(signed_up_id, signed_up_tournaments_id)
 VALUES (&apos;1&apos;, ${tournament_id});
@@ -279,7 +284,7 @@ END TRANSACTION;</stringProp>
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/tournaments/scoreboard/${tournament_id}</stringProp>
+            <stringProp name="HTTPSampler.path">/executions/${executionId}/tournaments/scoreboards</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -291,7 +296,7 @@ END TRANSACTION;</stringProp>
           </HTTPSamplerProxy>
           <hashTree/>
           <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert score list" enabled="true">
-            <stringProp name="JSON_PATH">$.scores</stringProp>
+            <stringProp name="JSON_PATH">$[0].scores</stringProp>
             <stringProp name="EXPECTED_VALUE"></stringProp>
             <boolProp name="JSONVALIDATION">false</boolProp>
             <boolProp name="EXPECT_NULL">false</boolProp>
@@ -300,7 +305,7 @@ END TRANSACTION;</stringProp>
           </JSONPathAssertion>
           <hashTree/>
           <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert average score" enabled="true">
-            <stringProp name="JSON_PATH">$.averageScore</stringProp>
+            <stringProp name="JSON_PATH">$[0].averageScore</stringProp>
             <stringProp name="EXPECTED_VALUE">0.0</stringProp>
             <boolProp name="JSONVALIDATION">true</boolProp>
             <boolProp name="EXPECT_NULL">false</boolProp>
@@ -310,7 +315,7 @@ END TRANSACTION;</stringProp>
           </JSONPathAssertion>
           <hashTree/>
           <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert number of participants" enabled="true">
-            <stringProp name="JSON_PATH">$.numberOfParticipants</stringProp>
+            <stringProp name="JSON_PATH">$[0].numberOfParticipants</stringProp>
             <stringProp name="EXPECTED_VALUE">2</stringProp>
             <boolProp name="JSONVALIDATION">true</boolProp>
             <boolProp name="EXPECT_NULL">false</boolProp>
@@ -319,7 +324,7 @@ END TRANSACTION;</stringProp>
           </JSONPathAssertion>
           <hashTree/>
           <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert number of questions" enabled="true">
-            <stringProp name="JSON_PATH">$.numberOfQuestions</stringProp>
+            <stringProp name="JSON_PATH">$[0].numberOfQuestions</stringProp>
             <stringProp name="EXPECTED_VALUE">1</stringProp>
             <boolProp name="JSONVALIDATION">true</boolProp>
             <boolProp name="EXPECT_NULL">false</boolProp>
@@ -328,7 +333,7 @@ END TRANSACTION;</stringProp>
           </JSONPathAssertion>
           <hashTree/>
           <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert title" enabled="true">
-            <stringProp name="JSON_PATH">$.tournamentTitle</stringProp>
+            <stringProp name="JSON_PATH">$[0].tournamentTitle</stringProp>
             <stringProp name="EXPECTED_VALUE">title</stringProp>
             <boolProp name="JSONVALIDATION">true</boolProp>
             <boolProp name="EXPECT_NULL">false</boolProp>

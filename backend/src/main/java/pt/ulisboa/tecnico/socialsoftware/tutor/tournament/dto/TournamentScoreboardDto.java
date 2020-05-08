@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.*;
 
 public class TournamentScoreboardDto implements Serializable {
-    private List<Integer> scores = new ArrayList<>();
+    private List<TournamentScoreDto> scores = new ArrayList<>();
     private float averageScore = 0;
     private Integer numberOfParticipants = 0;
     private Integer numberOfQuestions = 0;
@@ -14,11 +14,11 @@ public class TournamentScoreboardDto implements Serializable {
 
     public TournamentScoreboardDto(){}
 
-    public List<Integer> getScores() {
+    public List<TournamentScoreDto> getScores() {
         return scores;
     }
 
-    public void setScores(List<Integer> scores) {
+    public void setScores(List<TournamentScoreDto> scores) {
         this.scores = scores;
     }
 

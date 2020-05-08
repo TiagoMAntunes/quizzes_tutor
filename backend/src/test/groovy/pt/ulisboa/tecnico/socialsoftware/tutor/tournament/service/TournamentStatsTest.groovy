@@ -27,7 +27,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService;
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -280,6 +281,11 @@ class TournamentStatsTest extends Specification {
         @Bean
         DashboardService dashboardService() {
             return new DashboardService()
+        }
+
+        @Bean
+        UserService userService() {
+            return new UserService()
         }
     }
 }

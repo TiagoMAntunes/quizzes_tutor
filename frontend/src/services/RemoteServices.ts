@@ -16,6 +16,7 @@ import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
 import Tournament from '@/models/tournament/Tournament';
 import StudentDashboard from '@/models/user/StudentDashboard';
+import TournamentScoreboard from '@/models/tournament/TournamentScoreboard';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -755,6 +756,18 @@ export default class RemoteServices {
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  static async getTournamentScoreboards(): Promise<TournamentScoreboard[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/scoreboards`
+      )
+      .then(response => {
+        return response.data.map((scoreboard: any) => {
+          return new TournamentScoreboard(scoreboard);
+        });
+      })
   }
 
   static async getTournamentPrivacy() {
