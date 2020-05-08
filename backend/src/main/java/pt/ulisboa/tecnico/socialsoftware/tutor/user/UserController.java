@@ -45,4 +45,29 @@ public class UserController {
         return userService.getTournamentPrivacy(user.getId());
     }
 
+    @PutMapping("/user/question/privacy")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public ResponseEntity setQuestionPrivacy(@RequestParam boolean privacy, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        userService.setQuestionPrivacy(user.getId(), privacy);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/user/question/privacy")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public boolean getQuestionPrivacy(Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        return userService.getQuestionPrivacy(user.getId());
+    }
 }
