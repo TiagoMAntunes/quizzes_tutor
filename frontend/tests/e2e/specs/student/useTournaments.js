@@ -57,7 +57,7 @@ describe('Student using tournaments walkthrough', () => {
 
         //Create tournament in database
         cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"INSERT INTO tournaments(id, finish_time, number_of_questions, start_time, course_execution_id, creator_id, quiz_id, title) \
-        VALUES(42069, '" + finish_time.toISOString() + "', 5, '" + startTime.toISOString() + "', 11, 647, null, '" + TITLE + "'); INSERT INTO topics_tournaments(topics_id, tournaments_id) VALUES(88, 42069);\"");
+        VALUES(42069, '" + finish_time.toISOString() + "', 5, '" + startTime.toISOString() + "', 11, 676, null, '" + TITLE + "'); INSERT INTO topics_tournaments(topics_id, tournaments_id) VALUES(88, 42069);\"");
 
         //Insert user
         cy.exec("PGPASSWORD=db_pass psql tutordb -U db_admin -c \"INSERT INTO users_signed_up_tournaments VALUES(647, 42069);\"");
@@ -70,6 +70,11 @@ describe('Student using tournaments walkthrough', () => {
 
         //Answer quiz
         cy.answerTournamentQuiz();
+    })
+
+    it('Tournament stats test', () => {
+        cy.openStats();
+        cy.wait(1000); // let everything load
     })
 
 })

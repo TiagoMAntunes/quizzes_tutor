@@ -18,24 +18,14 @@ public class DashboardController {
     @Autowired
     private DashboardService dashboardService;
 
-    @GetMapping("/student/{courseId}/dashboard")
+    @GetMapping("/student/{execId}/dashboard")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public DashboardDto createDashboard(Principal principal, @PathVariable int courseId) {
+    public DashboardDto createDashboard(Principal principal, @PathVariable int execId) {
         User user = (User) ((Authentication) principal).getPrincipal();
         if(user == null){
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
-        Integer userId = user.getId();
-
-        DashboardDto dashboard = new DashboardDto();
-        dashboard.setNumberQuestionsSubmitted(this.dashboardService.findNumberStudentQuestionsSubmitted(userId, courseId));
-        dashboard.setNumberQuestionsApproved(this.dashboardService.findNumberStudentQuestionsApproved(userId, courseId));
-        dashboard.setCreatedTournaments(this.dashboardService.getCreatedTournamentsNumber(userId, courseId));
-        dashboard.setParticipatedTournamentsNumber(this.dashboardService.getParticipatedTournamentsNumber(userId, courseId));
-        dashboard.setNotYetParticipatedTournamentsNumber(this.dashboardService.getNotYetParticipatedTournamentsNumber(userId, courseId));
-        dashboard.setAverageTournamentScore(this.dashboardService.getAverageTournamentScore(userId, courseId));
-
-        return dashboard;
+        return dashboardService.getStudentDashboard(user.getId(), execId);
     }
 }

@@ -97,7 +97,7 @@ export default class RemoteServices {
   static async getStudentDashboard(): Promise<StudentDashboard> {
     return httpClient
         .get(
-            `/student/${Store.getters.getCurrentCourse.courseId}/dashboard`
+            `/student/${Store.getters.getCurrentCourse.courseExecutionId}/dashboard`
         )
         .then(response => {
           return new StudentDashboard(response.data);
