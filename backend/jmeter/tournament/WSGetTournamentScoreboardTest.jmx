@@ -115,11 +115,11 @@ END TRANSACTION;</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
           <stringProp name="query">START TRANSACTION;
 
-INSERT INTO users(id, name)
-VALUES(&apos;1&apos;, &apos;Nof&apos;);
+INSERT INTO users(id, name, tournament_privacy)
+VALUES(&apos;1&apos;, &apos;Nof&apos;, &apos;false&apos;);
 
-INSERT INTO users(id, name)
-VALUES(&apos;2&apos;, &apos;Tiago&apos;);
+INSERT INTO users(id, name, tournament_privacy)
+VALUES(&apos;2&apos;, &apos;Tiago&apos;, &apos;false&apos;);
 
 INSERT INTO users_signed_up_tournaments(signed_up_id, signed_up_tournaments_id)
 VALUES (&apos;1&apos;, ${tournament_id});
@@ -380,7 +380,7 @@ END TRANSACTION;</stringProp>
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown Thread Group" enabled="false">
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown Thread Group" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>

@@ -27,6 +27,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -151,12 +152,14 @@ class TournamentScoreboardTest extends Specification {
         student1.setKey(userRepository.getMaxUserNumber() + 1)
         student1.setRole(User.Role.STUDENT)
         student1.addCourse(courseExec)
+        student1.setTournamentPrivacy(false)
         userRepository.save(student1)
 
         student2 = new User()
         student2.setKey(userRepository.getMaxUserNumber() + 1)
         student2.setRole(User.Role.STUDENT)
         student2.addCourse(courseExec)
+        student2.setTournamentPrivacy(false)
         userRepository.save(student2)
 
         student1 = userRepository.findByKey(student1.getKey())
@@ -260,6 +263,11 @@ class TournamentScoreboardTest extends Specification {
         @Bean
         QuestionService questionService() {
             return new QuestionService()
+        }
+
+        @Bean
+        UserService userService() {
+            return new UserService()
         }
     }
 }

@@ -275,3 +275,12 @@ Cypress.Commands.add('resubmitStudentQuestion', title => {
     cy.get('[data-cy="updateQuestionCy"]').first().click({ force: true });
 });
 
+Cypress.Commands.add('openTournamentScoreboards', title => {
+  cy.get('[data-cy="tournaments"]').click();
+  cy.get('[data-cy="scoreboards"]').click();
+});
+
+Cypress.Commands.add('openDetailedScoreboard', title => {
+  cy.get('[data-cy="details"]').first().click();
+});
+

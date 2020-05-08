@@ -17,6 +17,5 @@ export default class TournamentScoreboard {
 
       this.scores = jsonObj.scores.map((score: TournamentScore) => new TournamentScore(score));
     }
-    console.log(jsonObj)
   }
 }

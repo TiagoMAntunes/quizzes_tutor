@@ -277,7 +277,8 @@ public class TournamentService {
 
         if(quiz != null) {
             quiz.getQuizAnswers().stream()
-                    .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId))
+                    .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId)
+                    && !(userService.getTournamentPrivacy(quizAnswer.getUser().getId())))
                     .forEach(quizAnswer -> scores.add(new TournamentScoreDto(quizAnswer.getUser().getName(), quizAnswer.getScore())));
         }
 

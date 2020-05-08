@@ -116,7 +116,7 @@
 
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="tournaments">
               Tournaments
               <v-icon>fas fa-trophy</v-icon>
             </v-btn>
@@ -144,7 +144,7 @@
             </v-list-item>
             <v-list-item to="/student/tournament/scoreboards">
               <v-list-item-action>
-                <v-icon>create</v-icon>
+                <v-icon>fas fa-medal</v-icon>
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title data-cy="scoreboards"
@@ -461,7 +461,7 @@
           </v-list-item>
           <v-list-item to="/student/tournament/scoreboards">
             <v-list-item-action>
-              <v-icon>create</v-icon>
+              <v-icon>fas fa-medal</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-content>Scoreboards</v-list-item-content>

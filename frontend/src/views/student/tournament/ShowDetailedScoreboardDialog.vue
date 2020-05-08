@@ -1,14 +1,21 @@
 <template>
-  <v-dialog v-model="dialog" @keydown.esc="closeDetailedScoreboardDialog" max-width="75%">
+  <v-dialog
+    v-model="dialog"
+    @keydown.esc="closeDetailedScoreboardDialog"
+    max-width="75%"
+  >
     <v-card>
       <v-card-title>
-        <span class="headline">Tournament Scoreboard - {{ scoreboard.tournamentTitle }}</span>
+        <span class="headline"
+          >Tournament Scoreboard - {{ scoreboard.tournamentTitle }}</span
+        >
       </v-card-title>
-
       <v-card-text class="text-left">
         <show-scores :scores="scoreboard.scores" />
       </v-card-text>
-
+      <footer>
+        (Displaying only public scores)
+      </footer>
       <v-card-actions>
         <v-spacer />
         <v-btn dark color="blue darken-1" @click="closeDetailedScoreboardDialog"
@@ -30,7 +37,8 @@ import ShowScores from '@/views/student/tournament/ShowScores.vue';
   }
 })
 export default class ShowDetailedScoreboardDialog extends Vue {
-  @Prop({ type: TournamentScoreboard, required: true }) readonly scoreboard!: TournamentScoreboard;
+  @Prop({ type: TournamentScoreboard, required: true })
+  readonly scoreboard!: TournamentScoreboard;
   @Prop({ type: Boolean, required: true }) readonly dialog!: boolean;
 
   closeDetailedScoreboardDialog() {
@@ -38,3 +46,13 @@ export default class ShowDetailedScoreboardDialog extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+footer {
+  font-size: 14px !important;
+}
+
+span {
+  margin: auto;
+}
+</style>

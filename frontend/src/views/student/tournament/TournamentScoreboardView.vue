@@ -12,6 +12,7 @@
         class="list-row"
         v-for="(scoreboard, index) in sortAlpha(scoreboards)"
         :key="index"
+        @click="showDetailedScoreboardDialog(scoreboard)"
       >
         <div class="col">
           {{ scoreboard.tournamentTitle }}
@@ -20,7 +21,7 @@
           {{ scoreboard.numberOfParticipants }}
         </div>
         <div class="col">
-          {{ scoreboard.averageScore }}
+          {{ parseFloat(scoreboard.averageScore).toFixed(2) }}
           /
           {{ scoreboard.numberOfQuestions }}
         </div>
@@ -33,7 +34,6 @@
                 v-on="on"
                 color="dark grey"
                 data-cy="details"
-                @click="showDetailedScoreboardDialog(scoreboard)"
                 >visibility</v-icon
               >
             </template>
@@ -46,7 +46,9 @@
       v-if="currentScoreboard"
       :dialog="detailedDialog"
       :scoreboard="currentScoreboard"
-      v-on:close-show-detailed-scoreboard-dialog="onCloseShowDetailedScoreboardDialog"
+      v-on:close-show-detailed-scoreboard-dialog="
+        onCloseShowDetailedScoreboardDialog
+      "
     />
   </div>
 </template>
@@ -64,11 +66,11 @@ import moment from 'moment';
   }
 })
 export default class TournamentList extends Vue {
-    scoreboards: TournamentScoreboard[] = [];
-    currentScoreboard: TournamentScoreboard | null = null;
-    detailedDialog: boolean = false;
+  scoreboards: TournamentScoreboard[] = [];
+  currentScoreboard: TournamentScoreboard | null = null;
+  detailedDialog: boolean = false;
 
-    async created() {
+  async created() {
     await this.$store.dispatch('loading');
     try {
       this.scoreboards = await RemoteServices.getTournamentScoreboards();
@@ -79,7 +81,9 @@ export default class TournamentList extends Vue {
   }
 
   sortAlpha(list: TournamentScoreboard[]) {
-    return list.slice().sort((a, b) => a.tournamentTitle.localeCompare(b.tournamentTitle));
+    return list
+      .slice()
+      .sort((a, b) => a.tournamentTitle.localeCompare(b.tournamentTitle));
   }
 
   showDetailedScoreboardDialog(scoreboard: TournamentScoreboard) {
@@ -90,7 +94,6 @@ export default class TournamentList extends Vue {
   onCloseShowDetailedScoreboardDialog() {
     this.detailedDialog = false;
   }
-
 }
 </script>
 
