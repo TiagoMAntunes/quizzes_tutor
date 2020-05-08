@@ -18,7 +18,7 @@ describe('Student changing privacy settings', () => {
         cy.openSettings().wait(500) // time to load
         cy.setPrivacy('tournament', 'public')
     })
-
+  
     it('Set question privacy as private', () => {
         cy.openSettings().wait(500) // time to load
         cy.setPrivacy('question', 'private')

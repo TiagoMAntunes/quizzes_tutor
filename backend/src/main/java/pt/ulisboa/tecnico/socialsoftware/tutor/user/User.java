@@ -76,7 +76,6 @@ public class User implements UserDetails, DomainEntity {
     @Column(name = "tournament_privacy", columnDefinition = "boolean default true")
     private boolean tournamentPrivacy = true;
 
-
     public User() {
     }
 
@@ -516,6 +515,14 @@ public class User implements UserDetails, DomainEntity {
     public int getCreatedTournamentsNumber(Integer executionId){
         return getCreatedTournamentsCourseExec(executionId).size();
 
+    }
+
+    public void setTournamentPrivacy(boolean privacy) {
+        this.tournamentPrivacy = privacy;
+    }
+
+    public boolean getTournamentPrivacy() {
+        return this.tournamentPrivacy;
     }
 
     public void setTournamentPrivacy(boolean privacy) {

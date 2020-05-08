@@ -70,5 +70,4 @@ public class UserController {
 
         return userService.getQuestionPrivacy(user.getId());
     }
-
 }

@@ -48,12 +48,14 @@ export default class SettingsView extends Vue {
   tournamentPrivacy : String = "false";
   questionPrivacy : String = "false";
 
+
   async created() {
     await this.$store.dispatch('loading');
     
     try {
         this.tournamentPrivacy = String(await RemoteServices.getTournamentPrivacy());
         this.questionPrivacy = String(await RemoteServices.getQuestionPrivacy());
+
     } catch (error) {
         await this.$store.dispatch('error', error)
     }
@@ -68,14 +70,14 @@ export default class SettingsView extends Vue {
           await this.$store.dispatch('error', error)
       }
   }
-
-    async setQuestionPrivacy(arg : boolean) {
+   async setQuestionPrivacy(arg : boolean) {
         try {
             await RemoteServices.setQuestionPrivacy(arg);
         } catch (error) {
             await this.$store.dispatch('error', error)
         }
     }
+
 }
 </script>
 
