@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -177,6 +178,7 @@ public class TournamentService {
         checkSameCourseExecution(user, tournament);
         checkTournamentIsOpen(tournamentId);
         checkNotSignedUpYet(tournament, user);
+        checkNotBanned(user);
 
         tournament.signUp(user);
         user.addTournament(tournament);
@@ -185,6 +187,11 @@ public class TournamentService {
             this.generateTournamentQuiz(tournament);
 
         return new TournamentDto(tournament, userId);
+    }
+
+    private void checkNotBanned(User user) {
+        if (user.isBanned())
+            throw new TutorException(ErrorMessage.USER_IS_BANNED);
     }
 
     private void generateTournamentQuiz(Tournament tournament) {
@@ -349,4 +356,8 @@ public class TournamentService {
         return tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
     }
+
+	public void banStudent(Integer studentId) {
+		userService.tournamentBan(studentId);
+	}
 }

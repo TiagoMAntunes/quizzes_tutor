@@ -171,4 +171,12 @@ public class UserService {
     public boolean getTournamentPrivacy(Integer userId) {
         return this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND)).getTournamentPrivacy();
     }
+
+    @Retryable(
+        value = { SQLException.class },
+        backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void tournamentBan(Integer userId) {
+        this.userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND)).ban();
+    }
 }

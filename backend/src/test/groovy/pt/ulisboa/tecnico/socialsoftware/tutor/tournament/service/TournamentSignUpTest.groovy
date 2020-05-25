@@ -459,6 +459,45 @@ class TournamentSignUpTest extends Specification {
         dashboardService.getNotYetParticipatedTournamentsNumber(student2.getId(), COURSE_EXEC_ID) == 1
     }
 
+    def "the teacher can ban a student from joining tournaments"() {
+        given: "a student"
+        def student = new User()
+        student.setKey(userRepository.getMaxUserNumber() + 1)
+        student.setRole(User.Role.STUDENT)
+        student.addCourse(courseExec)
+        userRepository.save(student)
+
+        and: "a teacher"
+        def teacher = TEACHER
+
+        when: "the teacher bans the student"
+        tournamentService.banStudent(student.getId())
+
+        then:
+        student.isBanned() == true;
+    }
+
+    def "the user is banned and tries to join a tournament"() {
+        given: "a tournament"
+        def tournament = openTournament
+
+        and: "a student"
+        def student = new User()
+        student.setKey(userRepository.getMaxUserNumber() + 1)
+        student.setRole(User.Role.STUDENT)
+        student.addCourse(courseExec)
+        userRepository.save(student)
+
+        and: "a teacher"
+        def teacher = TEACHER
+
+
+        and: "The student is banned"
+        tournamentService.banStudent(student.getId())
+
+        when: "the student joins a tournament"
+        tournamentService.joinTournament(open)
+    }
 
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {

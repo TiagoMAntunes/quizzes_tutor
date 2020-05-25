@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface  TournamentRepository extends JpaRepository<Tournament, Integer> {
     @Query(value = "SELECT * FROM tournaments t WHERE t.quiz_id = :quizId", nativeQuery = true)
     Optional<Tournament> findTournamentFromQuizId(int quizId);
+
+    
 }

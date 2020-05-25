@@ -90,4 +90,18 @@ public class TournamentController {
         return tournamentService.getTournamentScoreboards(executionId);
     }
 
+    @PutMapping("/tournaments/ban/{studentId}")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    public ResponseEntity banStudent(@PathVariable Integer studentId, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+    
+        tournamentService.banStudent(studentId);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

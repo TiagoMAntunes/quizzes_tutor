@@ -76,6 +76,9 @@ public class User implements UserDetails, DomainEntity {
     @Column(name = "tournament_privacy", columnDefinition = "boolean default true")
     private boolean tournamentPrivacy = true;
 
+    @Column(name = "tournament_banned")
+    private boolean tournamentBanned = false;
+    
     public User() {
     }
 
@@ -524,4 +527,9 @@ public class User implements UserDetails, DomainEntity {
     public boolean getTournamentPrivacy() {
         return this.tournamentPrivacy;
     }
+
+    public void ban() { tournamentBanned = true; }
+    public void unban() { tournamentBanned = false; }
+
+    public boolean isBanned() { return tournamentBanned; }
 }
