@@ -90,4 +90,13 @@ public class TournamentController {
         return tournamentService.getTournamentScoreboards(executionId);
     }
 
+    @PutMapping("/executions/{executionId}/tournaments/{tournamentId}/ban/{studentId}")
+    @PreAuthorize("hasRole('ROLE_ROLE_TEACHER') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    public ResponseEntity banStudent(@PathVariable Integer executionId, @PathVariable Integer tournamentId, @PathVariable Integer studentId, Principal principal) {
+
+        tournamentService.banStudentTournament(tournamentId, studentId);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

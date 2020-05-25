@@ -91,6 +91,8 @@ public enum ErrorMessage {
     TOURNAMENT_JOIN_WRONG_ROLE("Only students can join tournaments"),
     TOURNAMENT_DIFF_COURSE_EXEC("Student is not enrolled in this tournament's course execution"),
 
+    TOURNAMENT_CANT_BAN_STUDENT("Student is not enrolled in course execution %d"),
+
     CANT_ADD_EXPLANATION("Question is not in the rejected state"),
     CANT_MAKE_QUESTION_AVAILABLE("Question is not in the approved state"),
     ACCESS_DENIED("You do not have permission to view this resource"),

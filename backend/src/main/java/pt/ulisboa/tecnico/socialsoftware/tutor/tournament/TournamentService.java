@@ -146,6 +146,51 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void banStudentTournament(Integer tournamentId, Integer studentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
+        User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
+
+        tournament.ban(user);
+
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public boolean tournamentIsOpen(Integer tournamentId) {
+        LocalDateTime now = DateHandler.now();
+        Tournament tournament = getTournament(tournamentId);
+        return (tournament.getFinishTime().isAfter(now) &&
+                tournament.getStartTime().isAfter(now));
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public TournamentDto joinTournament(Integer tournamentId, Integer userId){
+        Tournament tournament = getTournament(tournamentId);
+        User user = getUser(userId);
+
+        checkIsStudentRole(user);
+        checkSameCourseExecution(user, tournament);
+        checkTournamentIsOpen(tournamentId);
+        checkNotSignedUpYet(tournament, user);
+
+        tournament.signUp(user);
+        user.addTournament(tournament);
+
+        if(tournament.getSignedUpNumber() == 2)
+            this.generateTournamentQuiz(tournament);
+
+        return new TournamentDto(tournament, userId);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<TournamentDto> getOpenTournaments(Integer courseExecutionId, Integer userId) {
         return tournamentRepository.findAll().stream()
                 .filter(tournament -> tournament.getCourseExecution().getId().equals(courseExecutionId)

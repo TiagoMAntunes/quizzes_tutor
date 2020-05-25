@@ -53,6 +53,9 @@ Tournament {
     @OneToOne
     private Quiz quiz;
 
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "bannedStudents", fetch=FetchType.EAGER)
+    private Set<User> banned = new HashSet<>();
+
     public Tournament(){}
 
     public Tournament(TournamentDto tournamentDto, Set<Topic> topic, User creator) {
@@ -164,4 +167,10 @@ Tournament {
     public void setNumberOfQuestions(int size) {
         this.numberOfQuestions = size;
     }
+
+    public void ban(User user){
+        banned.add(user);
+    }
+
+    public Set<User> banned() { return banned; }
 }
