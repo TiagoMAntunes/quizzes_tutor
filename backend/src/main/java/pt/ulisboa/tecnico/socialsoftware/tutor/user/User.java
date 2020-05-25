@@ -49,6 +49,8 @@ public class User implements UserDetails, DomainEntity {
     private Integer numberOfCorrectInClassAnswers;
     private Integer numberOfCorrectStudentAnswers;
 
+    private boolean isBanned = false;
+
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
@@ -523,5 +525,13 @@ public class User implements UserDetails, DomainEntity {
 
     public boolean getTournamentPrivacy() {
         return this.tournamentPrivacy;
+    }
+
+    public void ban(){
+        this.isBanned = true;
+    }
+
+    public boolean getIsBanned(){
+        return this.isBanned;
     }
 }

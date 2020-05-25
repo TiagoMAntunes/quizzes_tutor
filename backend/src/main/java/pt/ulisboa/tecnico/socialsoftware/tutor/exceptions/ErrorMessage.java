@@ -96,6 +96,9 @@ public enum ErrorMessage {
     ACCESS_DENIED("You do not have permission to view this resource"),
     NO_QUESTION_SUBMITTED("The user hasn't submitted any questions yet"),
 
+    BAN_FROM_TOURNAMENT_WRONG_ROLE("Only teachers can ban students"),
+    USER_IS_BANNED("This student is banned from joining tournaments"),
+
     CANNOT_OPEN_FILE("Cannot open file");
 
     public final String label;

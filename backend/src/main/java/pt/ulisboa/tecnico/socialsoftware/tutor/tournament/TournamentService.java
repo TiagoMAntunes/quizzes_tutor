@@ -174,6 +174,7 @@ public class TournamentService {
         User user = getUser(userId);
 
         checkIsStudentRole(user);
+        checkNotBanned(user);
         checkSameCourseExecution(user, tournament);
         checkTournamentIsOpen(tournamentId);
         checkNotSignedUpYet(tournament, user);
@@ -321,6 +322,20 @@ public class TournamentService {
                 .orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, id));
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void banStudentFromTournaments(Integer profId, Integer userId) {
+        User student = getUser(userId);
+        User prof = getUser(profId);
+
+        checkIsTeacherRole(prof);
+        checkIsStudentRole(student);
+
+        student.ban();
+    }
+
     private void checkNotSignedUpYet(Tournament tournament, User user) {
         if(tournament.hasSignedUp(user))
             throw new TutorException(ErrorMessage.TOURNAMENT_ALREADY_JOINED);
@@ -334,6 +349,16 @@ public class TournamentService {
     private void checkIsStudentRole(User user) {
         if (user.getRole() != User.Role.STUDENT)
             throw new TutorException(ErrorMessage.TOURNAMENT_JOIN_WRONG_ROLE);
+    }
+
+    private void checkNotBanned(User user) {
+        if (user.getIsBanned())
+            throw new TutorException(ErrorMessage.USER_IS_BANNED);
+    }
+
+    private void checkIsTeacherRole(User user) {
+        if (user.getRole() != User.Role.TEACHER)
+            throw new TutorException(ErrorMessage.BAN_FROM_TOURNAMENT_WRONG_ROLE);
     }
 
     private void checkSameCourseExecution(User user, Tournament tournament){
