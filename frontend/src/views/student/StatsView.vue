@@ -113,6 +113,14 @@
           <p>Joined Tournaments with Available Quizzes</p>
         </div>
       </div>
+      <div class="items">
+        <div class="icon-wrapper" ref="numberOfTournaments">
+          <animated-number :number="dashboard.numberOfTournaments" />
+        </div>
+        <div class="project-name">
+          <p>Total number of Tournaments</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>

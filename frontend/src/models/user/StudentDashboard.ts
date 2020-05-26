@@ -5,6 +5,7 @@ export default class StudentDashboard {
     participatedTournamentsNumber!: number;
     notYetParticipatedTournamentsNumber!: number;
     averageTournamentScore!: number;
+    numberOfTournaments!: number;
 
     constructor(jsonObj?: StudentDashboard) {
         if (jsonObj) {
@@ -14,6 +15,7 @@ export default class StudentDashboard {
             this.participatedTournamentsNumber = jsonObj.participatedTournamentsNumber;
             this.notYetParticipatedTournamentsNumber = jsonObj.notYetParticipatedTournamentsNumber;
             this.averageTournamentScore = jsonObj.averageTournamentScore;
+            this.numberOfTournaments = jsonObj.numberOfTournaments;
         }
     }
 }

@@ -138,6 +138,7 @@ class CreateTournamentTest extends Specification {
         topicRepository.findAll().get(0).getTournaments().size() == 1
 
         dashboardService.getCreatedTournamentsNumber(user.getId(), courseExecution) == 1
+        dashboardService.getNumberOfTournaments(courseExecution) == 1
     }
 
     def "the tournament is created with a start time after finish time"() {

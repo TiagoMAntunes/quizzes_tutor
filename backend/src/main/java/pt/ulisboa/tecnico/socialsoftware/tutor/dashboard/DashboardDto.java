@@ -7,6 +7,7 @@ public class DashboardDto {
     private Integer participatedTournamentsNumber = 0;
     private Integer notYetParticipatedTournamentsNumber = 0;
     private float averageTournamentScore = 0;
+    private Integer numberOfTOurnaments = 0;
 
     public DashboardDto() { }
 
@@ -56,5 +57,13 @@ public class DashboardDto {
 
     public void setAverageTournamentScore(float averageTournamentScore) {
         this.averageTournamentScore = averageTournamentScore;
+    }
+
+    public float getNumberOfTournaments() {
+        return numberOfTOurnaments;
+    }
+
+    public void setNumberOfTournaments(int numberOfTOurnaments) {
+        this.numberOfTOurnaments = numberOfTOurnaments;
     }
 }

@@ -61,6 +61,7 @@ public class DashboardService {
         dashboard.setParticipatedTournamentsNumber(getParticipatedTournamentsNumber(userId, execId));
         dashboard.setNotYetParticipatedTournamentsNumber(getNotYetParticipatedTournamentsNumber(userId, execId));
         dashboard.setAverageTournamentScore(getAverageTournamentScore(userId, execId));
+        dashboard.setNumberOfTournaments(getNumberOfTournaments(execId));
 
         return dashboard;
     }
@@ -117,6 +118,15 @@ public class DashboardService {
         User user = getUser(userId);
         return (int) user.getSignedUpTournamentsCourseExec(executionId).stream()
                 .filter(tournament -> canParticipateInTournament(user, tournament)).count();
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public int getNumberOfTournaments(Integer executionId) {
+        CourseExecution exec = getCourseExecution(executionId);
+        return exec.getTournaments().size();
     }
 
     private float getAverageTournamentScore(Integer userId, Integer executionId){
